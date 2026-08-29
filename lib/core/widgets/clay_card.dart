@@ -8,8 +8,6 @@ class ClayCard extends StatelessWidget {
   final double borderRadius;
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
-  final double shadowBlur;
-  final double shadowOffset;
   final VoidCallback? onTap;
   final Color? color;
 
@@ -19,8 +17,6 @@ class ClayCard extends StatelessWidget {
     this.borderRadius = 20,
     this.padding,
     this.margin,
-    this.shadowBlur = 12,
-    this.shadowOffset = 5,
     this.onTap,
     this.color,
   });
@@ -37,20 +33,6 @@ class ClayCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: cardColor,
           borderRadius: BorderRadius.circular(borderRadius),
-          boxShadow: [
-            // Light highlight – top-left
-            BoxShadow(
-              color: ext.shadowLight,
-              offset: Offset(-shadowOffset, -shadowOffset),
-              blurRadius: shadowBlur,
-            ),
-            // Depth shadow – bottom-right
-            BoxShadow(
-              color: ext.shadowDark,
-              offset: Offset(shadowOffset, shadowOffset),
-              blurRadius: shadowBlur,
-            ),
-          ],
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(borderRadius),

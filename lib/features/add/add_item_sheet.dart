@@ -373,18 +373,6 @@ class _ImagePickerWidget extends StatelessWidget {
         decoration: BoxDecoration(
           color: ext.bgColor,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: ext.shadowLight,
-              offset: const Offset(-5, -5),
-              blurRadius: 10,
-            ),
-            BoxShadow(
-              color: ext.shadowDark,
-              offset: const Offset(5, 5),
-              blurRadius: 10,
-            ),
-          ],
         ),
         child: imagePath != null
             ? ClipRRect(
@@ -487,26 +475,6 @@ class _CategorySelector extends StatelessWidget {
                   ? color.withValues(alpha: 0.85)
                   : ext.cardColor,
               borderRadius: BorderRadius.circular(20),
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: color.withValues(alpha: 0.4),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ]
-                  : [
-                      BoxShadow(
-                        color: ext.shadowLight,
-                        offset: const Offset(-3, -3),
-                        blurRadius: 6,
-                      ),
-                      BoxShadow(
-                        color: ext.shadowDark,
-                        offset: const Offset(3, 3),
-                        blurRadius: 6,
-                      ),
-                    ],
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,

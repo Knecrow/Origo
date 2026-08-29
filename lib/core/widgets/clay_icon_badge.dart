@@ -36,18 +36,6 @@ class ClayIconBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(containerSize / 2.5),
-        boxShadow: [
-          BoxShadow(
-            color: ext.shadowLight,
-            offset: const Offset(-3, -3),
-            blurRadius: 6,
-          ),
-          BoxShadow(
-            color: ext.shadowDark,
-            offset: const Offset(3, 3),
-            blurRadius: 6,
-          ),
-        ],
       ),
       child: Icon(icon, size: size, color: iconCol),
     );

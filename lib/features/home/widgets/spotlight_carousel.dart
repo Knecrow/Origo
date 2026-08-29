@@ -97,19 +97,8 @@ class _SpotlightCard extends StatelessWidget {
         duration: const Duration(milliseconds: 300),
         margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
+          color: ext.cardColor,
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: ext.shadowLight,
-              offset: const Offset(-6, -6),
-              blurRadius: 14,
-            ),
-            BoxShadow(
-              color: ext.shadowDark,
-              offset: const Offset(6, 6),
-              blurRadius: 14,
-            ),
-          ],
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
@@ -257,16 +246,6 @@ class _EmptySpotlight extends StatelessWidget {
       decoration: BoxDecoration(
         color: ext.cardColor,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-              color: ext.shadowLight,
-              offset: const Offset(-5, -5),
-              blurRadius: 10),
-          BoxShadow(
-              color: ext.shadowDark,
-              offset: const Offset(5, 5),
-              blurRadius: 10),
-        ],
       ),
       child: Center(
         child: Column(

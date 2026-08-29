@@ -46,18 +46,6 @@ class CategoryCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: ext.cardColor,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: ext.shadowLight,
-              offset: const Offset(-5, -5),
-              blurRadius: 12,
-            ),
-            BoxShadow(
-              color: ext.shadowDark,
-              offset: const Offset(5, 5),
-              blurRadius: 12,
-            ),
-          ],
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),

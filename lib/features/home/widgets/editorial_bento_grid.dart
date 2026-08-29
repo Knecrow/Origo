@@ -198,18 +198,6 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
           decoration: BoxDecoration(
             color: ext.cardColor,
             borderRadius: BorderRadius.circular(22),
-            boxShadow: [
-              BoxShadow(
-                color: ext.shadowLight,
-                offset: const Offset(-5, -5),
-                blurRadius: 14,
-              ),
-              BoxShadow(
-                color: ext.shadowDark,
-                offset: const Offset(5, 5),
-                blurRadius: 14,
-              ),
-            ],
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(22),
@@ -329,18 +317,6 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
           decoration: BoxDecoration(
             color: ext.cardColor,
             borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: ext.shadowLight,
-                offset: const Offset(-6, -6),
-                blurRadius: 16,
-              ),
-              BoxShadow(
-                color: ext.shadowDark,
-                offset: const Offset(6, 6),
-                blurRadius: 16,
-              ),
-            ],
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24),
@@ -511,18 +487,6 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
           decoration: BoxDecoration(
             color: ext.cardColor,
             borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: ext.shadowLight,
-                offset: const Offset(-5, -5),
-                blurRadius: 14,
-              ),
-              BoxShadow(
-                color: ext.shadowDark,
-                offset: const Offset(5, 5),
-                blurRadius: 14,
-              ),
-            ],
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24),
@@ -606,7 +570,7 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
   }
 }
 
-// ── Shared Corner Pill (Borderless) ──────────────────────────────────────────
+// ── Shared Corner Pill (Clean & Borderless) ──────────────────────────────────
 
 class _CornerPill extends StatelessWidget {
   final String label;

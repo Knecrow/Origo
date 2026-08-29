@@ -220,18 +220,6 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                 decoration: BoxDecoration(
                   color: ext.cardColor,
                   borderRadius: BorderRadius.circular(18),
-                  boxShadow: [
-                    BoxShadow(
-                      color: ext.shadowLight,
-                      offset: const Offset(-3, -3),
-                      blurRadius: 8,
-                    ),
-                    BoxShadow(
-                      color: ext.shadowDark,
-                      offset: const Offset(3, 3),
-                      blurRadius: 8,
-                    ),
-                  ],
                 ),
                 child: Row(
                   children: [
