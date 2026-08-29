@@ -2,15 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/models/origo_item.dart';
 import '../../core/providers/items_provider.dart';
 import '../../core/providers/showcase_provider.dart';
 import '../../core/providers/theme_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/clay_icon_badge.dart';
+import '../../core/widgets/frosted_glass_container.dart';
 import '../add/add_item_sheet.dart';
-import '../gallery/gallery_screen.dart';
-import 'widgets/category_card.dart';
+import 'widgets/editorial_bento_grid.dart';
 import 'widgets/spotlight_carousel.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -47,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            // ── Header ──────────────────────────────────────────────────────
+            // ── 1. Header ──────────────────────────────────────────────────
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
@@ -68,10 +67,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         Text(
-                          'VISION BOARD',
+                          'VISION PORTFOLIO',
                           style: TextStyle(
                             fontSize: 10,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w700,
                             color: ext.accent,
                             letterSpacing: 3,
                           ),
@@ -113,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
             if (isShowcase)
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 14, vertical: 8),
@@ -139,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const Spacer(),
                         Text(
-                          'Tap eye icon to exit',
+                          'Tap eye to exit',
                           style: TextStyle(
                               color: ext.textMuted, fontSize: 10),
                         ),
@@ -149,21 +148,77 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-            // ── Spotlight Section ────────────────────────────────────────────
+            // ── 2. Editorial Manifest Quote Card ───────────────────────────
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 14),
+                child: FrostedGlassContainer(
+                  blur: 16,
+                  borderRadius: 18,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 18, vertical: 14),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: ext.accent.withValues(alpha: 0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.format_quote_rounded,
+                          color: ext.accent,
+                          size: 18,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'DAILY MANIFEST',
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w800,
+                                color: ext.accent,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '“Design a reality that demands you expand into your highest potential.”',
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                fontStyle: FontStyle.italic,
+                                color: ext.textPrimary.withValues(alpha: 0.9),
+                                height: 1.35,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // ── 3. Spotlight Section ───────────────────────────────────────
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 8),
                 child: Row(
                   children: [
-                    ClayIconBadge(
+                    const ClayIconBadge(
                       icon: Icons.auto_awesome_rounded,
                       size: 14,
                       padding: 8,
-                      iconColor: const Color(0xFFFFD700),
+                      iconColor: Color(0xFFFFD700),
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      'SPOTLIGHT',
+                      'CURATED SPOTLIGHT',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
@@ -183,20 +238,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   : SpotlightCarousel(items: spotlightItems),
             ),
 
-            // ── Category Section ─────────────────────────────────────────────
+            // ── 4. Editorial Bento Grid Section ────────────────────────────
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+                padding: const EdgeInsets.fromLTRB(20, 26, 20, 14),
                 child: Row(
                   children: [
-                    ClayIconBadge(
-                      icon: Icons.grid_view_rounded,
+                    const ClayIconBadge(
+                      icon: Icons.dashboard_customize_rounded,
                       size: 14,
                       padding: 8,
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      'CATEGORIES',
+                      'COLLECTIONS BENTO',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
@@ -204,38 +259,29 @@ class _HomeScreenState extends State<HomeScreen> {
                         letterSpacing: 2,
                       ),
                     ),
+                    const Spacer(),
+                    Text(
+                      '6 CATEGORIES',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: ext.textMuted.withValues(alpha: 0.6),
+                        letterSpacing: 1.0,
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
 
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-              sliver: SliverGrid(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final cat = kCategories[index];
-                    return CategoryCard(
-                      category: cat,
-                      itemCount: counts[cat] ?? 0,
-                      latestItem: covers[cat],
-                      showCount: !isShowcase,
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => GalleryScreen(category: cat),
-                        ),
-                      ),
-                    );
-                  },
-                  childCount: kCategories.length,
-                ),
-                gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 14,
-                  mainAxisSpacing: 14,
-                  childAspectRatio: 1.0,
+            // Asymmetric Bento Grid
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 110),
+                child: EditorialBentoGrid(
+                  counts: counts,
+                  covers: covers,
+                  isShowcase: isShowcase,
                 ),
               ),
             ),
