@@ -1,161 +1,190 @@
 // lib/features/home/widgets/editorial_bento_grid.dart
 
 import 'package:flutter/material.dart';
+import '../../../core/models/origo_category.dart';
 import '../../../core/models/origo_item.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/origo_image.dart';
+import '../../add/add_category_sheet.dart';
 import '../../gallery/gallery_screen.dart';
 
-const Map<String, String> kCategoryDisplayNames = {
-  'Home': 'HOME & ESTATE',
-  'Garage': 'GARAGE & FLEET',
-  'Jets': 'JETS & AVIATION',
-  'Places': 'PLACES & TRAVEL',
-  'Yachts': 'YACHTS & MARINE',
-  'Others': 'COLLECTIONS & LUXURY',
-};
-
 class EditorialBentoGrid extends StatelessWidget {
+  final List<OrigoCategory> categories;
   final Map<String, int> counts;
   final Map<String, OrigoItem?> covers;
   final bool isShowcase;
 
   const EditorialBentoGrid({
     super.key,
+    required this.categories,
     required this.counts,
     required this.covers,
     required this.isShowcase,
   });
 
-  void _openCategory(BuildContext context, String category) {
+  void _openCategory(BuildContext context, String categoryKey) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => GalleryScreen(category: category),
+        builder: (_) => GalleryScreen(category: categoryKey),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          // ── Row 1: Dual Top Cards (HOME & ESTATE + GARAGE & FLEET) ───────
+    final widgets = <Widget>[];
+    int i = 0;
+
+    while (i < categories.length) {
+      // Pattern cycle: Dual (2) -> Panoramic Hero (1) -> Dual (2) -> Wide (1) ...
+      final cycleIndex = i % 4;
+
+      if (cycleIndex == 0) {
+        // Dual Square Cards (Take up to 2 items)
+        final first = categories[i];
+        final second = (i + 1 < categories.length) ? categories[i + 1] : null;
+
+        widgets.add(
           Row(
             children: [
               Expanded(
                 child: SizedBox(
                   height: 172,
                   child: _BentoSquareCard(
-                    categoryKey: 'Home',
-                    displayTitle: kCategoryDisplayNames['Home']!,
-                    itemCount: counts['Home'] ?? 0,
-                    latestItem: covers['Home'],
+                    category: first,
+                    itemCount: counts[first.key] ?? 0,
+                    latestItem: covers[first.key],
                     showCount: !isShowcase,
-                    onTap: () => _openCategory(context, 'Home'),
+                    onTap: () => _openCategory(context, first.key),
                   ),
                 ),
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: SizedBox(
-                  height: 172,
-                  child: _BentoSquareCard(
-                    categoryKey: 'Garage',
-                    displayTitle: kCategoryDisplayNames['Garage']!,
-                    itemCount: counts['Garage'] ?? 0,
-                    latestItem: covers['Garage'],
-                    showCount: !isShowcase,
-                    onTap: () => _openCategory(context, 'Garage'),
+              if (second != null) ...[
+                const SizedBox(width: 14),
+                Expanded(
+                  child: SizedBox(
+                    height: 172,
+                    child: _BentoSquareCard(
+                      category: second,
+                      itemCount: counts[second.key] ?? 0,
+                      latestItem: covers[second.key],
+                      showCount: !isShowcase,
+                      onTap: () => _openCategory(context, second.key),
+                    ),
                   ),
                 ),
-              ),
+              ] else
+                const Spacer(),
             ],
           ),
-          const SizedBox(height: 14),
-
-          // ── Row 2: Centerpiece Panoramic Hero Card (JETS & AVIATION) ───────
+        );
+        widgets.add(const SizedBox(height: 14));
+        i += (second != null ? 2 : 1);
+      } else if (cycleIndex == 2 || (cycleIndex == 1 && i % 3 == 2)) {
+        // Panoramic Hero Card (1 item)
+        final current = categories[i];
+        widgets.add(
           SizedBox(
             height: 195,
             child: _BentoPanoramicHeroCard(
-              categoryKey: 'Jets',
-              displayTitle: kCategoryDisplayNames['Jets']!,
-              itemCount: counts['Jets'] ?? 0,
-              latestItem: covers['Jets'],
+              category: current,
+              itemCount: counts[current.key] ?? 0,
+              latestItem: covers[current.key],
               showCount: !isShowcase,
-              onTap: () => _openCategory(context, 'Jets'),
+              onTap: () => _openCategory(context, current.key),
             ),
           ),
-          const SizedBox(height: 14),
+        );
+        widgets.add(const SizedBox(height: 14));
+        i += 1;
+      } else {
+        // Wide or Dual Row
+        final first = categories[i];
+        final second = (i + 1 < categories.length) ? categories[i + 1] : null;
 
-          // ── Row 3: Dual Cards (PLACES & TRAVEL + YACHTS & MARINE) ──────────
-          Row(
-            children: [
-              Expanded(
-                child: SizedBox(
-                  height: 172,
-                  child: _BentoSquareCard(
-                    categoryKey: 'Places',
-                    displayTitle: kCategoryDisplayNames['Places']!,
-                    itemCount: counts['Places'] ?? 0,
-                    latestItem: covers['Places'],
-                    showCount: !isShowcase,
-                    onTap: () => _openCategory(context, 'Places'),
+        if (second != null && i + 2 == categories.length) {
+          // If 2 remaining, show dual
+          widgets.add(
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 172,
+                    child: _BentoSquareCard(
+                      category: first,
+                      itemCount: counts[first.key] ?? 0,
+                      latestItem: covers[first.key],
+                      showCount: !isShowcase,
+                      onTap: () => _openCategory(context, first.key),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: SizedBox(
-                  height: 172,
-                  child: _BentoSquareCard(
-                    categoryKey: 'Yachts',
-                    displayTitle: kCategoryDisplayNames['Yachts']!,
-                    itemCount: counts['Yachts'] ?? 0,
-                    latestItem: covers['Yachts'],
-                    showCount: !isShowcase,
-                    onTap: () => _openCategory(context, 'Yachts'),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: SizedBox(
+                    height: 172,
+                    child: _BentoSquareCard(
+                      category: second,
+                      itemCount: counts[second.key] ?? 0,
+                      latestItem: covers[second.key],
+                      showCount: !isShowcase,
+                      onTap: () => _openCategory(context, second.key),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-
-          // ── Row 4: Wide Footer Card (COLLECTIONS & LUXURY) ─────────────────
-          SizedBox(
-            height: 154,
-            child: _BentoFooterCard(
-              categoryKey: 'Others',
-              displayTitle: kCategoryDisplayNames['Others']!,
-              itemCount: counts['Others'] ?? 0,
-              latestItem: covers['Others'],
-              showCount: !isShowcase,
-              onTap: () => _openCategory(context, 'Others'),
+              ],
             ),
-          ),
-        ],
-      ),
+          );
+          widgets.add(const SizedBox(height: 14));
+          i += 2;
+        } else {
+          // Wide Footer Card
+          widgets.add(
+            SizedBox(
+              height: 154,
+              child: _BentoFooterCard(
+                category: first,
+                itemCount: counts[first.key] ?? 0,
+                latestItem: covers[first.key],
+                showCount: !isShowcase,
+                onTap: () => _openCategory(context, first.key),
+              ),
+            ),
+          );
+          widgets.add(const SizedBox(height: 14));
+          i += 1;
+        }
+      }
+    }
+
+    // Add New Category Card (hidden during showcase mode)
+    if (!isShowcase) {
+      widgets.add(
+        _AddNewCategoryBentoCard(
+          onTap: () => AddCategorySheet.show(context),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(children: widgets),
     );
   }
 }
 
-// ── Square Bento Card (Rows 1 & 3) ───────────────────────────────────────────
+// ── Square Bento Card ────────────────────────────────────────────────────────
 
 class _BentoSquareCard extends StatefulWidget {
-  final String categoryKey;
-  final String displayTitle;
+  final OrigoCategory category;
   final int itemCount;
   final OrigoItem? latestItem;
   final bool showCount;
   final VoidCallback onTap;
 
   const _BentoSquareCard({
-    required this.categoryKey,
-    required this.displayTitle,
+    required this.category,
     required this.itemCount,
     required this.latestItem,
     required this.showCount,
@@ -172,7 +201,7 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
-    final accent = AppColors.categoryColors[widget.categoryKey] ?? ext.accent;
+    final accent = widget.category.color;
     final hasImage = widget.latestItem != null;
 
     return GestureDetector(
@@ -217,7 +246,6 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                // Image or gradient fallback
                 if (hasImage)
                   OrigoImage(
                     imagePath: widget.latestItem!.imagePath,
@@ -227,7 +255,7 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
                 else
                   _GradientFallback(color: accent),
 
-                // Smooth dark gradient overlay
+                // Scrim
                 DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -243,23 +271,24 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
                   ),
                 ),
 
-                // Top-right Asset count pill
+                // Top right pill
                 if (widget.showCount && widget.itemCount > 0)
                   Positioned(
                     top: 10,
                     right: 10,
                     child: _CornerPill(
-                      label: '${widget.itemCount} ${widget.itemCount == 1 ? 'Asset' : 'Assets'}',
+                      label:
+                          '${widget.itemCount} ${widget.itemCount == 1 ? 'Asset' : 'Assets'}',
                     ),
                   ),
 
-                // Bottom-left Category Title
+                // Bottom left title
                 Positioned(
                   left: 14,
                   right: 14,
                   bottom: 14,
                   child: Text(
-                    widget.displayTitle,
+                    widget.category.displayName,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -287,19 +316,17 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
   }
 }
 
-// ── Centerpiece Panoramic Hero Card (Row 2 - JETS & AVIATION) ────────────────
+// ── Centerpiece Panoramic Hero Card ──────────────────────────────────────────
 
 class _BentoPanoramicHeroCard extends StatefulWidget {
-  final String categoryKey;
-  final String displayTitle;
+  final OrigoCategory category;
   final int itemCount;
   final OrigoItem? latestItem;
   final bool showCount;
   final VoidCallback onTap;
 
   const _BentoPanoramicHeroCard({
-    required this.categoryKey,
-    required this.displayTitle,
+    required this.category,
     required this.itemCount,
     required this.latestItem,
     required this.showCount,
@@ -317,7 +344,7 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
-    final accent = AppColors.categoryColors[widget.categoryKey] ?? ext.accent;
+    final accent = widget.category.color;
     final hasImage = widget.latestItem != null;
 
     return GestureDetector(
@@ -393,7 +420,8 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
                     top: 14,
                     right: 14,
                     child: _CornerPill(
-                      label: '${widget.itemCount} ${widget.itemCount == 1 ? 'Asset' : 'Assets'}',
+                      label:
+                          '${widget.itemCount} ${widget.itemCount == 1 ? 'Asset' : 'Assets'}',
                     ),
                   ),
 
@@ -412,7 +440,7 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              widget.displayTitle,
+                              widget.category.displayName,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 17,
@@ -487,19 +515,17 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
   }
 }
 
-// ── Wide Footer Card (Row 4 - COLLECTIONS & LUXURY) ──────────────────────────
+// ── Wide Footer Card ─────────────────────────────────────────────────────────
 
 class _BentoFooterCard extends StatefulWidget {
-  final String categoryKey;
-  final String displayTitle;
+  final OrigoCategory category;
   final int itemCount;
   final OrigoItem? latestItem;
   final bool showCount;
   final VoidCallback onTap;
 
   const _BentoFooterCard({
-    required this.categoryKey,
-    required this.displayTitle,
+    required this.category,
     required this.itemCount,
     required this.latestItem,
     required this.showCount,
@@ -516,7 +542,7 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
-    final accent = AppColors.categoryColors[widget.categoryKey] ?? ext.accent;
+    final accent = widget.category.color;
     final hasImage = widget.latestItem != null;
 
     return GestureDetector(
@@ -592,7 +618,8 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
                     top: 12,
                     right: 12,
                     child: _CornerPill(
-                      label: '${widget.itemCount} ${widget.itemCount == 1 ? 'Asset' : 'Assets'}',
+                      label:
+                          '${widget.itemCount} ${widget.itemCount == 1 ? 'Asset' : 'Assets'}',
                     ),
                   ),
 
@@ -605,7 +632,7 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        widget.displayTitle,
+                        widget.category.displayName,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 15,
@@ -637,7 +664,78 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
   }
 }
 
-// ── Floating Corner Frosted Pill ─────────────────────────────────────────────
+// ── Add New Category Card ────────────────────────────────────────────────────
+
+class _AddNewCategoryBentoCard extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _AddNewCategoryBentoCard({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final ext = context.ext;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 64,
+        margin: const EdgeInsets.only(top: 6),
+        decoration: BoxDecoration(
+          color: ext.cardColor,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: ext.accent.withValues(alpha: 0.35),
+            width: 1.2,
+            strokeAlign: BorderSide.strokeAlignCenter,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: ext.shadowLight,
+              offset: const Offset(-3, -3),
+              blurRadius: 8,
+            ),
+            BoxShadow(
+              color: ext.shadowDark,
+              offset: const Offset(3, 3),
+              blurRadius: 8,
+            ),
+          ],
+        ),
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: ext.accent.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.add_rounded,
+                  color: ext.accent,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'CREATE CUSTOM CATEGORY',
+                style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w800,
+                  color: ext.accent,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Shared Corner Pill ───────────────────────────────────────────────────────
 
 class _CornerPill extends StatelessWidget {
   final String label;

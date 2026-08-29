@@ -12,7 +12,6 @@ import '../../core/widgets/origo_image.dart';
 import '../add/add_item_sheet.dart';
 import '../detail/detail_screen.dart';
 import '../home/widgets/category_card.dart';
-import '../home/widgets/editorial_bento_grid.dart';
 
 class GalleryScreen extends StatefulWidget {
   final String category;
@@ -29,12 +28,15 @@ class _GalleryScreenState extends State<GalleryScreen> {
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
-    final items = context.watch<ItemsProvider>().itemsByCategory(widget.category);
+    final itemsProv = context.watch<ItemsProvider>();
+    final items = itemsProv.itemsByCategory(widget.category);
     final isShowcase = context.watch<ShowcaseProvider>().isActive;
     final accentColor =
-        AppColors.categoryColors[widget.category] ?? ext.accent;
+        itemsProv.categoryColors[widget.category] ?? ext.accent;
     final icon =
-        kCategoryIcons[widget.category] ?? Icons.category_rounded;
+        itemsProv.categoryIcons[widget.category] ?? Icons.category_rounded;
+    final displayName =
+        itemsProv.categoryDisplayNames[widget.category] ?? widget.category.toUpperCase();
 
     return Scaffold(
       backgroundColor: ext.bgColor,
@@ -85,7 +87,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    kCategoryDisplayNames[widget.category] ?? widget.category,
+                    displayName,
                     style: TextStyle(
                       color: ext.textPrimary,
                       fontSize: 16,

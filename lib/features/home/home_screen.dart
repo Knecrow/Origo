@@ -8,6 +8,7 @@ import '../../core/providers/theme_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/clay_icon_badge.dart';
 import '../../core/widgets/frosted_glass_container.dart';
+import '../add/add_category_sheet.dart';
 import '../add/add_item_sheet.dart';
 import 'widgets/editorial_bento_grid.dart';
 import 'widgets/spotlight_carousel.dart';
@@ -251,8 +252,44 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     const Spacer(),
+                    if (!isShowcase)
+                      GestureDetector(
+                        onTap: () => AddCategorySheet.show(context),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: ext.accent.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: ext.accent.withValues(alpha: 0.25),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.add_rounded,
+                                size: 13,
+                                color: ext.accent,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                'Category',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  color: ext.accent,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    const SizedBox(width: 8),
                     Text(
-                      '6 CATEGORIES',
+                      '${itemsProv.categories.length} CATEGORIES',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
@@ -265,11 +302,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // ── 5. The "2 – 1 – 2" Editorial Bento Grid ────────────────────
+            // ── 5. The Dynamic Editorial Bento Grid ────────────────────────
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 100),
                 child: EditorialBentoGrid(
+                  categories: itemsProv.categories,
                   counts: counts,
                   covers: covers,
                   isShowcase: isShowcase,

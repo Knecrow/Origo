@@ -9,7 +9,6 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/frosted_glass_container.dart';
 import '../../core/widgets/origo_image.dart';
-import '../home/widgets/category_card.dart';
 
 class DetailScreen extends StatefulWidget {
   final OrigoItem item;
@@ -186,10 +185,13 @@ class _InfoSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
+    final itemsProv = context.watch<ItemsProvider>();
     final accentColor =
-        AppColors.categoryColors[item.category] ?? ext.accent;
+        itemsProv.categoryColors[item.category] ?? ext.accent;
     final categoryIcon =
-        kCategoryIcons[item.category] ?? Icons.category_rounded;
+        itemsProv.categoryIcons[item.category] ?? Icons.category_rounded;
+    final displayCategory =
+        itemsProv.categoryDisplayNames[item.category] ?? item.category.toUpperCase();
 
     return FrostedGlassContainer(
       blur: 20,
@@ -243,7 +245,7 @@ class _InfoSheet extends StatelessWidget {
                               size: 11, color: Colors.white),
                           const SizedBox(width: 4),
                           Text(
-                            item.category.toUpperCase(),
+                            displayCategory,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 10,

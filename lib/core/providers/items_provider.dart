@@ -1,7 +1,9 @@
 // lib/core/providers/items_provider.dart
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
+import '../models/origo_category.dart';
 import '../models/origo_item.dart';
 import '../utils/image_loader.dart' as loader;
 
@@ -10,6 +12,23 @@ class ItemsProvider extends ChangeNotifier {
 
   List<OrigoItem> _items = [];
   List<OrigoItem> get items => _items;
+
+  List<OrigoCategory> _categories = OrigoCategory.defaultCategories;
+  List<OrigoCategory> get categories => _categories;
+
+  List<String> get categoryKeys => _categories.map((c) => c.key).toList();
+
+  Map<String, String> get categoryDisplayNames => {
+        for (final c in _categories) c.key: c.displayName,
+      };
+
+  Map<String, IconData> get categoryIcons => {
+        for (final c in _categories) c.key: c.icon,
+      };
+
+  Map<String, Color> get categoryColors => {
+        for (final c in _categories) c.key: c.color,
+      };
 
   List<OrigoItem> get spotlightItems =>
       _items.where((i) => i.isSpotlight).toList();
@@ -41,10 +60,55 @@ class ItemsProvider extends ChangeNotifier {
   Future<void> loadAll() async {
     _loading = true;
     notifyListeners();
+
+    try {
+      final loadedCategories = await _db.getAllCategories();
+      if (loadedCategories.isNotEmpty) {
+        _categories = loadedCategories;
+      }
+    } catch (_) {}
+
     _items = await _db.getAllItems();
     _loading = false;
     notifyListeners();
   }
+
+  // ── CATEGORIES ─────────────────────────────────────────────────────────────
+
+  Future<void> addCategory({
+    required String name,
+    String? displayName,
+    IconData icon = Icons.category_rounded,
+    Color color = const Color(0xFF5E8BB8),
+  }) async {
+    final trimmedKey = name.trim();
+    if (trimmedKey.isEmpty) return;
+
+    final upperDisplay = (displayName != null && displayName.trim().isNotEmpty)
+        ? displayName.trim().toUpperCase()
+        : trimmedKey.toUpperCase();
+
+    final newCat = OrigoCategory(
+      key: trimmedKey,
+      displayName: upperDisplay,
+      icon: icon,
+      color: color,
+      isDefault: false,
+    );
+
+    await _db.insertCategory(newCat);
+    _categories.removeWhere((c) => c.key.toLowerCase() == trimmedKey.toLowerCase());
+    _categories.add(newCat);
+    notifyListeners();
+  }
+
+  Future<void> deleteCategory(String key) async {
+    await _db.deleteCategory(key);
+    _categories.removeWhere((c) => c.key == key && !c.isDefault);
+    notifyListeners();
+  }
+
+  // ── ITEMS ──────────────────────────────────────────────────────────────────
 
   Future<void> addItem({
     required String title,
@@ -54,8 +118,6 @@ class ItemsProvider extends ChangeNotifier {
     String? motivationNotes,
     bool isSpotlight = false,
   }) async {
-    // If it's on mobile/desktop and a local file path, copy locally.
-    // If it's on web (data:image or url), use it directly.
     final finalPath = (kIsWeb ||
             imagePath.startsWith('http://') ||
             imagePath.startsWith('https://') ||

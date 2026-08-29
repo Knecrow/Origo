@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'package:path/path.dart';
+import '../models/origo_category.dart';
 import '../models/origo_item.dart';
 
 class DatabaseHelper {
@@ -23,8 +24,9 @@ class DatabaseHelper {
       return factory.openDatabase(
         'origo.db',
         options: OpenDatabaseOptions(
-          version: 1,
+          version: 2,
           onCreate: _onCreate,
+          onUpgrade: _onUpgrade,
         ),
       );
     } else {
@@ -32,18 +34,20 @@ class DatabaseHelper {
       final path = join(dbPath, 'origo.db');
       return openDatabase(
         path,
-        version: 1,
+        version: 2,
         onCreate: _onCreate,
+        onUpgrade: _onUpgrade,
       );
     }
   }
 
   Future<void> _onCreate(Database db, int version) async {
+    // 1. Items table without restrictive CHECK constraint so custom categories work seamlessly
     await db.execute('''
       CREATE TABLE origo_items (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
-        category TEXT NOT NULL CHECK(category IN ('Home','Places','Garage','Jets','Yachts','Others')),
+        category TEXT NOT NULL,
         image_path TEXT NOT NULL,
         target_timeframe TEXT,
         motivation_notes TEXT,
@@ -52,12 +56,59 @@ class DatabaseHelper {
       )
     ''');
 
-    // Seed curated initial luxury portfolio dreams
+    // 2. Categories table
+    await db.execute('''
+      CREATE TABLE origo_categories (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        key TEXT NOT NULL UNIQUE,
+        display_name TEXT NOT NULL,
+        icon_code INTEGER NOT NULL,
+        icon_font_family TEXT,
+        color_value INTEGER NOT NULL,
+        is_default INTEGER DEFAULT 0
+      )
+    ''');
+
+    // 3. Seed default categories
+    final catBatch = db.batch();
+    for (final cat in OrigoCategory.defaultCategories) {
+      catBatch.insert('origo_categories', cat.toMap());
+    }
+    await catBatch.commit(noResult: true);
+
+    // 4. Seed initial curated dreams
     final batch = db.batch();
     for (final seed in _initialSeedItems) {
       batch.insert('origo_items', seed.toMap());
     }
     await batch.commit(noResult: true);
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Create categories table if upgrading
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS origo_categories (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          key TEXT NOT NULL UNIQUE,
+          display_name TEXT NOT NULL,
+          icon_code INTEGER NOT NULL,
+          icon_font_family TEXT,
+          color_value INTEGER NOT NULL,
+          is_default INTEGER DEFAULT 0
+        )
+      ''');
+
+      final catBatch = db.batch();
+      for (final cat in OrigoCategory.defaultCategories) {
+        catBatch.insert(
+          'origo_categories',
+          cat.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.ignore,
+        );
+      }
+      await catBatch.commit(noResult: true);
+    }
   }
 
   static const List<OrigoItem> _initialSeedItems = [
@@ -123,7 +174,37 @@ class DatabaseHelper {
     ),
   ];
 
-  // ── CREATE ──────────────────────────────────────────────────────────────────
+  // ── CATEGORIES CRUD ──────────────────────────────────────────────────────────
+
+  Future<List<OrigoCategory>> getAllCategories() async {
+    final db = await database;
+    final maps = await db.query('origo_categories', orderBy: 'id ASC');
+    if (maps.isEmpty) {
+      return OrigoCategory.defaultCategories;
+    }
+    return maps.map(OrigoCategory.fromMap).toList();
+  }
+
+  Future<int> insertCategory(OrigoCategory category) async {
+    final db = await database;
+    return db.insert(
+      'origo_categories',
+      category.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<int> deleteCategory(String key) async {
+    final db = await database;
+    // Don't delete if it's default
+    return db.delete(
+      'origo_categories',
+      where: 'key = ? AND is_default = 0',
+      whereArgs: [key],
+    );
+  }
+
+  // ── ITEMS CREATE ─────────────────────────────────────────────────────────────
 
   Future<int> insertItem(OrigoItem item) async {
     final db = await database;
@@ -134,7 +215,7 @@ class DatabaseHelper {
     );
   }
 
-  // ── READ ─────────────────────────────────────────────────────────────────────
+  // ── ITEMS READ ───────────────────────────────────────────────────────────────
 
   Future<List<OrigoItem>> getAllItems() async {
     final db = await database;
@@ -171,7 +252,7 @@ class DatabaseHelper {
     return OrigoItem.fromMap(maps.first);
   }
 
-  // ── UPDATE ───────────────────────────────────────────────────────────────────
+  // ── ITEMS UPDATE ─────────────────────────────────────────────────────────────
 
   Future<int> updateItem(OrigoItem item) async {
     final db = await database;
@@ -193,7 +274,7 @@ class DatabaseHelper {
     );
   }
 
-  // ── DELETE ───────────────────────────────────────────────────────────────────
+  // ── ITEMS DELETE ─────────────────────────────────────────────────────────────
 
   Future<int> deleteItem(int id) async {
     final db = await database;

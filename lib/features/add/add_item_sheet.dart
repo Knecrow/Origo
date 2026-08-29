@@ -5,15 +5,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import '../../core/models/origo_item.dart';
+import '../../core/models/origo_category.dart';
 import '../../core/providers/items_provider.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/clay_card.dart';
 import '../../core/widgets/clay_icon_badge.dart';
 import '../../core/widgets/origo_image.dart';
-import '../home/widgets/category_card.dart';
-import '../home/widgets/editorial_bento_grid.dart';
+import 'add_category_sheet.dart';
 
 class AddItemSheet extends StatefulWidget {
   const AddItemSheet({super.key});
@@ -40,7 +38,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
   final _timeframeCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
 
-  String _selectedCategory = kCategories.first;
+  String? _selectedCategory;
   String? _pickedImagePath;
   bool _isSpotlight = false;
   bool _saving = false;
@@ -76,6 +74,15 @@ class _AddItemSheetState extends State<AddItemSheet> {
     }
   }
 
+  Future<void> _openAddCategory() async {
+    await AddCategorySheet.show(context);
+    if (!mounted) return;
+    final latestCats = context.read<ItemsProvider>().categories;
+    if (latestCats.isNotEmpty) {
+      setState(() => _selectedCategory = latestCats.last.key);
+    }
+  }
+
   Future<void> _save() async {
     if (_pickedImagePath == null) {
       _showError('Please select an image');
@@ -83,11 +90,15 @@ class _AddItemSheetState extends State<AddItemSheet> {
     }
     if (!_formKey.currentState!.validate()) return;
 
+    final categories = context.read<ItemsProvider>().categories;
+    final cat = _selectedCategory ??
+        (categories.isNotEmpty ? categories.first.key : 'Home');
+
     setState(() => _saving = true);
     try {
       await context.read<ItemsProvider>().addItem(
             title: _titleCtrl.text.trim(),
-            category: _selectedCategory,
+            category: cat,
             imagePath: _pickedImagePath!,
             targetTimeframe: _timeframeCtrl.text,
             motivationNotes: _notesCtrl.text,
@@ -110,6 +121,11 @@ class _AddItemSheetState extends State<AddItemSheet> {
   Widget build(BuildContext context) {
     final ext = context.ext;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final itemsProv = context.watch<ItemsProvider>();
+    final categories = itemsProv.categories;
+
+    final activeCategory = _selectedCategory ??
+        (categories.isNotEmpty ? categories.first.key : 'Home');
 
     return Container(
       decoration: BoxDecoration(
@@ -156,20 +172,49 @@ class _AddItemSheetState extends State<AddItemSheet> {
               ),
               const SizedBox(height: 20),
 
-              // Category Selector
-              Text(
-                'CATEGORY',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: ext.textMuted,
-                  letterSpacing: 1.2,
-                ),
+              // Category Selector Header + Add Category link
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'CATEGORY',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: ext.textMuted,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: _openAddCategory,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.add_circle_outline_rounded,
+                          size: 14,
+                          color: ext.accent,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'New Category',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            color: ext.accent,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 10),
               _CategorySelector(
-                selected: _selectedCategory,
+                categories: categories,
+                selected: activeCategory,
                 onChanged: (c) => setState(() => _selectedCategory = c),
+                onAddNew: _openAddCategory,
               ),
               const SizedBox(height: 20),
 
@@ -415,82 +460,124 @@ class _ImagePickerWidget extends StatelessWidget {
   }
 }
 
-// ── Category Selector ──────────────────────────────────────────────────────────
+// ── Dynamic Category Selector ──────────────────────────────────────────────────
 
 class _CategorySelector extends StatelessWidget {
+  final List<OrigoCategory> categories;
   final String selected;
   final ValueChanged<String> onChanged;
+  final VoidCallback onAddNew;
 
   const _CategorySelector({
+    required this.categories,
     required this.selected,
     required this.onChanged,
+    required this.onAddNew,
   });
 
   @override
   Widget build(BuildContext context) {
+    final ext = context.ext;
+
     return Wrap(
       spacing: 10,
       runSpacing: 10,
-      children: kCategories.map((cat) {
-        final isSelected = cat == selected;
-        final ext = context.ext;
-        final color = AppColors.categoryColors[cat] ?? ext.accent;
-        final icon = kCategoryIcons[cat] ?? Icons.category_rounded;
+      children: [
+        ...categories.map((cat) {
+          final isSelected = cat.key == selected;
+          final color = cat.color;
+          final icon = cat.icon;
 
-        return GestureDetector(
-          onTap: () => onChanged(cat),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          return GestureDetector(
+            onTap: () => onChanged(cat.key),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? color.withValues(alpha: 0.85)
+                    : ext.cardColor,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: color.withValues(alpha: 0.4),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : [
+                        BoxShadow(
+                          color: ext.shadowLight,
+                          offset: const Offset(-3, -3),
+                          blurRadius: 6,
+                        ),
+                        BoxShadow(
+                          color: ext.shadowDark,
+                          offset: const Offset(3, 3),
+                          blurRadius: 6,
+                        ),
+                      ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    size: 14,
+                    color: isSelected ? Colors.white : ext.textMuted,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    cat.displayName,
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : ext.textMuted,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+
+        // "+ Add Category" Pill
+        GestureDetector(
+          onTap: onAddNew,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: isSelected
-                  ? color.withValues(alpha: 0.85)
-                  : ext.cardColor,
+              color: ext.accent.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(20),
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: color.withValues(alpha: 0.4),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ]
-                  : [
-                      BoxShadow(
-                        color: ext.shadowLight,
-                        offset: const Offset(-3, -3),
-                        blurRadius: 6,
-                      ),
-                      BoxShadow(
-                        color: ext.shadowDark,
-                        offset: const Offset(3, 3),
-                        blurRadius: 6,
-                      ),
-                    ],
+              border: Border.all(
+                color: ext.accent.withValues(alpha: 0.3),
+                width: 1,
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  icon,
-                  size: 14,
-                  color: isSelected ? Colors.white : ext.textMuted,
+                  Icons.add_rounded,
+                  size: 15,
+                  color: ext.accent,
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 4),
                 Text(
-                  kCategoryDisplayNames[cat] ?? cat,
+                  'Add Category',
                   style: TextStyle(
-                    color: isSelected ? Colors.white : ext.textMuted,
+                    color: ext.accent,
                     fontSize: 11.5,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.4,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ],
             ),
           ),
-        );
-      }).toList(),
+        ),
+      ],
     );
   }
 }
