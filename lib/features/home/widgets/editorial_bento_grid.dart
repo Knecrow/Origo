@@ -219,10 +219,6 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
           decoration: BoxDecoration(
             color: ext.cardColor,
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.1),
-              width: 1,
-            ),
             boxShadow: [
               BoxShadow(
                 color: ext.shadowLight,
@@ -362,10 +358,6 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
           decoration: BoxDecoration(
             color: ext.cardColor,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.12),
-              width: 1,
-            ),
             boxShadow: [
               BoxShadow(
                 color: ext.shadowLight,
@@ -560,10 +552,6 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
           decoration: BoxDecoration(
             color: ext.cardColor,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.1),
-              width: 1,
-            ),
             boxShadow: [
               BoxShadow(
                 color: ext.shadowLight,
@@ -678,16 +666,11 @@ class _AddNewCategoryBentoCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 64,
+        height: 60,
         margin: const EdgeInsets.only(top: 6),
         decoration: BoxDecoration(
           color: ext.cardColor,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: ext.accent.withValues(alpha: 0.35),
-            width: 1.2,
-            strokeAlign: BorderSide.strokeAlignCenter,
-          ),
           boxShadow: [
             BoxShadow(
               color: ext.shadowLight,
