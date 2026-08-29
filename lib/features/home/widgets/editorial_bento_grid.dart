@@ -208,10 +208,10 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
                   OrigoImage(
                     imagePath: widget.latestItem!.imagePath,
                     fit: BoxFit.cover,
-                    errorWidget: const _GradientFallback(),
+                    errorWidget: _GradientFallback(icon: widget.category.icon),
                   )
                 else
-                  const _GradientFallback(),
+                  _GradientFallback(icon: widget.category.icon),
 
                 // Scrim
                 DecoratedBox(
@@ -327,10 +327,10 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
                   OrigoImage(
                     imagePath: widget.latestItem!.imagePath,
                     fit: BoxFit.cover,
-                    errorWidget: const _GradientFallback(),
+                    errorWidget: _GradientFallback(icon: widget.category.icon),
                   )
                 else
-                  const _GradientFallback(),
+                  _GradientFallback(icon: widget.category.icon),
 
                 // Scrim
                 DecoratedBox(
@@ -497,10 +497,10 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
                   OrigoImage(
                     imagePath: widget.latestItem!.imagePath,
                     fit: BoxFit.cover,
-                    errorWidget: const _GradientFallback(),
+                    errorWidget: _GradientFallback(icon: widget.category.icon),
                   )
                 else
-                  const _GradientFallback(),
+                  _GradientFallback(icon: widget.category.icon),
 
                 // Scrim
                 DecoratedBox(
@@ -599,22 +599,39 @@ class _CornerPill extends StatelessWidget {
 }
 
 class _GradientFallback extends StatelessWidget {
-  const _GradientFallback();
+  final IconData? icon;
+  const _GradientFallback({this.icon});
 
   @override
   Widget build(BuildContext context) {
-    final ext = context.ext;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            ext.cardColor,
-            ext.bgColor,
-          ],
+          colors: isDark
+              ? [
+                  const Color(0xFF263344),
+                  const Color(0xFF19222E),
+                ]
+              : [
+                  const Color(0xFFFFFFFF),
+                  const Color(0xFFDDE7F0),
+                ],
         ),
       ),
+      child: icon != null
+          ? Center(
+              child: Icon(
+                icon,
+                size: 44,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : Colors.black.withValues(alpha: 0.05),
+              ),
+            )
+          : null,
     );
   }
 }

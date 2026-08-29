@@ -16,12 +16,12 @@ class AppColors {
   static const Color lightShadowDark = Color(0xFFCAD5DF);
   static const Color lightShadowLight = Color(0xFFFFFFFF);
 
-  // ── Dark Palette (Stealth Obsidian & Matte Slate) ──────────────────────────
+  // ── Dark Palette (High Contrast Stealth Obsidian & Elevated Midnight Slate) ─
   static const Color darkBackground = Color(0xFF090D13);
-  static const Color darkCard = Color(0xFF121822);
-  static const Color darkAccent = Color(0xFF5E8BB8);
+  static const Color darkCard = Color(0xFF1D2634);
+  static const Color darkAccent = Color(0xFF6B9EC7);
   static const Color darkTextPrimary = Color(0xFFF0F5FA);
-  static const Color darkTextMuted = Color(0xFF718599);
+  static const Color darkTextMuted = Color(0xFF8CA1B6);
 
   // Neumorphic shadows (dark theme)
   static const Color darkShadowDark = Color(0xFF05080C);
