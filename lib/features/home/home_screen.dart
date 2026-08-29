@@ -36,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final spotlightItems = itemsProv.spotlightItems;
     final counts = itemsProv.categoryCounts;
     final covers = itemsProv.categoryLatestCover;
-    final totalItems = itemsProv.items.length;
 
     return Scaffold(
       backgroundColor: ext.bgColor,
@@ -50,32 +49,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Origo',
-                          style: TextStyle(
-                            fontSize: 34,
-                            fontWeight: FontWeight.w800,
-                            color: ext.textPrimary,
-                            letterSpacing: -0.8,
-                            height: 1.1,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '$totalItems ${totalItems == 1 ? 'aspiration' : 'aspirations'} collected',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: ext.textMuted,
-                            letterSpacing: -0.1,
-                          ),
-                        ),
-                      ],
+                    Text(
+                      'Origo',
+                      style: TextStyle(
+                        fontSize: 34,
+                        fontWeight: FontWeight.w800,
+                        color: ext.textPrimary,
+                        letterSpacing: -0.8,
+                        height: 1.1,
+                      ),
                     ),
                     // Theme Switcher Button
                     ClayIconBadge(
