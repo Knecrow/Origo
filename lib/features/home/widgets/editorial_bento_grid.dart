@@ -201,7 +201,6 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
-    final accent = widget.category.color;
     final hasImage = widget.latestItem != null;
 
     return GestureDetector(
@@ -230,11 +229,6 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
                 offset: const Offset(5, 5),
                 blurRadius: 14,
               ),
-              BoxShadow(
-                color: accent.withValues(alpha: 0.14),
-                blurRadius: 20,
-                offset: const Offset(0, 6),
-              ),
             ],
           ),
           child: ClipRRect(
@@ -246,10 +240,10 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
                   OrigoImage(
                     imagePath: widget.latestItem!.imagePath,
                     fit: BoxFit.cover,
-                    errorWidget: _GradientFallback(color: accent),
+                    errorWidget: const _GradientFallback(),
                   )
                 else
-                  _GradientFallback(color: accent),
+                  const _GradientFallback(),
 
                 // Scrim
                 DecoratedBox(
@@ -340,7 +334,6 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
-    final accent = widget.category.color;
     final hasImage = widget.latestItem != null;
 
     return GestureDetector(
@@ -369,11 +362,6 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
                 offset: const Offset(6, 6),
                 blurRadius: 16,
               ),
-              BoxShadow(
-                color: accent.withValues(alpha: 0.22),
-                blurRadius: 28,
-                offset: const Offset(0, 8),
-              ),
             ],
           ),
           child: ClipRRect(
@@ -385,10 +373,10 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
                   OrigoImage(
                     imagePath: widget.latestItem!.imagePath,
                     fit: BoxFit.cover,
-                    errorWidget: _GradientFallback(color: accent),
+                    errorWidget: const _GradientFallback(),
                   )
                 else
-                  _GradientFallback(color: accent),
+                  const _GradientFallback(),
 
                 // Scrim
                 DecoratedBox(
@@ -534,7 +522,6 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
-    final accent = widget.category.color;
     final hasImage = widget.latestItem != null;
 
     return GestureDetector(
@@ -563,11 +550,6 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
                 offset: const Offset(5, 5),
                 blurRadius: 14,
               ),
-              BoxShadow(
-                color: accent.withValues(alpha: 0.16),
-                blurRadius: 22,
-                offset: const Offset(0, 6),
-              ),
             ],
           ),
           child: ClipRRect(
@@ -579,10 +561,10 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
                   OrigoImage(
                     imagePath: widget.latestItem!.imagePath,
                     fit: BoxFit.cover,
-                    errorWidget: _GradientFallback(color: accent),
+                    errorWidget: const _GradientFallback(),
                   )
                 else
-                  _GradientFallback(color: accent),
+                  const _GradientFallback(),
 
                 // Scrim
                 DecoratedBox(
@@ -751,19 +733,19 @@ class _CornerPill extends StatelessWidget {
 }
 
 class _GradientFallback extends StatelessWidget {
-  final Color color;
-  const _GradientFallback({required this.color});
+  const _GradientFallback();
 
   @override
   Widget build(BuildContext context) {
+    final ext = context.ext;
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            color.withValues(alpha: 0.85),
-            color.withValues(alpha: 0.45),
+            ext.cardColor,
+            ext.bgColor,
           ],
         ),
       ),

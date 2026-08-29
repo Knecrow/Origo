@@ -186,8 +186,7 @@ class _InfoSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final ext = context.ext;
     final itemsProv = context.watch<ItemsProvider>();
-    final accentColor =
-        itemsProv.categoryColors[item.category] ?? ext.accent;
+    final accentColor = ext.accent;
     final categoryIcon =
         itemsProv.categoryIcons[item.category] ?? Icons.category_rounded;
     final displayCategory =

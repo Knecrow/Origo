@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/models/origo_item.dart';
 import '../../../core/providers/items_provider.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/frosted_glass_container.dart';
 import '../../../core/widgets/origo_image.dart';
@@ -197,16 +196,15 @@ class _CategoryPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ext = context.ext;
     final itemsProv = context.watch<ItemsProvider>();
-    final color =
-        itemsProv.categoryColors[category] ?? AppColors.darkAccent;
     final displayName =
         itemsProv.categoryDisplayNames[category] ?? category.toUpperCase();
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.85),
+        color: ext.accent.withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(

@@ -2,45 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../core/models/origo_category.dart';
 import '../../core/providers/items_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/clay_icon_badge.dart';
-
-const List<IconData> kAvailableCategoryIcons = [
-  Icons.watch_rounded,
-  Icons.diamond_rounded,
-  Icons.castle_rounded,
-  Icons.villa_rounded,
-  Icons.landscape_rounded,
-  Icons.brush_rounded,
-  Icons.palette_rounded,
-  Icons.wine_bar_rounded,
-  Icons.military_tech_rounded,
-  Icons.shield_rounded,
-  Icons.sports_esports_rounded,
-  Icons.sports_golf_rounded,
-  Icons.piano_rounded,
-  Icons.camera_alt_rounded,
-  Icons.key_rounded,
-  Icons.star_rounded,
-  Icons.bolt_rounded,
-  Icons.workspace_premium_rounded,
-  Icons.fitness_center_rounded,
-  Icons.auto_stories_rounded,
-];
-
-const List<Color> kAvailableCategoryColors = [
-  Color(0xFF7B9EC2), // Platinum Slate
-  Color(0xFF5CAE97), // Monaco Emerald
-  Color(0xFFC4936B), // Cognac Amber
-  Color(0xFF8B7BC2), // Royal Violet
-  Color(0xFF55A4B5), // Côte d'Azur
-  Color(0xFFB5708E), // Rose Champagne
-  Color(0xFFC25C68), // Imperial Crimson
-  Color(0xFFD4A853), // Tuscan Gold
-  Color(0xFF5AB5C2), // Arctic Cyan
-  Color(0xFF6B87A6), // Deep Slate
-];
 
 class AddCategorySheet extends StatefulWidget {
   const AddCategorySheet({super.key});
@@ -66,8 +31,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
   final _nameCtrl = TextEditingController();
   final _displayCtrl = TextEditingController();
 
-  IconData _selectedIcon = kAvailableCategoryIcons.first;
-  Color _selectedColor = kAvailableCategoryColors.first;
+  IconData _selectedIcon = kAllSupportedCategoryIcons.first;
   bool _saving = false;
 
   @override
@@ -88,11 +52,13 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
           : name.toUpperCase();
 
       if (!mounted) return;
+      final ext = context.ext;
+
       await context.read<ItemsProvider>().addCategory(
             name: name,
             displayName: display,
             icon: _selectedIcon,
-            color: _selectedColor,
+            color: ext.accent,
           );
 
       if (mounted) Navigator.pop(context);
@@ -200,63 +166,6 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
               ),
               const SizedBox(height: 20),
 
-              // Color Palette Picker
-              Text(
-                'ACCENT COLOR',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  color: ext.textMuted,
-                  letterSpacing: 1.2,
-                ),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 42,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: kAvailableCategoryColors.length,
-                  separatorBuilder: (_, _) => const SizedBox(width: 10),
-                  itemBuilder: (context, idx) {
-                    final col = kAvailableCategoryColors[idx];
-                    final isSelected = col == _selectedColor;
-                    return GestureDetector(
-                      onTap: () => setState(() => _selectedColor = col),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 180),
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: col,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isSelected ? Colors.white : Colors.transparent,
-                            width: 2.5,
-                          ),
-                          boxShadow: isSelected
-                              ? [
-                                  BoxShadow(
-                                    color: col.withValues(alpha: 0.5),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ]
-                              : null,
-                        ),
-                        child: isSelected
-                            ? const Icon(
-                                Icons.check_rounded,
-                                color: Colors.white,
-                                size: 18,
-                              )
-                            : null,
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 20),
-
               // Icon Selector
               Text(
                 'SELECT ICON',
@@ -272,10 +181,10 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                 height: 52,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
-                  itemCount: kAvailableCategoryIcons.length,
+                  itemCount: kAllSupportedCategoryIcons.length,
                   separatorBuilder: (_, _) => const SizedBox(width: 10),
                   itemBuilder: (context, idx) {
-                    final icon = kAvailableCategoryIcons[idx];
+                    final icon = kAllSupportedCategoryIcons[idx];
                     final isSelected = icon == _selectedIcon;
                     return GestureDetector(
                       onTap: () => setState(() => _selectedIcon = icon),
@@ -285,7 +194,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                         padding: 10,
                         iconColor: isSelected ? Colors.white : ext.textMuted,
                         badgeColor: isSelected
-                            ? _selectedColor.withValues(alpha: 0.85)
+                            ? ext.accent.withValues(alpha: 0.85)
                             : ext.cardColor,
                       ),
                     );
@@ -311,15 +220,16 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                 decoration: BoxDecoration(
                   color: ext.cardColor,
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    width: 1,
-                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: _selectedColor.withValues(alpha: 0.18),
-                      blurRadius: 14,
-                      offset: const Offset(0, 4),
+                      color: ext.shadowLight,
+                      offset: const Offset(-3, -3),
+                      blurRadius: 8,
+                    ),
+                    BoxShadow(
+                      color: ext.shadowDark,
+                      offset: const Offset(3, 3),
+                      blurRadius: 8,
                     ),
                   ],
                 ),
@@ -330,7 +240,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                       size: 18,
                       padding: 8,
                       iconColor: Colors.white,
-                      badgeColor: _selectedColor.withValues(alpha: 0.85),
+                      badgeColor: ext.accent.withValues(alpha: 0.85),
                     ),
                     const SizedBox(width: 14),
                     Expanded(
@@ -345,7 +255,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                                     ? _nameCtrl.text.trim().toUpperCase()
                                     : 'NEW CATEGORY'),
                             style: TextStyle(
-                              color: _selectedColor.withValues(alpha: 0.9),
+                              color: ext.accent.withValues(alpha: 0.9),
                               fontSize: 9,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 1.2,
@@ -369,13 +279,13 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: _selectedColor.withValues(alpha: 0.2),
+                        color: ext.accent.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         '0 Assets',
                         style: TextStyle(
-                          color: _selectedColor,
+                          color: ext.accent,
                           fontSize: 10,
                           fontWeight: FontWeight.w800,
                         ),

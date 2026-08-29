@@ -31,8 +31,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
     final itemsProv = context.watch<ItemsProvider>();
     final items = itemsProv.itemsByCategory(widget.category);
     final isShowcase = context.watch<ShowcaseProvider>().isActive;
-    final accentColor =
-        itemsProv.categoryColors[widget.category] ?? ext.accent;
+    final accentColor = ext.accent;
     final icon =
         itemsProv.categoryIcons[widget.category] ?? Icons.category_rounded;
     final displayName =

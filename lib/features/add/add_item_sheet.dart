@@ -485,7 +485,7 @@ class _CategorySelector extends StatelessWidget {
       children: [
         ...categories.map((cat) {
           final isSelected = cat.key == selected;
-          final color = cat.color;
+          final color = ext.accent;
           final icon = cat.icon;
 
           return GestureDetector(
