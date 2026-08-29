@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../core/models/origo_item.dart';
 import '../../../core/providers/items_provider.dart';
@@ -89,10 +90,13 @@ class _SpotlightCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final ext = context.ext;
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => DetailScreen(item: item)),
-      ),
+      onTap: () {
+        HapticFeedback.lightImpact();
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => DetailScreen(item: item)),
+        );
+      },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -105,15 +109,18 @@ class _SpotlightCard extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              OrigoImage(
-                imagePath: item.imagePath,
-                fit: BoxFit.cover,
-                errorWidget: Container(
-                  color: ext.cardColor,
-                  child: Icon(
-                    Icons.image_not_supported_outlined,
-                    color: ext.textMuted,
-                    size: 40,
+              Hero(
+                tag: 'dream-hero-${item.id}',
+                child: OrigoImage(
+                  imagePath: item.imagePath,
+                  fit: BoxFit.cover,
+                  errorWidget: Container(
+                    color: ext.cardColor,
+                    child: Icon(
+                      Icons.image_not_supported_outlined,
+                      color: ext.textMuted,
+                      size: 40,
+                    ),
                   ),
                 ),
               ),

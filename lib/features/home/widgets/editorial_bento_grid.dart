@@ -1,11 +1,13 @@
 // lib/features/home/widgets/editorial_bento_grid.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../core/models/origo_category.dart';
 import '../../../core/models/origo_item.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/origo_image.dart';
 import '../../gallery/gallery_screen.dart';
+import 'card_quick_actions_sheet.dart';
 
 class EditorialBentoGrid extends StatelessWidget {
   final List<OrigoCategory> categories;
@@ -20,11 +22,20 @@ class EditorialBentoGrid extends StatelessWidget {
   });
 
   void _openCategory(BuildContext context, String categoryKey) {
+    HapticFeedback.lightImpact();
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => GalleryScreen(category: categoryKey),
       ),
+    );
+  }
+
+  void _showQuickActions(BuildContext context, OrigoCategory category) {
+    CardQuickActionsSheet.show(
+      context,
+      category: category,
+      itemCount: counts[category.key] ?? 0,
     );
   }
 
@@ -53,6 +64,7 @@ class EditorialBentoGrid extends StatelessWidget {
                     itemCount: counts[first.key] ?? 0,
                     latestItem: covers[first.key],
                     onTap: () => _openCategory(context, first.key),
+                    onLongPress: () => _showQuickActions(context, first),
                   ),
                 ),
               ),
@@ -66,6 +78,7 @@ class EditorialBentoGrid extends StatelessWidget {
                       itemCount: counts[second.key] ?? 0,
                       latestItem: covers[second.key],
                       onTap: () => _openCategory(context, second.key),
+                      onLongPress: () => _showQuickActions(context, second),
                     ),
                   ),
                 ),
@@ -87,6 +100,7 @@ class EditorialBentoGrid extends StatelessWidget {
               itemCount: counts[current.key] ?? 0,
               latestItem: covers[current.key],
               onTap: () => _openCategory(context, current.key),
+              onLongPress: () => _showQuickActions(context, current),
             ),
           ),
         );
@@ -110,6 +124,7 @@ class EditorialBentoGrid extends StatelessWidget {
                       itemCount: counts[first.key] ?? 0,
                       latestItem: covers[first.key],
                       onTap: () => _openCategory(context, first.key),
+                      onLongPress: () => _showQuickActions(context, first),
                     ),
                   ),
                 ),
@@ -122,6 +137,7 @@ class EditorialBentoGrid extends StatelessWidget {
                       itemCount: counts[second.key] ?? 0,
                       latestItem: covers[second.key],
                       onTap: () => _openCategory(context, second.key),
+                      onLongPress: () => _showQuickActions(context, second),
                     ),
                   ),
                 ),
@@ -140,6 +156,7 @@ class EditorialBentoGrid extends StatelessWidget {
                 itemCount: counts[first.key] ?? 0,
                 latestItem: covers[first.key],
                 onTap: () => _openCategory(context, first.key),
+                onLongPress: () => _showQuickActions(context, first),
               ),
             ),
           );
@@ -163,12 +180,14 @@ class _BentoSquareCard extends StatefulWidget {
   final int itemCount;
   final OrigoItem? latestItem;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
   const _BentoSquareCard({
     required this.category,
     required this.itemCount,
     required this.latestItem,
     required this.onTap,
+    this.onLongPress,
   });
 
   @override
@@ -190,6 +209,7 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
         widget.onTap();
       },
       onTapCancel: () => setState(() => _pressed = false),
+      onLongPress: widget.onLongPress,
       child: AnimatedScale(
         scale: _pressed ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 140),
@@ -281,12 +301,14 @@ class _BentoPanoramicHeroCard extends StatefulWidget {
   final int itemCount;
   final OrigoItem? latestItem;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
   const _BentoPanoramicHeroCard({
     required this.category,
     required this.itemCount,
     required this.latestItem,
     required this.onTap,
+    this.onLongPress,
   });
 
   @override
@@ -309,6 +331,7 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
         widget.onTap();
       },
       onTapCancel: () => setState(() => _pressed = false),
+      onLongPress: widget.onLongPress,
       child: AnimatedScale(
         scale: _pressed ? 0.98 : 1.0,
         duration: const Duration(milliseconds: 140),
@@ -452,12 +475,14 @@ class _BentoFooterCard extends StatefulWidget {
   final int itemCount;
   final OrigoItem? latestItem;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
   const _BentoFooterCard({
     required this.category,
     required this.itemCount,
     required this.latestItem,
     required this.onTap,
+    this.onLongPress,
   });
 
   @override
@@ -479,6 +504,7 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
         widget.onTap();
       },
       onTapCancel: () => setState(() => _pressed = false),
+      onLongPress: widget.onLongPress,
       child: AnimatedScale(
         scale: _pressed ? 0.98 : 1.0,
         duration: const Duration(milliseconds: 140),

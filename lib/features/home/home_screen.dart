@@ -1,6 +1,7 @@
 // lib/features/home/home_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../core/providers/items_provider.dart';
 import '../../core/providers/theme_provider.dart';
@@ -83,7 +84,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       iconColor: themeProv.isDark
                           ? const Color(0xFFFFC107)
                           : const Color(0xFF5E8BB8),
-                      onTap: themeProv.toggle,
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        themeProv.toggle();
+                      },
                     ),
                   ],
                 ),
@@ -224,6 +228,7 @@ class _AnimatedFABState extends State<_AnimatedFAB>
         onTapDown: (_) => _controller.reverse(),
         onTapUp: (_) {
           _controller.forward();
+          HapticFeedback.mediumImpact();
           widget.onTap();
         },
         onTapCancel: () => _controller.forward(),

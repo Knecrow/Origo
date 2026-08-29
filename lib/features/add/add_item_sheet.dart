@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../core/models/origo_category.dart';
@@ -14,9 +15,10 @@ import '../../core/widgets/origo_image.dart';
 import 'add_category_sheet.dart';
 
 class AddItemSheet extends StatefulWidget {
-  const AddItemSheet({super.key});
+  final String? initialCategory;
+  const AddItemSheet({super.key, this.initialCategory});
 
-  static Future<void> show(BuildContext context) {
+  static Future<void> show(BuildContext context, {String? initialCategory}) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -24,7 +26,7 @@ class AddItemSheet extends StatefulWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (_) => const AddItemSheet(),
+      builder: (_) => AddItemSheet(initialCategory: initialCategory),
     );
   }
 
@@ -46,6 +48,12 @@ class _AddItemSheetState extends State<AddItemSheet> {
   final _picker = ImagePicker();
 
   @override
+  void initState() {
+    super.initState();
+    _selectedCategory = widget.initialCategory;
+  }
+
+  @override
   void dispose() {
     _titleCtrl.dispose();
     _timeframeCtrl.dispose();
@@ -60,6 +68,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
         imageQuality: 85,
       );
       if (result != null) {
+        HapticFeedback.lightImpact();
         if (kIsWeb) {
           final bytes = await result.readAsBytes();
           final mime = result.mimeType ?? 'image/jpeg';
@@ -75,6 +84,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
   }
 
   Future<void> _openAddCategory() async {
+    HapticFeedback.lightImpact();
     await AddCategorySheet.show(context);
     if (!mounted) return;
     final latestCats = context.read<ItemsProvider>().categories;
@@ -104,6 +114,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
             motivationNotes: _notesCtrl.text,
             isSpotlight: _isSpotlight,
           );
+      HapticFeedback.mediumImpact();
       if (mounted) Navigator.pop(context);
     } catch (e) {
       setState(() => _saving = false);
@@ -466,7 +477,10 @@ class _CategorySelector extends StatelessWidget {
         final icon = cat.icon;
 
         return GestureDetector(
-          onTap: () => onChanged(cat.key),
+          onTap: () {
+            HapticFeedback.selectionClick();
+            onChanged(cat.key);
+          },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),

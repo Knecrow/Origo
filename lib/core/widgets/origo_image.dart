@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../utils/image_loader.dart' as loader;
+import 'shimmer_loading.dart';
 
 class OrigoImage extends StatelessWidget {
   final String imagePath;
@@ -43,22 +44,8 @@ class OrigoImage extends StatelessWidget {
         errorBuilder: (_, _, e) => fallback,
         loadingBuilder: (context, child, progress) {
           if (progress == null) return child;
-          return Container(
-            color: ext.cardColor,
-            child: Center(
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  value: progress.expectedTotalBytes != null
-                      ? progress.cumulativeBytesLoaded /
-                          progress.expectedTotalBytes!
-                      : null,
-                  color: ext.accent,
-                ),
-              ),
-            ),
+          return const ShimmerLoading(
+            borderRadius: 0,
           );
         },
       );

@@ -1,6 +1,7 @@
 // lib/features/gallery/gallery_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../core/models/origo_item.dart';
 import '../../core/providers/items_provider.dart';
@@ -44,7 +45,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
             pinned: true,
             backgroundColor: ext.bgColor,
             leading: GestureDetector(
-              onTap: () => Navigator.pop(context),
+              onTap: () {
+                HapticFeedback.lightImpact();
+                Navigator.pop(context);
+              },
               child: const Padding(
                 padding: EdgeInsets.all(8),
                 child: ClayIconBadge(
@@ -63,8 +67,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
                       : Icons.view_agenda_rounded,
                   size: 18,
                   padding: 10,
-                  onTap: () =>
-                      setState(() => _columns = _columns == 1 ? 2 : 1),
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    setState(() => _columns = _columns == 1 ? 2 : 1);
+                  },
                 ),
               ),
             ],
@@ -124,7 +130,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => AddItemSheet.show(context),
+        onPressed: () {
+          HapticFeedback.lightImpact();
+          AddItemSheet.show(context, initialCategory: widget.category);
+        },
         backgroundColor: accentColor,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
         label: const Text(
@@ -147,10 +156,13 @@ class _GalleryTile extends StatelessWidget {
     final ext = context.ext;
 
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => DetailScreen(item: item)),
-      ),
+      onTap: () {
+        HapticFeedback.lightImpact();
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => DetailScreen(item: item)),
+        );
+      },
       child: Container(
         decoration: BoxDecoration(
           color: ext.cardColor,
@@ -161,14 +173,17 @@ class _GalleryTile extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              OrigoImage(
-                imagePath: item.imagePath,
-                fit: BoxFit.cover,
-                errorWidget: Container(
-                  color: ext.cardColor,
-                  child: Icon(
-                    Icons.broken_image_rounded,
-                    color: ext.textMuted,
+              Hero(
+                tag: 'dream-hero-${item.id}',
+                child: OrigoImage(
+                  imagePath: item.imagePath,
+                  fit: BoxFit.cover,
+                  errorWidget: Container(
+                    color: ext.cardColor,
+                    child: Icon(
+                      Icons.broken_image_rounded,
+                      color: ext.textMuted,
+                    ),
                   ),
                 ),
               ),

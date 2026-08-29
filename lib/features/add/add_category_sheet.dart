@@ -1,6 +1,7 @@
 // lib/features/add/add_category_sheet.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../core/models/origo_category.dart';
 import '../../core/providers/items_provider.dart';
@@ -60,6 +61,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
             icon: _selectedIcon,
             color: ext.accent,
           );
+      HapticFeedback.mediumImpact();
 
       if (mounted) Navigator.pop(context);
     } catch (e) {
@@ -187,7 +189,10 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                     final icon = kAllSupportedCategoryIcons[idx];
                     final isSelected = icon == _selectedIcon;
                     return GestureDetector(
-                      onTap: () => setState(() => _selectedIcon = icon),
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        setState(() => _selectedIcon = icon);
+                      },
                       child: ClayIconBadge(
                         icon: icon,
                         size: 18,

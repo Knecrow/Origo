@@ -1,6 +1,7 @@
 // lib/features/detail/detail_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../core/models/origo_item.dart';
 import '../../core/providers/items_provider.dart';
@@ -41,19 +42,22 @@ class _DetailScreenState extends State<DetailScreen> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Full-bleed zoomable image
+            // Full-bleed zoomable image with matching Hero tag
             InteractiveViewer(
               minScale: 0.8,
               maxScale: 5.0,
               child: Center(
-                child: OrigoImage(
-                  imagePath: _item.imagePath,
-                  fit: BoxFit.contain,
-                  errorWidget: Center(
-                    child: Icon(
-                      Icons.broken_image_rounded,
-                      color: ext.textMuted,
-                      size: 60,
+                child: Hero(
+                  tag: 'dream-hero-${_item.id}',
+                  child: OrigoImage(
+                    imagePath: _item.imagePath,
+                    fit: BoxFit.contain,
+                    errorWidget: Center(
+                      child: Icon(
+                        Icons.broken_image_rounded,
+                        color: ext.textMuted,
+                        size: 60,
+                      ),
                     ),
                   ),
                 ),
@@ -73,7 +77,10 @@ class _DetailScreenState extends State<DetailScreen> {
                     child: Row(
                       children: [
                         GestureDetector(
-                          onTap: () => Navigator.pop(context),
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            Navigator.pop(context);
+                          },
                           child: const FrostedGlassContainer(
                             borderRadius: 14,
                             padding: EdgeInsets.all(10),
@@ -128,11 +135,13 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   Future<void> _toggleSpotlight() async {
+    HapticFeedback.mediumImpact();
     await context.read<ItemsProvider>().toggleSpotlight(_item);
     setState(() => _item = _item.copyWith(isSpotlight: !_item.isSpotlight));
   }
 
   Future<void> _deleteItem() async {
+    HapticFeedback.mediumImpact();
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
