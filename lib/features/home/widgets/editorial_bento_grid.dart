@@ -5,7 +5,6 @@ import '../../../core/models/origo_category.dart';
 import '../../../core/models/origo_item.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/origo_image.dart';
-import '../../add/add_category_sheet.dart';
 import '../../gallery/gallery_screen.dart';
 
 class EditorialBentoGrid extends StatelessWidget {
@@ -156,15 +155,6 @@ class EditorialBentoGrid extends StatelessWidget {
           i += 1;
         }
       }
-    }
-
-    // Add New Category Card (hidden during showcase mode)
-    if (!isShowcase) {
-      widgets.add(
-        _AddNewCategoryBentoCard(
-          onTap: () => AddCategorySheet.show(context),
-        ),
-      );
     }
 
     return Padding(
@@ -627,72 +617,6 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
                 ),
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Add New Category Card ────────────────────────────────────────────────────
-
-class _AddNewCategoryBentoCard extends StatelessWidget {
-  final VoidCallback onTap;
-
-  const _AddNewCategoryBentoCard({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final ext = context.ext;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 60,
-        margin: const EdgeInsets.only(top: 6),
-        decoration: BoxDecoration(
-          color: ext.cardColor,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: ext.shadowLight,
-              offset: const Offset(-3, -3),
-              blurRadius: 8,
-            ),
-            BoxShadow(
-              color: ext.shadowDark,
-              offset: const Offset(3, 3),
-              blurRadius: 8,
-            ),
-          ],
-        ),
-        child: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: ext.accent.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.add_rounded,
-                  color: ext.accent,
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                'CREATE CUSTOM CATEGORY',
-                style: TextStyle(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w800,
-                  color: ext.accent,
-                  letterSpacing: 1.2,
-                ),
-              ),
-            ],
           ),
         ),
       ),

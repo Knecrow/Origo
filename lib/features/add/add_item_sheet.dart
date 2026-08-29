@@ -172,39 +172,32 @@ class _AddItemSheetState extends State<AddItemSheet> {
               ),
               const SizedBox(height: 20),
 
-              // Category Selector Header + Add Category link
+              // Category Header with Add Circle Popup on the Left
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  GestureDetector(
+                    onTap: _openAddCategory,
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        color: ext.accent.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.add_rounded,
+                        size: 15,
+                        color: ext.accent,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   Text(
                     'CATEGORY',
                     style: TextStyle(
                       fontSize: 11,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w800,
                       color: ext.textMuted,
                       letterSpacing: 1.2,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: _openAddCategory,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.add_circle_outline_rounded,
-                          size: 14,
-                          color: ext.accent,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'New Category',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            color: ext.accent,
-                          ),
-                        ),
-                      ],
                     ),
                   ),
                 ],
@@ -214,7 +207,6 @@ class _AddItemSheetState extends State<AddItemSheet> {
                 categories: categories,
                 selected: activeCategory,
                 onChanged: (c) => setState(() => _selectedCategory = c),
-                onAddNew: _openAddCategory,
               ),
               const SizedBox(height: 20),
 
@@ -466,13 +458,11 @@ class _CategorySelector extends StatelessWidget {
   final List<OrigoCategory> categories;
   final String selected;
   final ValueChanged<String> onChanged;
-  final VoidCallback onAddNew;
 
   const _CategorySelector({
     required this.categories,
     required this.selected,
     required this.onChanged,
-    required this.onAddNew,
   });
 
   @override
@@ -482,102 +472,65 @@ class _CategorySelector extends StatelessWidget {
     return Wrap(
       spacing: 10,
       runSpacing: 10,
-      children: [
-        ...categories.map((cat) {
-          final isSelected = cat.key == selected;
-          final color = ext.accent;
-          final icon = cat.icon;
+      children: categories.map((cat) {
+        final isSelected = cat.key == selected;
+        final color = ext.accent;
+        final icon = cat.icon;
 
-          return GestureDetector(
-            onTap: () => onChanged(cat.key),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? color.withValues(alpha: 0.85)
-                    : ext.cardColor,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: isSelected
-                    ? [
-                        BoxShadow(
-                          color: color.withValues(alpha: 0.4),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ]
-                    : [
-                        BoxShadow(
-                          color: ext.shadowLight,
-                          offset: const Offset(-3, -3),
-                          blurRadius: 6,
-                        ),
-                        BoxShadow(
-                          color: ext.shadowDark,
-                          offset: const Offset(3, 3),
-                          blurRadius: 6,
-                        ),
-                      ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    icon,
-                    size: 14,
-                    color: isSelected ? Colors.white : ext.textMuted,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    cat.displayName,
-                    style: TextStyle(
-                      color: isSelected ? Colors.white : ext.textMuted,
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.4,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }),
-
-        // "+ Add Category" Pill
-        GestureDetector(
-          onTap: onAddNew,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        return GestureDetector(
+          onTap: () => onChanged(cat.key),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: ext.accent.withValues(alpha: 0.12),
+              color: isSelected
+                  ? color.withValues(alpha: 0.85)
+                  : ext.cardColor,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: ext.accent.withValues(alpha: 0.3),
-                width: 1,
-              ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: color.withValues(alpha: 0.4),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
+                  : [
+                      BoxShadow(
+                        color: ext.shadowLight,
+                        offset: const Offset(-3, -3),
+                        blurRadius: 6,
+                      ),
+                      BoxShadow(
+                        color: ext.shadowDark,
+                        offset: const Offset(3, 3),
+                        blurRadius: 6,
+                      ),
+                    ],
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  Icons.add_rounded,
-                  size: 15,
-                  color: ext.accent,
+                  icon,
+                  size: 14,
+                  color: isSelected ? Colors.white : ext.textMuted,
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 6),
                 Text(
-                  'Add Category',
+                  cat.displayName,
                   style: TextStyle(
-                    color: ext.accent,
+                    color: isSelected ? Colors.white : ext.textMuted,
                     fontSize: 11.5,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.4,
                   ),
                 ),
               ],
             ),
           ),
-        ),
-      ],
+        );
+      }).toList(),
     );
   }
 }
