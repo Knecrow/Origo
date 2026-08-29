@@ -80,27 +80,29 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                         ),
-                        // Theme Switcher Button
-                        ClayIconBadge(
-                          icon: themeProv.isDark
-                              ? Icons.wb_sunny_rounded
-                              : Icons.dark_mode_rounded,
-                          size: 18,
-                          padding: 10,
-                          iconColor: themeProv.isDark
-                              ? const Color(0xFFFFC107)
-                              : const Color(0xFF5E8BB8),
-                          onTap: themeProv.toggle,
+                        Row(
+                          children: [
+                            // Showcase Toggle Pill
+                            _ShowcasePillButton(
+                              isShowcase: isShowcase,
+                              onTap: () => showcaseProv.toggle(),
+                            ),
+                            const SizedBox(width: 10),
+                            // Theme Switcher Button
+                            ClayIconBadge(
+                              icon: themeProv.isDark
+                                  ? Icons.wb_sunny_rounded
+                                  : Icons.dark_mode_rounded,
+                              size: 18,
+                              padding: 10,
+                              iconColor: themeProv.isDark
+                                  ? const Color(0xFFFFC107)
+                                  : const Color(0xFF5E8BB8),
+                              onTap: themeProv.toggle,
+                            ),
+                          ],
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Top Segmented Capsule Switcher [ SHOWCASE | ADD ]
-                    _TopSegmentedCapsule(
-                      isShowcase: isShowcase,
-                      onToggleShowcase: () => showcaseProv.toggle(),
-                      onTapAdd: () => AddItemSheet.show(context),
                     ),
                   ],
                 ),
@@ -291,17 +293,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// ── Top Segmented Capsule Switcher ───────────────────────────────────────────
+// ── Header Showcase Pill Button ──────────────────────────────────────────────
 
-class _TopSegmentedCapsule extends StatelessWidget {
+class _ShowcasePillButton extends StatelessWidget {
   final bool isShowcase;
-  final VoidCallback onToggleShowcase;
-  final VoidCallback onTapAdd;
+  final VoidCallback onTap;
 
-  const _TopSegmentedCapsule({
+  const _ShowcasePillButton({
     required this.isShowcase,
-    required this.onToggleShowcase,
-    required this.onTapAdd,
+    required this.onTap,
   });
 
   @override
@@ -309,124 +309,66 @@ class _TopSegmentedCapsule extends StatelessWidget {
     final ext = context.ext;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      height: 46,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF151C26) : const Color(0xFFDCE5EE),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: isDark ? 0.08 : 0.4),
-          width: 1,
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: isShowcase
+              ? (isDark ? Colors.white : ext.accent)
+              : ext.cardColor,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: isShowcase
+              ? [
+                  BoxShadow(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.25)
+                        : ext.accent.withValues(alpha: 0.35),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: ext.shadowLight,
+                    offset: const Offset(-3, -3),
+                    blurRadius: 6,
+                  ),
+                  BoxShadow(
+                    color: ext.shadowDark,
+                    offset: const Offset(3, 3),
+                    blurRadius: 6,
+                  ),
+                ],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: ext.shadowLight,
-            offset: const Offset(-3, -3),
-            blurRadius: 8,
-          ),
-          BoxShadow(
-            color: ext.shadowDark,
-            offset: const Offset(3, 3),
-            blurRadius: 8,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // SHOWCASE Button (Toggle)
-          Expanded(
-            child: GestureDetector(
-              onTap: onToggleShowcase,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutCubic,
-                decoration: BoxDecoration(
-                  color: isShowcase
-                      ? (isDark ? Colors.white : ext.accent)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: isShowcase
-                      ? [
-                          BoxShadow(
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.25)
-                                : ext.accent.withValues(alpha: 0.35),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ]
-                      : null,
-                ),
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        isShowcase
-                            ? Icons.visibility_rounded
-                            : Icons.slideshow_rounded,
-                        size: 14,
-                        color: isShowcase
-                            ? (isDark ? const Color(0xFF0E1621) : Colors.white)
-                            : ext.textMuted,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'SHOWCASE',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.2,
-                          color: isShowcase
-                              ? (isDark
-                                  ? const Color(0xFF0E1621)
-                                  : Colors.white)
-                              : ext.textMuted,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isShowcase
+                  ? Icons.visibility_rounded
+                  : Icons.slideshow_rounded,
+              size: 14,
+              color: isShowcase
+                  ? (isDark ? const Color(0xFF0E1621) : Colors.white)
+                  : ext.textMuted,
+            ),
+            const SizedBox(width: 5),
+            Text(
+              'SHOWCASE',
+              style: TextStyle(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.0,
+                color: isShowcase
+                    ? (isDark ? const Color(0xFF0E1621) : Colors.white)
+                    : ext.textMuted,
               ),
             ),
-          ),
-
-          // ADD Button
-          Expanded(
-            child: GestureDetector(
-              onTap: onTapAdd,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.add_rounded,
-                        size: 16,
-                        color: ext.textMuted,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'ADD DREAM',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.2,
-                          color: ext.textMuted,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
