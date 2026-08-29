@@ -281,13 +281,28 @@ class DatabaseHelper {
     return db.delete('origo_items', where: 'id = ?', whereArgs: [id]);
   }
 
-  // ── STATS ────────────────────────────────────────────────────────────────────
+  // ── RESET & BACKUP ─────────────────────────────────────────────────────────
 
-  Future<Map<String, int>> getCategoryCounts() async {
+  Future<void> clearAllItems() async {
     final db = await database;
-    final result = await db.rawQuery(
-      'SELECT category, COUNT(*) as count FROM origo_items GROUP BY category',
-    );
-    return {for (final r in result) r['category'] as String: r['count'] as int};
+    await db.delete('origo_items');
+  }
+
+  Future<void> resetToDefaults() async {
+    final db = await database;
+    await db.delete('origo_items');
+    await db.delete('origo_categories');
+
+    final catBatch = db.batch();
+    for (final cat in OrigoCategory.defaultCategories) {
+      catBatch.insert('origo_categories', cat.toMap());
+    }
+    await catBatch.commit(noResult: true);
+
+    final batch = db.batch();
+    for (final seed in _initialSeedItems) {
+      batch.insert('origo_items', seed.toMap());
+    }
+    await batch.commit(noResult: true);
   }
 }

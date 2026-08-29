@@ -8,6 +8,7 @@ import '../../core/providers/theme_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/clay_icon_badge.dart';
 import '../add/add_item_sheet.dart';
+import '../settings/settings_sheet.dart';
 import 'widgets/editorial_bento_grid.dart';
 import 'widgets/spotlight_carousel.dart';
 
@@ -61,20 +62,36 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 1.1,
                       ),
                     ),
-                    // Theme Switcher Button
-                    ClayIconBadge(
-                      icon: themeProv.isDark
-                          ? Icons.wb_sunny_rounded
-                          : Icons.dark_mode_rounded,
-                      size: 18,
-                      padding: 10,
-                      iconColor: themeProv.isDark
-                          ? const Color(0xFFFFD60A)
-                          : ext.textPrimary,
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        themeProv.toggle();
-                      },
+                    Row(
+                      children: [
+                        // Theme Switcher Button
+                        ClayIconBadge(
+                          icon: themeProv.isDark
+                              ? Icons.wb_sunny_rounded
+                              : Icons.dark_mode_rounded,
+                          size: 18,
+                          padding: 10,
+                          iconColor: themeProv.isDark
+                              ? const Color(0xFFFFD60A)
+                              : ext.textPrimary,
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            themeProv.toggle();
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        // Settings Button
+                        ClayIconBadge(
+                          icon: Icons.tune_rounded,
+                          size: 18,
+                          padding: 10,
+                          iconColor: ext.textPrimary,
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            SettingsSheet.show(context);
+                          },
+                        ),
+                      ],
                     ),
                   ],
                 ),

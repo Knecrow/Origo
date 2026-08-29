@@ -163,4 +163,17 @@ class ItemsProvider extends ChangeNotifier {
     _items.removeWhere((i) => i.id == item.id);
     notifyListeners();
   }
+
+  // ── BULK / RESET ACTIONS ───────────────────────────────────────────────────
+
+  Future<void> clearAllItems() async {
+    await _db.clearAllItems();
+    _items.clear();
+    notifyListeners();
+  }
+
+  Future<void> resetToDefaults() async {
+    await _db.resetToDefaults();
+    await loadAll();
+  }
 }
