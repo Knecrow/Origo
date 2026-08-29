@@ -150,7 +150,7 @@ class _DetailScreenState extends State<DetailScreen> {
         title: const Text('Delete Dream',
             style: TextStyle(fontWeight: FontWeight.w700)),
         content: const Text(
-            'Are you sure you want to remove this dream from your portfolio?'),
+            'Are you sure you want to remove this dream from Origo?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),

@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Portfolio',
+                          'Origo',
                           style: TextStyle(
                             fontSize: 34,
                             fontWeight: FontWeight.w800,

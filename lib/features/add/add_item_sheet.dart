@@ -344,7 +344,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
                           elevation: 0,
                         ),
                         child: const Text(
-                          'Add to Portfolio',
+                          'Add Dream',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,

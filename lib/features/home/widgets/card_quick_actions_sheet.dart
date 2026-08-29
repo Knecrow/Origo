@@ -95,7 +95,7 @@ class CardQuickActionsSheet extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '$itemCount ${itemCount == 1 ? 'item in portfolio' : 'items in portfolio'}',
+                      '$itemCount ${itemCount == 1 ? 'item' : 'items'}',
                       style: TextStyle(
                         fontSize: 12.5,
                         color: ext.textMuted,
