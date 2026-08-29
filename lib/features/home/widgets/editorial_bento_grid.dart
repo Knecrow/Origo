@@ -45,11 +45,10 @@ class EditorialBentoGrid extends StatelessWidget {
     int i = 0;
 
     while (i < categories.length) {
-      // Pattern cycle: Dual (2) -> Panoramic Hero (1) -> Dual (2) -> Wide (1) ...
       final cycleIndex = i % 4;
 
       if (cycleIndex == 0) {
-        // Dual Square Cards (Take up to 2 items)
+        // Dual Square Cards
         final first = categories[i];
         final second = (i + 1 < categories.length) ? categories[i + 1] : null;
 
@@ -58,7 +57,7 @@ class EditorialBentoGrid extends StatelessWidget {
             children: [
               Expanded(
                 child: SizedBox(
-                  height: 172,
+                  height: 176,
                   child: _BentoSquareCard(
                     category: first,
                     itemCount: counts[first.key] ?? 0,
@@ -72,7 +71,7 @@ class EditorialBentoGrid extends StatelessWidget {
                 const SizedBox(width: 14),
                 Expanded(
                   child: SizedBox(
-                    height: 172,
+                    height: 176,
                     child: _BentoSquareCard(
                       category: second,
                       itemCount: counts[second.key] ?? 0,
@@ -90,11 +89,11 @@ class EditorialBentoGrid extends StatelessWidget {
         widgets.add(const SizedBox(height: 14));
         i += (second != null ? 2 : 1);
       } else if (cycleIndex == 2 || (cycleIndex == 1 && i % 3 == 2)) {
-        // Panoramic Hero Card (1 item)
+        // Panoramic Hero Card
         final current = categories[i];
         widgets.add(
           SizedBox(
-            height: 195,
+            height: 198,
             child: _BentoPanoramicHeroCard(
               category: current,
               itemCount: counts[current.key] ?? 0,
@@ -112,13 +111,12 @@ class EditorialBentoGrid extends StatelessWidget {
         final second = (i + 1 < categories.length) ? categories[i + 1] : null;
 
         if (second != null && i + 2 == categories.length) {
-          // If 2 remaining, show dual
           widgets.add(
             Row(
               children: [
                 Expanded(
                   child: SizedBox(
-                    height: 172,
+                    height: 176,
                     child: _BentoSquareCard(
                       category: first,
                       itemCount: counts[first.key] ?? 0,
@@ -131,7 +129,7 @@ class EditorialBentoGrid extends StatelessWidget {
                 const SizedBox(width: 14),
                 Expanded(
                   child: SizedBox(
-                    height: 172,
+                    height: 176,
                     child: _BentoSquareCard(
                       category: second,
                       itemCount: counts[second.key] ?? 0,
@@ -150,7 +148,7 @@ class EditorialBentoGrid extends StatelessWidget {
           // Wide Footer Card
           widgets.add(
             SizedBox(
-              height: 154,
+              height: 156,
               child: _BentoFooterCard(
                 category: first,
                 itemCount: counts[first.key] ?? 0,
@@ -173,7 +171,7 @@ class EditorialBentoGrid extends StatelessWidget {
   }
 }
 
-// ── Square Bento Card ────────────────────────────────────────────────────────
+// ── Square Bento Card (Apple Photos / One UI Style) ──────────────────────────
 
 class _BentoSquareCard extends StatefulWidget {
   final OrigoCategory category;
@@ -217,10 +215,10 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
         child: Container(
           decoration: BoxDecoration(
             color: ext.cardColor,
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(26),
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(26),
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -240,49 +238,55 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withValues(alpha: 0.15),
-                        Colors.black.withValues(alpha: 0.35),
-                        Colors.black.withValues(alpha: 0.88),
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: 0.3),
+                        Colors.black.withValues(alpha: 0.82),
                       ],
-                      stops: const [0.0, 0.45, 1.0],
+                      stops: const [0.3, 0.65, 1.0],
                     ),
                   ),
                 ),
 
-                // Top right pill
-                if (widget.itemCount > 0)
-                  Positioned(
-                    top: 10,
-                    right: 10,
-                    child: _CornerPill(
-                      label:
-                          '${widget.itemCount} ${widget.itemCount == 1 ? 'Asset' : 'Assets'}',
-                    ),
-                  ),
-
-                // Bottom left title
+                // Bottom Content
                 Positioned(
-                  left: 14,
-                  right: 14,
+                  left: 16,
+                  right: 16,
                   bottom: 14,
-                  child: Text(
-                    widget.category.displayName,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.6,
-                      height: 1.25,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black87,
-                          blurRadius: 8,
-                          offset: Offset(0, 2),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.category.displayName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black54,
+                              blurRadius: 6,
+                              offset: Offset(0, 1),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        widget.itemCount > 0
+                            ? '${widget.itemCount} ${widget.itemCount == 1 ? 'item' : 'items'}'
+                            : 'Empty',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.72),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: -0.1,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -339,10 +343,10 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
         child: Container(
           decoration: BoxDecoration(
             color: ext.cardColor,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(26),
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(26),
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -362,30 +366,19 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withValues(alpha: 0.1),
-                        Colors.black.withValues(alpha: 0.35),
-                        Colors.black.withValues(alpha: 0.88),
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: 0.3),
+                        Colors.black.withValues(alpha: 0.82),
                       ],
-                      stops: const [0.0, 0.4, 1.0],
+                      stops: const [0.25, 0.6, 1.0],
                     ),
                   ),
                 ),
 
-                // Top Right Pill
-                if (widget.itemCount > 0)
-                  Positioned(
-                    top: 14,
-                    right: 14,
-                    child: _CornerPill(
-                      label:
-                          '${widget.itemCount} ${widget.itemCount == 1 ? 'Asset' : 'Assets'}',
-                    ),
-                  ),
-
-                // Bottom Left Title & Sub-detail
+                // Bottom Content
                 Positioned(
-                  left: 16,
-                  right: 16,
+                  left: 18,
+                  right: 18,
                   bottom: 16,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -400,60 +393,52 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
                               widget.category.displayName,
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 17,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 0.8,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.4,
                                 shadows: [
                                   Shadow(
-                                    color: Colors.black87,
-                                    blurRadius: 8,
-                                    offset: Offset(0, 2),
+                                    color: Colors.black54,
+                                    blurRadius: 6,
+                                    offset: Offset(0, 1),
                                   ),
                                 ],
                               ),
                             ),
-                            if (widget.latestItem != null) ...[
-                              const SizedBox(height: 3),
-                              Text(
-                                widget.latestItem!.title,
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.75),
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                            const SizedBox(height: 2),
+                            Text(
+                              widget.latestItem != null
+                                  ? widget.latestItem!.title
+                                  : (widget.itemCount > 0
+                                      ? '${widget.itemCount} items'
+                                      : 'Empty'),
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.75),
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: -0.1,
                               ),
-                            ],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ],
                         ),
                       ),
-                      if (widget.latestItem != null)
+                      if (widget.itemCount > 0)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 5),
+                              horizontal: 10, vertical: 4.5),
                           decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.45),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.star_rounded,
-                                color: const Color(0xFFFFD700),
-                                size: 14,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Featured',
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.9),
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
+                          child: Text(
+                            '${widget.itemCount}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                     ],
@@ -512,10 +497,10 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
         child: Container(
           decoration: BoxDecoration(
             color: ext.cardColor,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(26),
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(26),
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -535,49 +520,56 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withValues(alpha: 0.1),
-                        Colors.black.withValues(alpha: 0.4),
-                        Colors.black.withValues(alpha: 0.88),
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: 0.3),
+                        Colors.black.withValues(alpha: 0.82),
                       ],
-                      stops: const [0.0, 0.45, 1.0],
+                      stops: const [0.3, 0.65, 1.0],
                     ),
                   ),
                 ),
 
-                // Top Right Pill
-                if (widget.itemCount > 0)
-                  Positioned(
-                    top: 12,
-                    right: 12,
-                    child: _CornerPill(
-                      label:
-                          '${widget.itemCount} ${widget.itemCount == 1 ? 'Asset' : 'Assets'}',
-                    ),
-                  ),
-
-                // Bottom Left Title
+                // Bottom Content
                 Positioned(
-                  left: 16,
-                  right: 16,
-                  bottom: 14,
+                  left: 18,
+                  right: 18,
+                  bottom: 16,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        widget.category.displayName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 0.8,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black87,
-                              blurRadius: 8,
-                              offset: Offset(0, 2),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            widget.category.displayName,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.3,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black54,
+                                  blurRadius: 6,
+                                  offset: Offset(0, 1),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            widget.itemCount > 0
+                                ? '${widget.itemCount} ${widget.itemCount == 1 ? 'item' : 'items'}'
+                                : 'Empty',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.72),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: -0.1,
+                            ),
+                          ),
+                        ],
                       ),
                       Icon(
                         Icons.arrow_forward_ios_rounded,
@@ -596,33 +588,7 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
   }
 }
 
-// ── Shared Corner Pill (Clean & Borderless) ──────────────────────────────────
-
-class _CornerPill extends StatelessWidget {
-  final String label;
-
-  const _CornerPill({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.45),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 10.5,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.4,
-        ),
-      ),
-    );
-  }
-}
+// ── Minimalist Fallback Gradient ─────────────────────────────────────────────
 
 class _GradientFallback extends StatelessWidget {
   final IconData? icon;
@@ -638,12 +604,12 @@ class _GradientFallback extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: isDark
               ? [
-                  const Color(0xFF263344),
-                  const Color(0xFF19222E),
+                  const Color(0xFF2C2C2E),
+                  const Color(0xFF1C1C1E),
                 ]
               : [
                   const Color(0xFFFFFFFF),
-                  const Color(0xFFDDE7F0),
+                  const Color(0xFFE5E5EA),
                 ],
         ),
       ),
@@ -651,7 +617,7 @@ class _GradientFallback extends StatelessWidget {
           ? Center(
               child: Icon(
                 icon,
-                size: 44,
+                size: 42,
                 color: isDark
                     ? Colors.white.withValues(alpha: 0.08)
                     : Colors.black.withValues(alpha: 0.05),

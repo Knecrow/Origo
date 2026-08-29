@@ -166,15 +166,15 @@ class _AddItemSheetState extends State<AddItemSheet> {
 
               // Title
               Text(
-                'ADD TO VISION BOARD',
+                'New Aspiration',
                 style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  color: ext.accent,
-                  letterSpacing: 1.5,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: ext.textPrimary,
+                  letterSpacing: -0.4,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
 
               // Image Picker
               _ImagePickerWidget(
@@ -203,12 +203,11 @@ class _AddItemSheetState extends State<AddItemSheet> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'CATEGORY',
+                    'Category',
                     style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
                       color: ext.textMuted,
-                      letterSpacing: 1.2,
                     ),
                   ),
                 ],
@@ -221,14 +220,13 @@ class _AddItemSheetState extends State<AddItemSheet> {
               ),
               const SizedBox(height: 20),
 
-              // Title field
+              // Title Field
               Text(
-                'TITLE',
+                'Title',
                 style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                   color: ext.textMuted,
-                  letterSpacing: 1.2,
                 ),
               ),
               const SizedBox(height: 8),
@@ -236,21 +234,20 @@ class _AddItemSheetState extends State<AddItemSheet> {
                 controller: _titleCtrl,
                 style: TextStyle(color: ext.textPrimary),
                 decoration: const InputDecoration(
-                  hintText: 'Give your dream a name...',
+                  hintText: 'e.g. Villa in Como, Porsche 911 GT3',
                 ),
                 validator: (v) =>
-                    v == null || v.trim().isEmpty ? 'Title is required' : null,
+                    (v == null || v.trim().isEmpty) ? 'Please enter a title' : null,
               ),
               const SizedBox(height: 16),
 
               // Timeframe
               Text(
-                'TARGET TIMEFRAME',
+                'Target Date / Timeframe',
                 style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                   color: ext.textMuted,
-                  letterSpacing: 1.2,
                 ),
               ),
               const SizedBox(height: 8),
@@ -258,19 +255,18 @@ class _AddItemSheetState extends State<AddItemSheet> {
                 controller: _timeframeCtrl,
                 style: TextStyle(color: ext.textPrimary),
                 decoration: const InputDecoration(
-                  hintText: 'e.g. Before 2030, Within 5 years...',
+                  hintText: 'e.g. By Age 30, Q4 2027, In 3 Years',
                 ),
               ),
               const SizedBox(height: 16),
 
               // Notes
               Text(
-                'MOTIVATION NOTES',
+                'Motivation & Notes',
                 style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                   color: ext.textMuted,
-                  letterSpacing: 1.2,
                 ),
               ),
               const SizedBox(height: 8),
@@ -348,11 +344,11 @@ class _AddItemSheetState extends State<AddItemSheet> {
                           elevation: 0,
                         ),
                         child: const Text(
-                          'ADD TO VISION BOARD',
+                          'Add to Portfolio',
                           style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.2,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.2,
                           ),
                         ),
                       ),

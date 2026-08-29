@@ -91,9 +91,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
                     displayName,
                     style: TextStyle(
                       color: ext.textPrimary,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.8,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.4,
                     ),
                   ),
                 ],

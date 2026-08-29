@@ -87,17 +87,17 @@ class CardQuickActionsSheet extends StatelessWidget {
                     Text(
                       category.displayName,
                       style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
+                        fontSize: 19,
+                        fontWeight: FontWeight.w700,
                         color: ext.textPrimary,
-                        letterSpacing: 0.5,
+                        letterSpacing: -0.4,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '$itemCount ${itemCount == 1 ? 'asset in portfolio' : 'assets in portfolio'}',
+                      '$itemCount ${itemCount == 1 ? 'item in portfolio' : 'items in portfolio'}',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 12.5,
                         color: ext.textMuted,
                         fontWeight: FontWeight.w500,
                       ),

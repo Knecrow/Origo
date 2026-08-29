@@ -36,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final spotlightItems = itemsProv.spotlightItems;
     final counts = itemsProv.categoryCounts;
     final covers = itemsProv.categoryLatestCover;
+    final totalItems = itemsProv.items.length;
 
     return Scaffold(
       backgroundColor: ext.bgColor,
@@ -43,33 +44,35 @@ class _HomeScreenState extends State<HomeScreen> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            // ── 1. Top Brand Header ─────────────────────────────────────────
+            // ── 1. Top Navigation Bar (Apple Large Title) ───────────────────
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'ORIGO',
+                          'Portfolio',
                           style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w900,
+                            fontSize: 34,
+                            fontWeight: FontWeight.w800,
                             color: ext.textPrimary,
-                            letterSpacing: 4,
+                            letterSpacing: -0.8,
+                            height: 1.1,
                           ),
                         ),
+                        const SizedBox(height: 4),
                         Text(
-                          'DREAM PORTFOLIO',
+                          '$totalItems ${totalItems == 1 ? 'aspiration' : 'aspirations'} collected',
                           style: TextStyle(
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w700,
-                            color: ext.accent,
-                            letterSpacing: 2.5,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: ext.textMuted,
+                            letterSpacing: -0.1,
                           ),
                         ),
                       ],
@@ -82,8 +85,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       size: 18,
                       padding: 10,
                       iconColor: themeProv.isDark
-                          ? const Color(0xFFFFC107)
-                          : const Color(0xFF5E8BB8),
+                          ? const Color(0xFFFFD60A)
+                          : ext.textPrimary,
                       onTap: () {
                         HapticFeedback.selectionClick();
                         themeProv.toggle();
@@ -94,29 +97,18 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // ── 2. Spotlight Hero Carousel ─────────────────────────────────
+            // ── 2. Featured Section (Apple Photos Spotlight) ───────────────
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
-                child: Row(
-                  children: [
-                    const ClayIconBadge(
-                      icon: Icons.auto_awesome_rounded,
-                      size: 13,
-                      padding: 7,
-                      iconColor: Color(0xFFFFD700),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'FEATURED SPOTLIGHT',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: ext.textMuted,
-                        letterSpacing: 1.8,
-                      ),
-                    ),
-                  ],
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                child: Text(
+                  'Featured',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: ext.textPrimary,
+                    letterSpacing: -0.4,
+                  ),
                 ),
               ),
             ),
@@ -128,35 +120,30 @@ class _HomeScreenState extends State<HomeScreen> {
                   : SpotlightCarousel(items: spotlightItems),
             ),
 
-            // ── 3. Bento Grid Header ───────────────────────────────────────
+            // ── 3. Categories Section Header ───────────────────────────────
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+                padding: const EdgeInsets.fromLTRB(20, 28, 20, 14),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
                   children: [
-                    const ClayIconBadge(
-                      icon: Icons.dashboard_customize_rounded,
-                      size: 13,
-                      padding: 7,
-                    ),
-                    const SizedBox(width: 8),
                     Text(
-                      'VISION PORTFOLIO',
+                      'Categories',
                       style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: ext.textMuted,
-                        letterSpacing: 1.8,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: ext.textPrimary,
+                        letterSpacing: -0.4,
                       ),
                     ),
-                    const Spacer(),
                     Text(
-                      '${itemsProv.categories.length} CATEGORIES',
+                      '${itemsProv.categories.length}',
                       style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: ext.textMuted.withValues(alpha: 0.6),
-                        letterSpacing: 1.0,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: ext.textMuted,
                       ),
                     ),
                   ],
@@ -179,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      // FAB
+      // Floating Action Button
       floatingActionButton: _AnimatedFAB(
         onTap: () => AddItemSheet.show(context),
       ),
@@ -233,8 +220,8 @@ class _AnimatedFABState extends State<_AnimatedFAB>
         },
         onTapCancel: () => _controller.forward(),
         child: Container(
-          width: 58,
-          height: 58,
+          width: 56,
+          height: 56,
           decoration: BoxDecoration(
             color: ext.accent,
             shape: BoxShape.circle,
@@ -242,7 +229,7 @@ class _AnimatedFABState extends State<_AnimatedFAB>
           child: const Icon(
             Icons.add_rounded,
             color: Colors.white,
-            size: 28,
+            size: 26,
           ),
         ),
       ),

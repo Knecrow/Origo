@@ -110,24 +110,23 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
 
               // Title
               Text(
-                'NEW VISION CATEGORY',
+                'New Category',
                 style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w900,
-                  color: ext.accent,
-                  letterSpacing: 1.5,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: ext.textPrimary,
+                  letterSpacing: -0.4,
                 ),
               ),
               const SizedBox(height: 16),
 
               // Category Name Input
               Text(
-                'CATEGORY NAME',
+                'Category Name',
                 style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                   color: ext.textMuted,
-                  letterSpacing: 1.2,
                 ),
               ),
               const SizedBox(height: 8),
@@ -135,7 +134,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                 controller: _nameCtrl,
                 style: TextStyle(color: ext.textPrimary),
                 decoration: const InputDecoration(
-                  hintText: 'e.g. Watches, Real Estate, Island...',
+                  hintText: 'e.g. Watches, Real Estate, Art',
                 ),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) {
@@ -149,12 +148,11 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
 
               // Display Subtitle / Tagline
               Text(
-                'EDITORIAL TAGLINE (OPTIONAL)',
+                'Editorial Tagline (Optional)',
                 style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                   color: ext.textMuted,
-                  letterSpacing: 1.2,
                 ),
               ),
               const SizedBox(height: 8),
@@ -162,7 +160,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                 controller: _displayCtrl,
                 style: TextStyle(color: ext.textPrimary),
                 decoration: const InputDecoration(
-                  hintText: 'e.g. HOROLOGY & CRAFT, PRIVATE SANCTUARY...',
+                  hintText: 'e.g. Horology & Craft, Private Sanctuary',
                 ),
                 onChanged: (_) => setState(() {}),
               ),
@@ -170,12 +168,11 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
 
               // Icon Selector
               Text(
-                'SELECT ICON',
+                'Select Icon',
                 style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                   color: ext.textMuted,
-                  letterSpacing: 1.2,
                 ),
               ),
               const SizedBox(height: 10),
@@ -210,12 +207,11 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
 
               // Live Preview Card
               Text(
-                'LIVE PREVIEW',
+                'Live Preview',
                 style: TextStyle(
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                   color: ext.textMuted,
-                  letterSpacing: 1.2,
                 ),
               ),
               const SizedBox(height: 8),
@@ -308,11 +304,11 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                           elevation: 0,
                         ),
                         child: const Text(
-                          'CREATE CATEGORY',
+                          'Create Category',
                           style: TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.2,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.2,
                           ),
                         ),
                       ),
