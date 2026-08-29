@@ -716,17 +716,6 @@ class _EmptyInvitationContent extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 2),
-          Text(
-            'Tap to add dream',
-            style: TextStyle(
-              fontSize: 11.5,
-              fontWeight: FontWeight.w500,
-              color: ext.textMuted,
-              letterSpacing: -0.1,
-            ),
-            textAlign: TextAlign.center,
-          ),
         ],
       ),
     );
