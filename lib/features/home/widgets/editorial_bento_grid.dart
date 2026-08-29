@@ -102,6 +102,7 @@ class EditorialBentoGrid extends StatelessWidget {
         final count = counts[current.key] ?? 0;
         widgets.add(
           SizedBox(
+            width: double.infinity,
             height: 195,
             child: _BentoPanoramicHeroCard(
               category: current,
@@ -160,6 +161,7 @@ class EditorialBentoGrid extends StatelessWidget {
           // Wide Footer Card
           widgets.add(
             SizedBox(
+              width: double.infinity,
               height: 154,
               child: _BentoFooterCard(
                 category: first,
@@ -178,7 +180,10 @@ class EditorialBentoGrid extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(children: widgets),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: widgets,
+      ),
     );
   }
 }
@@ -664,6 +669,7 @@ class _EmptyInvitationContent extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
+      width: double.infinity,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
