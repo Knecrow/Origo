@@ -16,28 +16,28 @@ class AppColors {
   static const Color lightShadowDark = Color(0xFFCAD5DF);
   static const Color lightShadowLight = Color(0xFFFFFFFF);
 
-  // ── Dark Palette ───────────────────────────────────────────────────────────
-  static const Color darkBackground = Color(0xFF0E1621);
-  static const Color darkCard = Color(0xFF172331);
+  // ── Dark Palette (Stealth Obsidian & Matte Slate) ──────────────────────────
+  static const Color darkBackground = Color(0xFF090D13);
+  static const Color darkCard = Color(0xFF121822);
   static const Color darkAccent = Color(0xFF5E8BB8);
   static const Color darkTextPrimary = Color(0xFFF0F5FA);
-  static const Color darkTextMuted = Color(0xFF6B8299);
+  static const Color darkTextMuted = Color(0xFF718599);
 
   // Neumorphic shadows (dark theme)
-  static const Color darkShadowDark = Color(0xFF090F18);
-  static const Color darkShadowLight = Color(0xFF1F3347);
+  static const Color darkShadowDark = Color(0xFF05080C);
+  static const Color darkShadowLight = Color(0xFF1B2433);
 
   // ── Shared ─────────────────────────────────────────────────────────────────
   static const Color error = Color(0xFFE05B5B);
   static const Color success = Color(0xFF5BB8A0);
 
-  // ── Category Colors ────────────────────────────────────────────────────────
+  // ── Category Accent Colors ─────────────────────────────────────────────────
   static const Map<String, Color> categoryColors = {
     'Home': Color(0xFF7B9EC2),
-    'Places': Color(0xFF6DB29A),
-    'Garage': Color(0xFFB2896D),
+    'Places': Color(0xFF5CAE97),
+    'Garage': Color(0xFFC4936B),
     'Jets': Color(0xFF8B7BC2),
-    'Yachts': Color(0xFF6BA8B2),
-    'Others': Color(0xFFB27B9A),
+    'Yachts': Color(0xFF55A4B5),
+    'Others': Color(0xFFB5708E),
   };
 }

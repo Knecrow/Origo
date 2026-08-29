@@ -4,28 +4,16 @@ import 'package:flutter/material.dart';
 import '../../../core/models/origo_item.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/clay_icon_badge.dart';
-import '../../../core/widgets/frosted_glass_container.dart';
 import '../../../core/widgets/origo_image.dart';
 import '../../gallery/gallery_screen.dart';
-import 'category_card.dart';
 
-const Map<String, String> kCategorySubtitles = {
-  'Home': 'SANCTUARY & LIVING',
-  'Garage': 'PRECISION MOBILITY',
-  'Jets': 'PRIVATE AVIATION',
-  'Yachts': 'MARITIME FLEET',
-  'Places': 'GLOBAL HORIZONS',
-  'Others': 'BESPOKE ACQUISITIONS',
-};
-
-const Map<String, String> kCategoryNumbers = {
-  'Home': '01',
-  'Garage': '02',
-  'Jets': '03',
-  'Yachts': '04',
-  'Places': '05',
-  'Others': '06',
+const Map<String, String> kCategoryDisplayNames = {
+  'Home': 'HOME & ESTATE',
+  'Garage': 'GARAGE & FLEET',
+  'Jets': 'JETS & AVIATION',
+  'Places': 'PLACES & TRAVEL',
+  'Yachts': 'YACHTS & MARINE',
+  'Others': 'COLLECTIONS & LUXURY',
 };
 
 class EditorialBentoGrid extends StatelessWidget {
@@ -55,27 +43,29 @@ class EditorialBentoGrid extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
-          // ── 1. Full-Width Panoramic Bento Hero Card (HOME) ───────────
-          _BentoHeroCard(
-            category: 'Home',
-            itemCount: counts['Home'] ?? 0,
-            latestItem: covers['Home'],
-            showCount: !isShowcase,
-            onTap: () => _openCategory(context, 'Home'),
-          ),
-          const SizedBox(height: 14),
-
-          // ── 2. Asymmetric Middle Tier: Tall Portrait (GARAGE) + Stacked Dual (JETS, YACHTS) ─
+          // ── Row 1: Dual Top Cards (HOME & ESTATE + GARAGE & FLEET) ───────
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Left: Tall Portrait Feature (Garage)
               Expanded(
-                flex: 11,
                 child: SizedBox(
-                  height: 254,
-                  child: _BentoPortraitCard(
-                    category: 'Garage',
+                  height: 172,
+                  child: _BentoSquareCard(
+                    categoryKey: 'Home',
+                    displayTitle: kCategoryDisplayNames['Home']!,
+                    itemCount: counts['Home'] ?? 0,
+                    latestItem: covers['Home'],
+                    showCount: !isShowcase,
+                    onTap: () => _openCategory(context, 'Home'),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: SizedBox(
+                  height: 172,
+                  child: _BentoSquareCard(
+                    categoryKey: 'Garage',
+                    displayTitle: kCategoryDisplayNames['Garage']!,
                     itemCount: counts['Garage'] ?? 0,
                     latestItem: covers['Garage'],
                     showCount: !isShowcase,
@@ -83,49 +73,33 @@ class EditorialBentoGrid extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 14),
-              // Right: Stacked Dual Compact Cards (Jets & Yachts)
-              Expanded(
-                flex: 12,
-                child: SizedBox(
-                  height: 254,
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: _BentoCompactCard(
-                          category: 'Jets',
-                          itemCount: counts['Jets'] ?? 0,
-                          latestItem: covers['Jets'],
-                          showCount: !isShowcase,
-                          onTap: () => _openCategory(context, 'Jets'),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      Expanded(
-                        child: _BentoCompactCard(
-                          category: 'Yachts',
-                          itemCount: counts['Yachts'] ?? 0,
-                          latestItem: covers['Yachts'],
-                          showCount: !isShowcase,
-                          onTap: () => _openCategory(context, 'Yachts'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ],
           ),
           const SizedBox(height: 14),
 
-          // ── 3. Bottom Tier: Balanced Landscape Pair (PLACES & OTHERS) ─
+          // ── Row 2: Centerpiece Panoramic Hero Card (JETS & AVIATION) ───────
+          SizedBox(
+            height: 195,
+            child: _BentoPanoramicHeroCard(
+              categoryKey: 'Jets',
+              displayTitle: kCategoryDisplayNames['Jets']!,
+              itemCount: counts['Jets'] ?? 0,
+              latestItem: covers['Jets'],
+              showCount: !isShowcase,
+              onTap: () => _openCategory(context, 'Jets'),
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // ── Row 3: Dual Cards (PLACES & TRAVEL + YACHTS & MARINE) ──────────
           Row(
             children: [
               Expanded(
                 child: SizedBox(
-                  height: 156,
-                  child: _BentoLandscapeCard(
-                    category: 'Places',
+                  height: 172,
+                  child: _BentoSquareCard(
+                    categoryKey: 'Places',
+                    displayTitle: kCategoryDisplayNames['Places']!,
                     itemCount: counts['Places'] ?? 0,
                     latestItem: covers['Places'],
                     showCount: !isShowcase,
@@ -136,17 +110,32 @@ class EditorialBentoGrid extends StatelessWidget {
               const SizedBox(width: 14),
               Expanded(
                 child: SizedBox(
-                  height: 156,
-                  child: _BentoLandscapeCard(
-                    category: 'Others',
-                    itemCount: counts['Others'] ?? 0,
-                    latestItem: covers['Others'],
+                  height: 172,
+                  child: _BentoSquareCard(
+                    categoryKey: 'Yachts',
+                    displayTitle: kCategoryDisplayNames['Yachts']!,
+                    itemCount: counts['Yachts'] ?? 0,
+                    latestItem: covers['Yachts'],
                     showCount: !isShowcase,
-                    onTap: () => _openCategory(context, 'Others'),
+                    onTap: () => _openCategory(context, 'Yachts'),
                   ),
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 14),
+
+          // ── Row 4: Wide Footer Card (COLLECTIONS & LUXURY) ─────────────────
+          SizedBox(
+            height: 154,
+            child: _BentoFooterCard(
+              categoryKey: 'Others',
+              displayTitle: kCategoryDisplayNames['Others']!,
+              itemCount: counts['Others'] ?? 0,
+              latestItem: covers['Others'],
+              showCount: !isShowcase,
+              onTap: () => _openCategory(context, 'Others'),
+            ),
           ),
         ],
       ),
@@ -154,17 +143,19 @@ class EditorialBentoGrid extends StatelessWidget {
   }
 }
 
-// ── 1. Hero Panoramic Card ───────────────────────────────────────────────────
+// ── Square Bento Card (Rows 1 & 3) ───────────────────────────────────────────
 
-class _BentoHeroCard extends StatefulWidget {
-  final String category;
+class _BentoSquareCard extends StatefulWidget {
+  final String categoryKey;
+  final String displayTitle;
   final int itemCount;
   final OrigoItem? latestItem;
   final bool showCount;
   final VoidCallback onTap;
 
-  const _BentoHeroCard({
-    required this.category,
+  const _BentoSquareCard({
+    required this.categoryKey,
+    required this.displayTitle,
     required this.itemCount,
     required this.latestItem,
     required this.showCount,
@@ -172,20 +163,162 @@ class _BentoHeroCard extends StatefulWidget {
   });
 
   @override
-  State<_BentoHeroCard> createState() => _BentoHeroCardState();
+  State<_BentoSquareCard> createState() => _BentoSquareCardState();
 }
 
-class _BentoHeroCardState extends State<_BentoHeroCard> {
+class _BentoSquareCardState extends State<_BentoSquareCard> {
   bool _pressed = false;
 
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
-    final accent = AppColors.categoryColors[widget.category] ?? ext.accent;
-    final icon = kCategoryIcons[widget.category] ?? Icons.home_rounded;
+    final accent = AppColors.categoryColors[widget.categoryKey] ?? ext.accent;
     final hasImage = widget.latestItem != null;
-    final numStr = kCategoryNumbers[widget.category] ?? '01';
-    final subtitle = kCategorySubtitles[widget.category] ?? 'VISION';
+
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.97 : 1.0,
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOutCubic,
+        child: Container(
+          decoration: BoxDecoration(
+            color: ext.cardColor,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.1),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: ext.shadowLight,
+                offset: const Offset(-5, -5),
+                blurRadius: 14,
+              ),
+              BoxShadow(
+                color: ext.shadowDark,
+                offset: const Offset(5, 5),
+                blurRadius: 14,
+              ),
+              BoxShadow(
+                color: accent.withValues(alpha: 0.14),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(22),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // Image or gradient fallback
+                if (hasImage)
+                  OrigoImage(
+                    imagePath: widget.latestItem!.imagePath,
+                    fit: BoxFit.cover,
+                    errorWidget: _GradientFallback(color: accent),
+                  )
+                else
+                  _GradientFallback(color: accent),
+
+                // Smooth dark gradient overlay
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.15),
+                        Colors.black.withValues(alpha: 0.35),
+                        Colors.black.withValues(alpha: 0.88),
+                      ],
+                      stops: const [0.0, 0.45, 1.0],
+                    ),
+                  ),
+                ),
+
+                // Top-right Asset count pill
+                if (widget.showCount && widget.itemCount > 0)
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: _CornerPill(
+                      label: '${widget.itemCount} ${widget.itemCount == 1 ? 'Asset' : 'Assets'}',
+                    ),
+                  ),
+
+                // Bottom-left Category Title
+                Positioned(
+                  left: 14,
+                  right: 14,
+                  bottom: 14,
+                  child: Text(
+                    widget.displayTitle,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.6,
+                      height: 1.25,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black87,
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Centerpiece Panoramic Hero Card (Row 2 - JETS & AVIATION) ────────────────
+
+class _BentoPanoramicHeroCard extends StatefulWidget {
+  final String categoryKey;
+  final String displayTitle;
+  final int itemCount;
+  final OrigoItem? latestItem;
+  final bool showCount;
+  final VoidCallback onTap;
+
+  const _BentoPanoramicHeroCard({
+    required this.categoryKey,
+    required this.displayTitle,
+    required this.itemCount,
+    required this.latestItem,
+    required this.showCount,
+    required this.onTap,
+  });
+
+  @override
+  State<_BentoPanoramicHeroCard> createState() =>
+      _BentoPanoramicHeroCardState();
+}
+
+class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final ext = context.ext;
+    final accent = AppColors.categoryColors[widget.categoryKey] ?? ext.accent;
+    final hasImage = widget.latestItem != null;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _pressed = true),
@@ -196,13 +329,16 @@ class _BentoHeroCardState extends State<_BentoHeroCard> {
       onTapCancel: () => setState(() => _pressed = false),
       child: AnimatedScale(
         scale: _pressed ? 0.98 : 1.0,
-        duration: const Duration(milliseconds: 150),
+        duration: const Duration(milliseconds: 140),
         curve: Curves.easeOutCubic,
         child: Container(
-          height: 200,
           decoration: BoxDecoration(
             color: ext.cardColor,
             borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.12),
+              width: 1,
+            ),
             boxShadow: [
               BoxShadow(
                 color: ext.shadowLight,
@@ -214,9 +350,8 @@ class _BentoHeroCardState extends State<_BentoHeroCard> {
                 offset: const Offset(6, 6),
                 blurRadius: 16,
               ),
-              // Subtle ambient accent halo
               BoxShadow(
-                color: accent.withValues(alpha: 0.18),
+                color: accent.withValues(alpha: 0.22),
                 blurRadius: 28,
                 offset: const Offset(0, 8),
               ),
@@ -224,539 +359,6 @@ class _BentoHeroCardState extends State<_BentoHeroCard> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                // Background Image / Gradient
-                if (hasImage)
-                  OrigoImage(
-                    imagePath: widget.latestItem!.imagePath,
-                    fit: BoxFit.cover,
-                    errorWidget: _GradientFallback(color: accent),
-                  )
-                else
-                  _GradientFallback(color: accent),
-
-                // Editorial gradient scrim
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.black.withValues(alpha: 0.25),
-                        Colors.black.withValues(alpha: 0.75),
-                      ],
-                      stops: const [0.2, 1.0],
-                    ),
-                  ),
-                ),
-
-                // Top row: Number Badge & Category Icon + Count
-                Positioned(
-                  top: 16,
-                  left: 16,
-                  right: 16,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Editorial index tag
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.4),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            width: 1,
-                          ),
-                        ),
-                        child: Text(
-                          '$numStr // FEATURED HABITAT',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                      ),
-                      // Clay Icon badge
-                      ClayIconBadge(
-                        icon: icon,
-                        size: 18,
-                        padding: 8,
-                        iconColor: Colors.white,
-                        badgeColor: accent.withValues(alpha: 0.8),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Bottom Content with Frosted Glass Label
-                Positioned(
-                  bottom: 14,
-                  left: 14,
-                  right: 14,
-                  child: FrostedGlassContainer(
-                    blur: 14,
-                    borderRadius: 16,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
-                    tint: Colors.black.withValues(alpha: 0.35),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                subtitle,
-                                style: TextStyle(
-                                  color: accent.withValues(alpha: 0.9),
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 1.5,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                widget.category,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                              if (widget.latestItem != null) ...[
-                                const SizedBox(height: 2),
-                                Text(
-                                  widget.latestItem!.title,
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.75),
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        if (widget.showCount)
-                          _BentoCountPill(
-                            count: widget.itemCount,
-                            accentColor: accent,
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── 2. Portrait Card (Tall 250px) ───────────────────────────────────────────
-
-class _BentoPortraitCard extends StatefulWidget {
-  final String category;
-  final int itemCount;
-  final OrigoItem? latestItem;
-  final bool showCount;
-  final VoidCallback onTap;
-
-  const _BentoPortraitCard({
-    required this.category,
-    required this.itemCount,
-    required this.latestItem,
-    required this.showCount,
-    required this.onTap,
-  });
-
-  @override
-  State<_BentoPortraitCard> createState() => _BentoPortraitCardState();
-}
-
-class _BentoPortraitCardState extends State<_BentoPortraitCard> {
-  bool _pressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final ext = context.ext;
-    final accent = AppColors.categoryColors[widget.category] ?? ext.accent;
-    final icon = kCategoryIcons[widget.category] ?? Icons.directions_car_rounded;
-    final hasImage = widget.latestItem != null;
-    final numStr = kCategoryNumbers[widget.category] ?? '02';
-    final subtitle = kCategorySubtitles[widget.category] ?? 'MOBILITY';
-
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) {
-        setState(() => _pressed = false);
-        widget.onTap();
-      },
-      onTapCancel: () => setState(() => _pressed = false),
-      child: AnimatedScale(
-        scale: _pressed ? 0.97 : 1.0,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeOutCubic,
-        child: Container(
-          decoration: BoxDecoration(
-            color: ext.cardColor,
-            borderRadius: BorderRadius.circular(22),
-            boxShadow: [
-              BoxShadow(
-                color: ext.shadowLight,
-                offset: const Offset(-5, -5),
-                blurRadius: 14,
-              ),
-              BoxShadow(
-                color: ext.shadowDark,
-                offset: const Offset(5, 5),
-                blurRadius: 14,
-              ),
-              BoxShadow(
-                color: accent.withValues(alpha: 0.15),
-                blurRadius: 20,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(22),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                if (hasImage)
-                  OrigoImage(
-                    imagePath: widget.latestItem!.imagePath,
-                    fit: BoxFit.cover,
-                    errorWidget: _GradientFallback(color: accent),
-                  )
-                else
-                  _GradientFallback(color: accent),
-
-                // Gradient scrim
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.black.withValues(alpha: 0.3),
-                        Colors.transparent,
-                        Colors.black.withValues(alpha: 0.8),
-                      ],
-                      stops: const [0.0, 0.4, 1.0],
-                    ),
-                  ),
-                ),
-
-                // Top row
-                Positioned(
-                  top: 14,
-                  left: 14,
-                  right: 14,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        numStr,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.8),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                      ClayIconBadge(
-                        icon: icon,
-                        size: 16,
-                        padding: 7,
-                        iconColor: Colors.white,
-                        badgeColor: accent.withValues(alpha: 0.8),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Bottom details
-                Positioned(
-                  left: 14,
-                  right: 14,
-                  bottom: 14,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          color: accent.withValues(alpha: 0.95),
-                          fontSize: 8.5,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        widget.category,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      if (widget.showCount)
-                        _BentoCountPill(
-                          count: widget.itemCount,
-                          accentColor: accent,
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── 3. Compact Stacked Card (Jets & Yachts) ──────────────────────────────────
-
-class _BentoCompactCard extends StatefulWidget {
-  final String category;
-  final int itemCount;
-  final OrigoItem? latestItem;
-  final bool showCount;
-  final VoidCallback onTap;
-
-  const _BentoCompactCard({
-    required this.category,
-    required this.itemCount,
-    required this.latestItem,
-    required this.showCount,
-    required this.onTap,
-  });
-
-  @override
-  State<_BentoCompactCard> createState() => _BentoCompactCardState();
-}
-
-class _BentoCompactCardState extends State<_BentoCompactCard> {
-  bool _pressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final ext = context.ext;
-    final accent = AppColors.categoryColors[widget.category] ?? ext.accent;
-    final icon = kCategoryIcons[widget.category] ?? Icons.flight_rounded;
-    final hasImage = widget.latestItem != null;
-    final numStr = kCategoryNumbers[widget.category] ?? '03';
-
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) {
-        setState(() => _pressed = false);
-        widget.onTap();
-      },
-      onTapCancel: () => setState(() => _pressed = false),
-      child: AnimatedScale(
-        scale: _pressed ? 0.97 : 1.0,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeOutCubic,
-        child: Container(
-          decoration: BoxDecoration(
-            color: ext.cardColor,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: ext.shadowLight,
-                offset: const Offset(-4, -4),
-                blurRadius: 12,
-              ),
-              BoxShadow(
-                color: ext.shadowDark,
-                offset: const Offset(4, 4),
-                blurRadius: 12,
-              ),
-              BoxShadow(
-                color: accent.withValues(alpha: 0.12),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                if (hasImage)
-                  OrigoImage(
-                    imagePath: widget.latestItem!.imagePath,
-                    fit: BoxFit.cover,
-                    errorWidget: _GradientFallback(color: accent),
-                  )
-                else
-                  _GradientFallback(color: accent),
-
-                // Subtle dark gradient
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.black.withValues(alpha: 0.3),
-                        Colors.black.withValues(alpha: 0.7),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Content
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ClayIconBadge(
-                            icon: icon,
-                            size: 15,
-                            padding: 6,
-                            iconColor: Colors.white,
-                            badgeColor: accent.withValues(alpha: 0.8),
-                          ),
-                          Text(
-                            numStr,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.6),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            widget.category,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          if (widget.showCount)
-                            _BentoCountPill(
-                              count: widget.itemCount,
-                              accentColor: accent,
-                              compact: true,
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── 4. Balanced Landscape Card (Places & Others) ─────────────────────────────
-
-class _BentoLandscapeCard extends StatefulWidget {
-  final String category;
-  final int itemCount;
-  final OrigoItem? latestItem;
-  final bool showCount;
-  final VoidCallback onTap;
-
-  const _BentoLandscapeCard({
-    required this.category,
-    required this.itemCount,
-    required this.latestItem,
-    required this.showCount,
-    required this.onTap,
-  });
-
-  @override
-  State<_BentoLandscapeCard> createState() => _BentoLandscapeCardState();
-}
-
-class _BentoLandscapeCardState extends State<_BentoLandscapeCard> {
-  bool _pressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final ext = context.ext;
-    final accent = AppColors.categoryColors[widget.category] ?? ext.accent;
-    final icon = kCategoryIcons[widget.category] ?? Icons.explore_rounded;
-    final hasImage = widget.latestItem != null;
-    final numStr = kCategoryNumbers[widget.category] ?? '05';
-    final subtitle = kCategorySubtitles[widget.category] ?? 'EXPEDITIONS';
-
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) {
-        setState(() => _pressed = false);
-        widget.onTap();
-      },
-      onTapCancel: () => setState(() => _pressed = false),
-      child: AnimatedScale(
-        scale: _pressed ? 0.97 : 1.0,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeOutCubic,
-        child: Container(
-          decoration: BoxDecoration(
-            color: ext.cardColor,
-            borderRadius: BorderRadius.circular(22),
-            boxShadow: [
-              BoxShadow(
-                color: ext.shadowLight,
-                offset: const Offset(-5, -5),
-                blurRadius: 14,
-              ),
-              BoxShadow(
-                color: ext.shadowDark,
-                offset: const Offset(5, 5),
-                blurRadius: 14,
-              ),
-              BoxShadow(
-                color: accent.withValues(alpha: 0.15),
-                blurRadius: 18,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(22),
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -776,73 +378,252 @@ class _BentoLandscapeCardState extends State<_BentoLandscapeCard> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withValues(alpha: 0.2),
-                        Colors.black.withValues(alpha: 0.75),
+                        Colors.black.withValues(alpha: 0.1),
+                        Colors.black.withValues(alpha: 0.35),
+                        Colors.black.withValues(alpha: 0.88),
                       ],
+                      stops: const [0.0, 0.4, 1.0],
                     ),
                   ),
                 ),
 
-                // Content
-                Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                // Top Right Pill
+                if (widget.showCount && widget.itemCount > 0)
+                  Positioned(
+                    top: 14,
+                    right: 14,
+                    child: _CornerPill(
+                      label: '${widget.itemCount} ${widget.itemCount == 1 ? 'Asset' : 'Assets'}',
+                    ),
+                  ),
+
+                // Bottom Left Title & Sub-detail
+                Positioned(
+                  left: 16,
+                  right: 16,
+                  bottom: 16,
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ClayIconBadge(
-                            icon: icon,
-                            size: 16,
-                            padding: 7,
-                            iconColor: Colors.white,
-                            badgeColor: accent.withValues(alpha: 0.8),
-                          ),
-                          Text(
-                            numStr,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.7),
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              widget.displayTitle,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.8,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black87,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            subtitle,
-                            style: TextStyle(
-                              color: accent.withValues(alpha: 0.95),
-                              fontSize: 8,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.1,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
+                            if (widget.latestItem != null) ...[
+                              const SizedBox(height: 3),
                               Text(
-                                widget.category,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w900,
+                                widget.latestItem!.title,
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.75),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      if (widget.showCount && widget.latestItem != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.45),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.star_rounded,
+                                color: const Color(0xFFFFD700),
+                                size: 14,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Featured',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              if (widget.showCount)
-                                _BentoCountPill(
-                                  count: widget.itemCount,
-                                  accentColor: accent,
-                                  compact: true,
-                                ),
                             ],
                           ),
-                        ],
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Wide Footer Card (Row 4 - COLLECTIONS & LUXURY) ──────────────────────────
+
+class _BentoFooterCard extends StatefulWidget {
+  final String categoryKey;
+  final String displayTitle;
+  final int itemCount;
+  final OrigoItem? latestItem;
+  final bool showCount;
+  final VoidCallback onTap;
+
+  const _BentoFooterCard({
+    required this.categoryKey,
+    required this.displayTitle,
+    required this.itemCount,
+    required this.latestItem,
+    required this.showCount,
+    required this.onTap,
+  });
+
+  @override
+  State<_BentoFooterCard> createState() => _BentoFooterCardState();
+}
+
+class _BentoFooterCardState extends State<_BentoFooterCard> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final ext = context.ext;
+    final accent = AppColors.categoryColors[widget.categoryKey] ?? ext.accent;
+    final hasImage = widget.latestItem != null;
+
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.98 : 1.0,
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOutCubic,
+        child: Container(
+          decoration: BoxDecoration(
+            color: ext.cardColor,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.1),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: ext.shadowLight,
+                offset: const Offset(-5, -5),
+                blurRadius: 14,
+              ),
+              BoxShadow(
+                color: ext.shadowDark,
+                offset: const Offset(5, 5),
+                blurRadius: 14,
+              ),
+              BoxShadow(
+                color: accent.withValues(alpha: 0.16),
+                blurRadius: 22,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                if (hasImage)
+                  OrigoImage(
+                    imagePath: widget.latestItem!.imagePath,
+                    fit: BoxFit.cover,
+                    errorWidget: _GradientFallback(color: accent),
+                  )
+                else
+                  _GradientFallback(color: accent),
+
+                // Scrim
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.1),
+                        Colors.black.withValues(alpha: 0.4),
+                        Colors.black.withValues(alpha: 0.88),
+                      ],
+                      stops: const [0.0, 0.45, 1.0],
+                    ),
+                  ),
+                ),
+
+                // Top Right Pill
+                if (widget.showCount && widget.itemCount > 0)
+                  Positioned(
+                    top: 12,
+                    right: 12,
+                    child: _CornerPill(
+                      label: '${widget.itemCount} ${widget.itemCount == 1 ? 'Asset' : 'Assets'}',
+                    ),
+                  ),
+
+                // Bottom Left Title
+                Positioned(
+                  left: 16,
+                  right: 16,
+                  bottom: 14,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        widget.displayTitle,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.8,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black87,
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        color: Colors.white.withValues(alpha: 0.6),
+                        size: 14,
                       ),
                     ],
                   ),
@@ -856,41 +637,32 @@ class _BentoLandscapeCardState extends State<_BentoLandscapeCard> {
   }
 }
 
-// ── Shared Bento Helpers ─────────────────────────────────────────────────────
+// ── Floating Corner Frosted Pill ─────────────────────────────────────────────
 
-class _BentoCountPill extends StatelessWidget {
-  final int count;
-  final Color accentColor;
-  final bool compact;
+class _CornerPill extends StatelessWidget {
+  final String label;
 
-  const _BentoCountPill({
-    required this.count,
-    required this.accentColor,
-    this.compact = false,
-  });
+  const _CornerPill({required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: compact ? 8 : 10,
-        vertical: compact ? 3 : 4,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
       decoration: BoxDecoration(
-        color: accentColor.withValues(alpha: 0.8),
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.black.withValues(alpha: 0.45),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.3),
+          color: Colors.white.withValues(alpha: 0.2),
           width: 0.8,
         ),
       ),
       child: Text(
-        count == 0 ? '0' : (compact ? '$count' : '$count dreams'),
-        style: TextStyle(
+        label,
+        style: const TextStyle(
           color: Colors.white,
-          fontSize: compact ? 10 : 11,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 0.3,
+          fontSize: 10.5,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.4,
         ),
       ),
     );

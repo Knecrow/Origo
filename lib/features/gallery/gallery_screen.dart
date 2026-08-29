@@ -12,6 +12,7 @@ import '../../core/widgets/origo_image.dart';
 import '../add/add_item_sheet.dart';
 import '../detail/detail_screen.dart';
 import '../home/widgets/category_card.dart';
+import '../home/widgets/editorial_bento_grid.dart';
 
 class GalleryScreen extends StatefulWidget {
   final String category;
@@ -84,11 +85,12 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    widget.category,
+                    kCategoryDisplayNames[widget.category] ?? widget.category,
                     style: TextStyle(
                       color: ext.textPrimary,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.8,
                     ),
                   ),
                 ],

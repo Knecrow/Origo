@@ -13,6 +13,7 @@ import '../../core/widgets/clay_card.dart';
 import '../../core/widgets/clay_icon_badge.dart';
 import '../../core/widgets/origo_image.dart';
 import '../home/widgets/category_card.dart';
+import '../home/widgets/editorial_bento_grid.dart';
 
 class AddItemSheet extends StatefulWidget {
   const AddItemSheet({super.key});
@@ -477,11 +478,12 @@ class _CategorySelector extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  cat,
+                  kCategoryDisplayNames[cat] ?? cat,
                   style: TextStyle(
                     color: isSelected ? Colors.white : ext.textMuted,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.4,
                   ),
                 ),
               ],
