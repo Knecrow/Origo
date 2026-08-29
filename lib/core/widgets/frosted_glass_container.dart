@@ -34,10 +34,6 @@ class FrostedGlassContainer extends StatelessWidget {
           decoration: BoxDecoration(
             color: tint ?? defaultTint,
             borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.15),
-              width: 1,
-            ),
           ),
           padding: padding ?? const EdgeInsets.all(16),
           child: child,

@@ -11,14 +11,12 @@ class EditorialBentoGrid extends StatelessWidget {
   final List<OrigoCategory> categories;
   final Map<String, int> counts;
   final Map<String, OrigoItem?> covers;
-  final bool isShowcase;
 
   const EditorialBentoGrid({
     super.key,
     required this.categories,
     required this.counts,
     required this.covers,
-    required this.isShowcase,
   });
 
   void _openCategory(BuildContext context, String categoryKey) {
@@ -54,7 +52,6 @@ class EditorialBentoGrid extends StatelessWidget {
                     category: first,
                     itemCount: counts[first.key] ?? 0,
                     latestItem: covers[first.key],
-                    showCount: !isShowcase,
                     onTap: () => _openCategory(context, first.key),
                   ),
                 ),
@@ -68,7 +65,6 @@ class EditorialBentoGrid extends StatelessWidget {
                       category: second,
                       itemCount: counts[second.key] ?? 0,
                       latestItem: covers[second.key],
-                      showCount: !isShowcase,
                       onTap: () => _openCategory(context, second.key),
                     ),
                   ),
@@ -90,7 +86,6 @@ class EditorialBentoGrid extends StatelessWidget {
               category: current,
               itemCount: counts[current.key] ?? 0,
               latestItem: covers[current.key],
-              showCount: !isShowcase,
               onTap: () => _openCategory(context, current.key),
             ),
           ),
@@ -114,7 +109,6 @@ class EditorialBentoGrid extends StatelessWidget {
                       category: first,
                       itemCount: counts[first.key] ?? 0,
                       latestItem: covers[first.key],
-                      showCount: !isShowcase,
                       onTap: () => _openCategory(context, first.key),
                     ),
                   ),
@@ -127,7 +121,6 @@ class EditorialBentoGrid extends StatelessWidget {
                       category: second,
                       itemCount: counts[second.key] ?? 0,
                       latestItem: covers[second.key],
-                      showCount: !isShowcase,
                       onTap: () => _openCategory(context, second.key),
                     ),
                   ),
@@ -146,7 +139,6 @@ class EditorialBentoGrid extends StatelessWidget {
                 category: first,
                 itemCount: counts[first.key] ?? 0,
                 latestItem: covers[first.key],
-                showCount: !isShowcase,
                 onTap: () => _openCategory(context, first.key),
               ),
             ),
@@ -170,14 +162,12 @@ class _BentoSquareCard extends StatefulWidget {
   final OrigoCategory category;
   final int itemCount;
   final OrigoItem? latestItem;
-  final bool showCount;
   final VoidCallback onTap;
 
   const _BentoSquareCard({
     required this.category,
     required this.itemCount,
     required this.latestItem,
-    required this.showCount,
     required this.onTap,
   });
 
@@ -252,7 +242,7 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
                 ),
 
                 // Top right pill
-                if (widget.showCount && widget.itemCount > 0)
+                if (widget.itemCount > 0)
                   Positioned(
                     top: 10,
                     right: 10,
@@ -302,14 +292,12 @@ class _BentoPanoramicHeroCard extends StatefulWidget {
   final OrigoCategory category;
   final int itemCount;
   final OrigoItem? latestItem;
-  final bool showCount;
   final VoidCallback onTap;
 
   const _BentoPanoramicHeroCard({
     required this.category,
     required this.itemCount,
     required this.latestItem,
-    required this.showCount,
     required this.onTap,
   });
 
@@ -385,7 +373,7 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
                 ),
 
                 // Top Right Pill
-                if (widget.showCount && widget.itemCount > 0)
+                if (widget.itemCount > 0)
                   Positioned(
                     top: 14,
                     right: 14,
@@ -441,17 +429,13 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
                           ],
                         ),
                       ),
-                      if (widget.showCount && widget.latestItem != null)
+                      if (widget.latestItem != null)
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
                             color: Colors.black.withValues(alpha: 0.45),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.15),
-                              width: 1,
-                            ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -491,14 +475,12 @@ class _BentoFooterCard extends StatefulWidget {
   final OrigoCategory category;
   final int itemCount;
   final OrigoItem? latestItem;
-  final bool showCount;
   final VoidCallback onTap;
 
   const _BentoFooterCard({
     required this.category,
     required this.itemCount,
     required this.latestItem,
-    required this.showCount,
     required this.onTap,
   });
 
@@ -573,7 +555,7 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
                 ),
 
                 // Top Right Pill
-                if (widget.showCount && widget.itemCount > 0)
+                if (widget.itemCount > 0)
                   Positioned(
                     top: 12,
                     right: 12,
@@ -624,7 +606,7 @@ class _BentoFooterCardState extends State<_BentoFooterCard> {
   }
 }
 
-// ── Shared Corner Pill ───────────────────────────────────────────────────────
+// ── Shared Corner Pill (Borderless) ──────────────────────────────────────────
 
 class _CornerPill extends StatelessWidget {
   final String label;
@@ -638,10 +620,6 @@ class _CornerPill extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.45),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.2),
-          width: 0.8,
-        ),
       ),
       child: Text(
         label,

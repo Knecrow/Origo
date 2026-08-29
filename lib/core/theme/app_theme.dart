@@ -149,7 +149,7 @@ class AppTheme {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: AppColors.lightAccent.withValues(alpha: 0.4), width: 1.5),
+        borderSide: BorderSide.none,
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
     );

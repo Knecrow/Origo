@@ -3,11 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/providers/items_provider.dart';
-import '../../core/providers/showcase_provider.dart';
 import '../../core/providers/theme_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/clay_icon_badge.dart';
-import '../../core/widgets/frosted_glass_container.dart';
 import '../add/add_item_sheet.dart';
 import 'widgets/editorial_bento_grid.dart';
 import 'widgets/spotlight_carousel.dart';
@@ -32,13 +30,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final ext = context.ext;
     final themeProv = context.watch<ThemeProvider>();
-    final showcaseProv = context.watch<ShowcaseProvider>();
     final itemsProv = context.watch<ItemsProvider>();
 
     final spotlightItems = itemsProv.spotlightItems;
     final counts = itemsProv.categoryCounts;
     final covers = itemsProv.categoryLatestCover;
-    final isShowcase = showcaseProv.isActive;
 
     return Scaffold(
       backgroundColor: ext.bgColor,
@@ -46,161 +42,58 @@ class _HomeScreenState extends State<HomeScreen> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            // ── 1. Top Header & Segmented Capsule Toggle ──────────────────
+            // ── 1. Top Brand Header ─────────────────────────────────────────
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-                child: Column(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Brand row + Theme toggle
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'ORIGO',
-                              style: TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.w900,
-                                color: ext.textPrimary,
-                                letterSpacing: 4,
-                              ),
-                            ),
-                            Text(
-                              'DREAM PORTFOLIO',
-                              style: TextStyle(
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.w700,
-                                color: ext.accent,
-                                letterSpacing: 2.5,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          'ORIGO',
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w900,
+                            color: ext.textPrimary,
+                            letterSpacing: 4,
+                          ),
                         ),
-                        Row(
-                          children: [
-                            // Showcase Toggle Pill
-                            _ShowcasePillButton(
-                              isShowcase: isShowcase,
-                              onTap: () => showcaseProv.toggle(),
-                            ),
-                            const SizedBox(width: 10),
-                            // Theme Switcher Button
-                            ClayIconBadge(
-                              icon: themeProv.isDark
-                                  ? Icons.wb_sunny_rounded
-                                  : Icons.dark_mode_rounded,
-                              size: 18,
-                              padding: 10,
-                              iconColor: themeProv.isDark
-                                  ? const Color(0xFFFFC107)
-                                  : const Color(0xFF5E8BB8),
-                              onTap: themeProv.toggle,
-                            ),
-                          ],
+                        Text(
+                          'DREAM PORTFOLIO',
+                          style: TextStyle(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w700,
+                            color: ext.accent,
+                            letterSpacing: 2.5,
+                          ),
                         ),
                       ],
+                    ),
+                    // Theme Switcher Button
+                    ClayIconBadge(
+                      icon: themeProv.isDark
+                          ? Icons.wb_sunny_rounded
+                          : Icons.dark_mode_rounded,
+                      size: 18,
+                      padding: 10,
+                      iconColor: themeProv.isDark
+                          ? const Color(0xFFFFC107)
+                          : const Color(0xFF5E8BB8),
+                      onTap: themeProv.toggle,
                     ),
                   ],
                 ),
               ),
             ),
 
-            // Showcase banner indicator
-            if (isShowcase)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: ext.accent.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: ext.accent.withValues(alpha: 0.25),
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.visibility_off_rounded,
-                          color: ext.accent,
-                          size: 15,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'SHOWCASE MODE ACTIVE',
-                          style: TextStyle(
-                            color: ext.accent,
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          'Tap toggle to edit',
-                          style: TextStyle(
-                            color: ext.textMuted,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-            // ── 2. Editorial Manifest Quote Card ───────────────────────────
+            // ── 2. Spotlight Hero Carousel ─────────────────────────────────
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 14),
-                child: FrostedGlassContainer(
-                  blur: 16,
-                  borderRadius: 18,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 12),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(7),
-                        decoration: BoxDecoration(
-                          color: ext.accent.withValues(alpha: 0.15),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.format_quote_rounded,
-                          color: ext.accent,
-                          size: 16,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          '“Design a reality that demands you expand into your highest potential.”',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontStyle: FontStyle.italic,
-                            color: ext.textPrimary.withValues(alpha: 0.88),
-                            height: 1.35,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            // ── 3. Spotlight Hero Carousel ─────────────────────────────────
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 6, 20, 8),
+                padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
                 child: Row(
                   children: [
                     const ClayIconBadge(
@@ -231,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   : SpotlightCarousel(items: spotlightItems),
             ),
 
-            // ── 4. Bento Grid Header ───────────────────────────────────────
+            // ── 3. Bento Grid Header ───────────────────────────────────────
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
@@ -267,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // ── 5. The Dynamic Editorial Bento Grid ────────────────────────
+            // ── 4. The Dynamic Editorial Bento Grid ────────────────────────
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 100),
@@ -275,7 +168,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   categories: itemsProv.categories,
                   counts: counts,
                   covers: covers,
-                  isShowcase: isShowcase,
                 ),
               ),
             ),
@@ -283,92 +175,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      // FAB (Shown only when not in Showcase Mode)
-      floatingActionButton: isShowcase
-          ? null
-          : _AnimatedFAB(
-              onTap: () => AddItemSheet.show(context),
-            ),
-    );
-  }
-}
-
-// ── Header Showcase Pill Button ──────────────────────────────────────────────
-
-class _ShowcasePillButton extends StatelessWidget {
-  final bool isShowcase;
-  final VoidCallback onTap;
-
-  const _ShowcasePillButton({
-    required this.isShowcase,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final ext = context.ext;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-        decoration: BoxDecoration(
-          color: isShowcase
-              ? (isDark ? Colors.white : ext.accent)
-              : ext.cardColor,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: isShowcase
-              ? [
-                  BoxShadow(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.25)
-                        : ext.accent.withValues(alpha: 0.35),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : [
-                  BoxShadow(
-                    color: ext.shadowLight,
-                    offset: const Offset(-3, -3),
-                    blurRadius: 6,
-                  ),
-                  BoxShadow(
-                    color: ext.shadowDark,
-                    offset: const Offset(3, 3),
-                    blurRadius: 6,
-                  ),
-                ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isShowcase
-                  ? Icons.visibility_rounded
-                  : Icons.slideshow_rounded,
-              size: 14,
-              color: isShowcase
-                  ? (isDark ? const Color(0xFF0E1621) : Colors.white)
-                  : ext.textMuted,
-            ),
-            const SizedBox(width: 5),
-            Text(
-              'SHOWCASE',
-              style: TextStyle(
-                fontSize: 10.5,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.0,
-                color: isShowcase
-                    ? (isDark ? const Color(0xFF0E1621) : Colors.white)
-                    : ext.textMuted,
-              ),
-            ),
-          ],
-        ),
+      // FAB
+      floatingActionButton: _AnimatedFAB(
+        onTap: () => AddItemSheet.show(context),
       ),
     );
   }
@@ -427,12 +236,16 @@ class _AnimatedFABState extends State<_AnimatedFAB>
             boxShadow: [
               BoxShadow(
                 color: ext.accent.withValues(alpha: 0.4),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
-          child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+          child: const Icon(
+            Icons.add_rounded,
+            color: Colors.white,
+            size: 28,
+          ),
         ),
       ),
     );

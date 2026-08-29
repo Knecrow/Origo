@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/models/origo_item.dart';
 import '../../core/providers/items_provider.dart';
-import '../../core/providers/showcase_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/frosted_glass_container.dart';
@@ -34,7 +33,6 @@ class _DetailScreenState extends State<DetailScreen> {
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
-    final isShowcase = context.watch<ShowcaseProvider>().isActive;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -87,23 +85,22 @@ class _DetailScreenState extends State<DetailScreen> {
                           ),
                         ),
                         const Spacer(),
-                        if (!isShowcase)
-                          GestureDetector(
-                            onTap: () => _toggleSpotlight(context),
-                            child: FrostedGlassContainer(
-                              borderRadius: 14,
-                              padding: const EdgeInsets.all(10),
-                              child: Icon(
-                                _item.isSpotlight
-                                    ? Icons.star_rounded
-                                    : Icons.star_border_rounded,
-                                color: _item.isSpotlight
-                                    ? const Color(0xFFFFD700)
-                                    : Colors.white,
-                                size: 22,
-                              ),
+                        GestureDetector(
+                          onTap: _toggleSpotlight,
+                          child: FrostedGlassContainer(
+                            borderRadius: 14,
+                            padding: const EdgeInsets.all(10),
+                            child: Icon(
+                              _item.isSpotlight
+                                  ? Icons.star_rounded
+                                  : Icons.star_border_rounded,
+                              color: _item.isSpotlight
+                                  ? const Color(0xFFFFD700)
+                                  : Colors.white,
+                              size: 22,
                             ),
                           ),
+                        ),
                       ],
                     ),
                   ),
@@ -120,9 +117,8 @@ class _DetailScreenState extends State<DetailScreen> {
               right: 0,
               child: _InfoSheet(
                 item: _item,
-                isShowcase: isShowcase,
-                onToggleSpotlight: () => _toggleSpotlight(context),
-                onDelete: () => _deleteItem(context),
+                onToggleSpotlight: _toggleSpotlight,
+                onDelete: _deleteItem,
               ),
             ),
           ],
@@ -131,38 +127,45 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 
-  Future<void> _toggleSpotlight(BuildContext context) async {
+  Future<void> _toggleSpotlight() async {
     await context.read<ItemsProvider>().toggleSpotlight(_item);
     setState(() => _item = _item.copyWith(isSpotlight: !_item.isSpotlight));
   }
 
-  Future<void> _deleteItem(BuildContext context) async {
+  Future<void> _deleteItem() async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: context.ext.cardColor,
-        title: Text('Delete Item',
-            style: TextStyle(color: context.ext.textPrimary)),
-        content: Text('Remove "${_item.title}" from your vision board?',
-            style: TextStyle(color: context.ext.textMuted)),
+        backgroundColor: ctx.ext.cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Delete Dream',
+            style: TextStyle(fontWeight: FontWeight.w700)),
+        content: const Text(
+            'Are you sure you want to remove this dream from your portfolio?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: Text('Cancel',
-                style: TextStyle(color: context.ext.textMuted)),
+                style: TextStyle(color: ctx.ext.textMuted)),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Delete',
-                style: TextStyle(
-                    color: AppColors.error, fontWeight: FontWeight.w700)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('Delete'),
           ),
         ],
       ),
     );
-    if (confirm == true && context.mounted) {
+
+    if (!mounted) return;
+    if (confirm == true) {
       await context.read<ItemsProvider>().deleteItem(_item);
-      if (context.mounted) Navigator.pop(context);
+      if (mounted) Navigator.pop(context);
     }
   }
 }
@@ -171,13 +174,11 @@ class _DetailScreenState extends State<DetailScreen> {
 
 class _InfoSheet extends StatelessWidget {
   final OrigoItem item;
-  final bool isShowcase;
   final VoidCallback onToggleSpotlight;
   final VoidCallback onDelete;
 
   const _InfoSheet({
     required this.item,
-    required this.isShowcase,
     required this.onToggleSpotlight,
     required this.onDelete,
   });
@@ -271,32 +272,31 @@ class _InfoSheet extends StatelessWidget {
                   ],
                 ),
               ),
-              if (!isShowcase)
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: onToggleSpotlight,
-                      child: Icon(
-                        item.isSpotlight
-                            ? Icons.star_rounded
-                            : Icons.star_border_rounded,
-                        color: item.isSpotlight
-                            ? const Color(0xFFFFD700)
-                            : Colors.white60,
-                        size: 26,
-                      ),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: onToggleSpotlight,
+                    child: Icon(
+                      item.isSpotlight
+                          ? Icons.star_rounded
+                          : Icons.star_border_rounded,
+                      color: item.isSpotlight
+                          ? const Color(0xFFFFD700)
+                          : Colors.white60,
+                      size: 26,
                     ),
-                    const SizedBox(width: 12),
-                    GestureDetector(
-                      onTap: onDelete,
-                      child: const Icon(
-                        Icons.delete_outline_rounded,
-                        color: AppColors.error,
-                        size: 24,
-                      ),
+                  ),
+                  const SizedBox(width: 12),
+                  GestureDetector(
+                    onTap: onDelete,
+                    child: const Icon(
+                      Icons.delete_outline_rounded,
+                      color: AppColors.error,
+                      size: 24,
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
             ],
           ),
 

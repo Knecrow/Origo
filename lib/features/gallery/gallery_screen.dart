@@ -4,14 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/models/origo_item.dart';
 import '../../core/providers/items_provider.dart';
-import '../../core/providers/showcase_provider.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/clay_icon_badge.dart';
 import '../../core/widgets/origo_image.dart';
 import '../add/add_item_sheet.dart';
 import '../detail/detail_screen.dart';
-import '../home/widgets/category_card.dart';
 
 class GalleryScreen extends StatefulWidget {
   final String category;
@@ -30,7 +27,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
     final ext = context.ext;
     final itemsProv = context.watch<ItemsProvider>();
     final items = itemsProv.itemsByCategory(widget.category);
-    final isShowcase = context.watch<ShowcaseProvider>().isActive;
     final accentColor = ext.accent;
     final icon =
         itemsProv.categoryIcons[widget.category] ?? Icons.category_rounded;
@@ -101,7 +97,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
           if (items.isEmpty)
             SliverFillRemaining(
-              child: _EmptyGallery(category: widget.category),
+              child: _EmptyGallery(
+                category: widget.category,
+                icon: icon,
+              ),
             )
           else
             SliverPadding(
@@ -110,10 +109,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     final item = items[index];
-                    return _GalleryTile(
-                      item: item,
-                      isShowcase: isShowcase,
-                    );
+                    return _GalleryTile(item: item);
                   },
                   childCount: items.length,
                 ),
@@ -127,27 +123,24 @@ class _GalleryScreenState extends State<GalleryScreen> {
             ),
         ],
       ),
-      floatingActionButton: isShowcase
-          ? null
-          : FloatingActionButton.extended(
-              onPressed: () => AddItemSheet.show(context),
-              backgroundColor: accentColor,
-              icon: const Icon(Icons.add_rounded, color: Colors.white),
-              label: const Text(
-                'Add',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w700),
-              ),
-            ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => AddItemSheet.show(context),
+        backgroundColor: accentColor,
+        icon: const Icon(Icons.add_rounded, color: Colors.white),
+        label: const Text(
+          'Add Dream',
+          style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.w700),
+        ),
+      ),
     );
   }
 }
 
 class _GalleryTile extends StatelessWidget {
   final OrigoItem item;
-  final bool isShowcase;
 
-  const _GalleryTile({required this.item, required this.isShowcase});
+  const _GalleryTile({required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -198,7 +191,7 @@ class _GalleryTile extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withValues(alpha: 0.5),
+                        Colors.black.withValues(alpha: 0.55),
                       ],
                       stops: const [0.5, 1.0],
                     ),
@@ -239,19 +232,22 @@ class _GalleryTile extends StatelessWidget {
 
 class _EmptyGallery extends StatelessWidget {
   final String category;
-  const _EmptyGallery({required this.category});
+  final IconData icon;
+
+  const _EmptyGallery({
+    required this.category,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
-    final icon = kCategoryIcons[category] ?? Icons.category_rounded;
-    final color = AppColors.categoryColors[category] ?? ext.accent;
 
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ClayIconBadge(icon: icon, size: 40, padding: 20, iconColor: color),
+          ClayIconBadge(icon: icon, size: 40, padding: 20, iconColor: ext.accent),
           const SizedBox(height: 20),
           Text(
             'No $category items yet',

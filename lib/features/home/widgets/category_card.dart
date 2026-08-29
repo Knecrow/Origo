@@ -179,7 +179,6 @@ class _CountBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white30, width: 1),
       ),
       child: Text(
         '$count',
