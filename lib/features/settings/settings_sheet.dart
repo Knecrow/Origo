@@ -390,10 +390,12 @@ class SettingsSheet extends StatelessWidget {
                             children: [
                               ClayIconBadge(
                                 icon: cat.icon,
-                                size: 16,
+                                size: 18,
                                 padding: 8,
-                                iconColor: ext.textPrimary,
-                                badgeColor: ext.cardColor,
+                                gradientColors: AppColors.getCategoryGradient(cat.key),
+                                badgeColor: Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xFF1E2135)
+                                    : const Color(0xFFFFFFFF),
                               ),
                               const SizedBox(width: 12),
                               Expanded(

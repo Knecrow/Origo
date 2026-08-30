@@ -74,10 +74,12 @@ class CardQuickActionsSheet extends StatelessWidget {
             children: [
               ClayIconBadge(
                 icon: category.icon,
-                size: 20,
+                size: 22,
                 padding: 10,
-                iconColor: ext.textPrimary,
-                badgeColor: ext.bgColor,
+                gradientColors: AppColors.getCategoryGradient(category.key),
+                badgeColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF1E2135)
+                    : const Color(0xFFFFFFFF),
               ),
               const SizedBox(width: 14),
               Expanded(

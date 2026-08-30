@@ -8,6 +8,7 @@ class ClayIconBadge extends StatefulWidget {
   final IconData icon;
   final double size;
   final Color? iconColor;
+  final List<Color>? gradientColors;
   final Color? badgeColor;
   final double padding;
   final String? label;
@@ -18,6 +19,7 @@ class ClayIconBadge extends StatefulWidget {
     required this.icon,
     this.size = 22,
     this.iconColor,
+    this.gradientColors,
     this.badgeColor,
     this.padding = 12,
     this.label,
@@ -40,6 +42,46 @@ class _ClayIconBadgeState extends State<ClayIconBadge> {
 
     final bg = widget.badgeColor ?? (isDark ? const Color(0xFF1E2135) : const Color(0xFFFFFFFF));
     final iconCol = widget.iconColor ?? (isDark ? Colors.white : ext.textPrimary);
+
+    Widget iconWidget;
+    if (widget.gradientColors != null && widget.gradientColors!.length >= 2) {
+      iconWidget = Stack(
+        alignment: Alignment.center,
+        children: [
+          // Soft ambient luminescence glow behind the 3D glyph
+          Icon(
+            widget.icon,
+            size: widget.size,
+            color: widget.gradientColors!.first.withValues(alpha: 0.35),
+            shadows: [
+              Shadow(
+                color: widget.gradientColors!.last.withValues(alpha: 0.45),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          ShaderMask(
+            shaderCallback: (bounds) => LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: widget.gradientColors!,
+            ).createShader(bounds),
+            child: Icon(
+              widget.icon,
+              size: widget.size,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      );
+    } else {
+      iconWidget = Icon(
+        widget.icon,
+        size: widget.size,
+        color: iconCol,
+      );
+    }
 
     Widget badge = AnimatedScale(
       scale: _pressed ? 0.92 : 1.0,
@@ -91,11 +133,7 @@ class _ClayIconBadgeState extends State<ClayIconBadge> {
                 ],
         ),
         child: Center(
-          child: Icon(
-            widget.icon,
-            size: widget.size,
-            color: iconCol,
-          ),
+          child: iconWidget,
         ),
       ),
     );

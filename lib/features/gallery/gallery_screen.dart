@@ -103,10 +103,12 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 children: [
                   ClayIconBadge(
                     icon: icon,
-                    size: 16,
+                    size: 18,
                     padding: 8,
-                    iconColor: ext.textPrimary,
-                    badgeColor: ext.cardColor,
+                    gradientColors: AppColors.getCategoryGradient(widget.category),
+                    badgeColor: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF1E2135)
+                        : const Color(0xFFFFFFFF),
                   ),
                   const SizedBox(width: 10),
                   Text(
@@ -432,9 +434,12 @@ class _EmptyGallery extends StatelessWidget {
         children: [
           ClayIconBadge(
             icon: icon,
-            size: 40,
-            padding: 24,
-            iconColor: ext.accent,
+            size: 42,
+            padding: 22,
+            gradientColors: AppColors.getCategoryGradient(category),
+            badgeColor: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF1E2135)
+                : const Color(0xFFFFFFFF),
           ),
           const SizedBox(height: 20),
           Text(

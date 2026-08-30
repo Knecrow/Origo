@@ -533,8 +533,9 @@ class _EmptyInvitationContent extends StatelessWidget {
         children: [
           ClayIconBadge(
             icon: category.icon,
-            size: isCompact ? 20 : 24,
-            padding: isCompact ? 8 : 10,
+            size: isCompact ? 22 : 26,
+            padding: isCompact ? 10 : 12,
+            gradientColors: AppColors.getCategoryGradient(category.key),
           ),
           SizedBox(height: isCompact ? 8 : 10),
           Text(

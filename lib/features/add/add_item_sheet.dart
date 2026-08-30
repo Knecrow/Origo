@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import '../../core/models/origo_category.dart';
 import '../../core/models/origo_item.dart';
 import '../../core/providers/items_provider.dart';
+import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/origo_image.dart';
 import 'add_category_sheet.dart';
@@ -628,25 +629,45 @@ class _CategorySelector extends StatelessWidget {
               duration: const Duration(milliseconds: 160),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: isSelected ? ext.textPrimary : ext.bgColor,
+                color: isSelected
+                    ? (Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF7582FF)
+                        : const Color(0xFF5360ED))
+                    : ext.bgColor,
                 borderRadius: BorderRadius.circular(18),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: const Color(0xFF5360ED).withValues(alpha: 0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ]
+                    : null,
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    cat.icon,
-                    size: 14,
-                    color: isSelected ? ext.bgColor : ext.textPrimary,
+                  ShaderMask(
+                    shaderCallback: (bounds) => LinearGradient(
+                      colors: isSelected
+                          ? [Colors.white, Colors.white]
+                          : AppColors.getCategoryGradient(cat.key),
+                    ).createShader(bounds),
+                    child: Icon(
+                      cat.icon,
+                      size: 15,
+                      color: Colors.white,
+                    ),
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 7),
                   Text(
                     cat.displayName,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 12.5,
                       fontWeight:
                           isSelected ? FontWeight.w700 : FontWeight.w600,
-                      color: isSelected ? ext.bgColor : ext.textPrimary,
+                      color: isSelected ? Colors.white : ext.textPrimary,
                     ),
                   ),
                 ],

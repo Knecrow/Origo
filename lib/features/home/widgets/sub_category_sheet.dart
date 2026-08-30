@@ -249,6 +249,7 @@ class _SubCategorySheetState extends State<SubCategorySheet> {
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final itemsProv = context.watch<ItemsProvider>();
     final items = itemsProv.itemsByCategory(widget.category.key);
 
@@ -302,10 +303,10 @@ class _SubCategorySheetState extends State<SubCategorySheet> {
                 children: [
                   ClayIconBadge(
                     icon: widget.category.icon,
-                    size: 20,
+                    size: 22,
                     padding: 10,
-                    iconColor: ext.textPrimary,
-                    badgeColor: ext.bgColor,
+                    gradientColors: AppColors.getCategoryGradient(widget.category.key),
+                    badgeColor: isDark ? const Color(0xFF1E2135) : const Color(0xFFFFFFFF),
                   ),
                   const SizedBox(width: 14),
                   Column(
@@ -384,6 +385,7 @@ class _SubCategorySheetState extends State<SubCategorySheet> {
                   count: subItems.length,
                   latestItem: latestSub,
                   icon: widget.category.icon,
+                  categoryKey: widget.category.key,
                   categoryColor: widget.category.color,
                   onLongPress: () => _showSubCategoryActions(context, subName, subItems.length),
                   onTap: () {
@@ -422,6 +424,7 @@ class _SubCategoryCard extends StatefulWidget {
   final int count;
   final OrigoItem? latestItem;
   final IconData icon;
+  final String categoryKey;
   final Color categoryColor;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
@@ -431,6 +434,7 @@ class _SubCategoryCard extends StatefulWidget {
     required this.count,
     required this.latestItem,
     required this.icon,
+    required this.categoryKey,
     required this.categoryColor,
     required this.onTap,
     this.onLongPress,
@@ -573,8 +577,9 @@ class _SubCategoryCardState extends State<_SubCategoryCard> {
                       children: [
                         ClayIconBadge(
                           icon: widget.icon,
-                          size: 18,
+                          size: 20,
                           padding: 8,
+                          gradientColors: AppColors.getCategoryGradient(widget.categoryKey),
                         ),
                         const SizedBox(height: 8),
                         Text(

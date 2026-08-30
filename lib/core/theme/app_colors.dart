@@ -37,18 +37,34 @@ class AppColors {
 
   // ── Curated Ceramic Category Accents (Subtle & Elegant) ────────────────────
   static const Map<String, Color> categoryColors = {
-    'Home': Color(0xFF5360ED),
-    'Garage': Color(0xFF7582FF),
-    'Aviation': Color(0xFF8E99F3),
-    'Marine': Color(0xFF5B78E5),
-    'Places': Color(0xFF6366F1),
-    'Sanctuary': Color(0xFF6B7FF5),
-    'Experiences': Color(0xFF7E8BFF),
-    'Collections': Color(0xFF8B96FF),
+    'Home': Color(0xFF3B82F6),
+    'Garage': Color(0xFFFF6B4A),
+    'Aviation': Color(0xFF9D4EDD),
+    'Marine': Color(0xFF00B4D8),
+    'Places': Color(0xFF10B981),
+    'Sanctuary': Color(0xFFEC4899),
+    'Experiences': Color(0xFF8B5CF6),
+    'Collections': Color(0xFFF59E0B),
   };
 
   static Color getCategoryColor(String key) {
     return categoryColors[key] ?? const Color(0xFF7582FF);
+  }
+
+  // ── Luminous 3D Ceramic Gradients (Inspired by the Reference Image) ────────
+  static const Map<String, List<Color>> categoryGradients = {
+    'Home': [Color(0xFF3B82F6), Color(0xFF8B5CF6)], // Royal Cobalt & Lavender
+    'Garage': [Color(0xFFFF5722), Color(0xFFFF9800)], // Sunset Coral & Amber
+    'Aviation': [Color(0xFF7928CA), Color(0xFFFF0080)], // Twilight Violet & Magenta
+    'Marine': [Color(0xFF00C6FF), Color(0xFF0072FF)], // Deep Cyan & Aqua
+    'Places': [Color(0xFF059669), Color(0xFF34D399)], // Emerald & Mint
+    'Sanctuary': [Color(0xFFFF4E50), Color(0xFFF9D423)], // Rose Lotus & Sunset Gold
+    'Experiences': [Color(0xFF6366F1), Color(0xFFA855F7)], // Cosmic Indigo & Orchid
+    'Collections': [Color(0xFFF59E0B), Color(0xFFFCD34D)], // Champagne Gold & Topaz
+  };
+
+  static List<Color> getCategoryGradient(String key) {
+    return categoryGradients[key] ?? [const Color(0xFF6366F1), const Color(0xFF8B5CF6)];
   }
 
   // ── Smooth Cinematic Ambient Scrim ─────────────────────────────────────────
