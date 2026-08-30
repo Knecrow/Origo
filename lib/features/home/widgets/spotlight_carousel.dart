@@ -10,6 +10,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/frosted_glass_container.dart';
 import '../../../core/widgets/origo_image.dart';
+import '../../../core/utils/smooth_page_route.dart';
 import '../../detail/detail_screen.dart';
 
 class SpotlightCarousel extends StatefulWidget {
@@ -95,7 +96,7 @@ class _SpotlightCard extends StatelessWidget {
         HapticFeedback.lightImpact();
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => DetailScreen(item: item)),
+          SmoothPageRoute(child: DetailScreen(item: item)),
         );
       },
       child: AnimatedContainer(

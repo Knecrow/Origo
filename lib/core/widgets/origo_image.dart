@@ -41,6 +41,7 @@ class OrigoImage extends StatelessWidget {
       return Image.network(
         imagePath,
         fit: fit,
+        cacheWidth: 800,
         errorBuilder: (_, _, e) => fallback,
         loadingBuilder: (context, child, progress) {
           if (progress == null) return child;
@@ -62,6 +63,7 @@ class OrigoImage extends StatelessWidget {
           return Image.memory(
             bytes,
             fit: fit,
+            cacheWidth: 800,
             errorBuilder: (_, _, e) => fallback,
           );
         } catch (_) {
@@ -71,6 +73,7 @@ class OrigoImage extends StatelessWidget {
       return Image.network(
         imagePath,
         fit: fit,
+        cacheWidth: 800,
         errorBuilder: (_, _, e) => fallback,
       );
     }

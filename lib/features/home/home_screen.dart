@@ -9,6 +9,7 @@ import '../../core/providers/profile_provider.dart';
 import '../../core/providers/theme_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/smooth_page_route.dart';
 import '../../core/widgets/clay_icon_badge.dart';
 import '../../core/widgets/origo_image.dart';
 import '../add/add_item_sheet.dart';
@@ -130,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onOpenProfile: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                          SmoothPageRoute(child: const ProfileScreen()),
                         );
                       },
                       isDark: themeProv.isDark,
@@ -350,14 +351,16 @@ class _SculptedWaveTopBar extends StatelessWidget {
         alignment: Alignment.topCenter,
         children: [
           // Exact Vertical Mirror of the Bottom Wave Cradle Painter!
-          Transform.flip(
-            flipY: true,
-            child: CustomPaint(
-              size: Size(MediaQuery.of(context).size.width, barHeight + 10),
-              painter: _WaveCradlePainter(
-                color: bgColor,
-                shadowColor: shadowColor,
-                highlightColor: highlightColor,
+          RepaintBoundary(
+            child: Transform.flip(
+              flipY: true,
+              child: CustomPaint(
+                size: Size(MediaQuery.of(context).size.width, barHeight + 10),
+                painter: _WaveCradlePainter(
+                  color: bgColor,
+                  shadowColor: shadowColor,
+                  highlightColor: highlightColor,
+                ),
               ),
             ),
           ),
@@ -500,12 +503,14 @@ class _SculptedWaveBottomBar extends StatelessWidget {
         alignment: Alignment.bottomCenter,
         children: [
           // Sculpted Custom Painted Wave Panel with Center Cradle Notch
-          CustomPaint(
-            size: Size(MediaQuery.of(context).size.width, barHeight + 10),
-            painter: _WaveCradlePainter(
-              color: bgColor,
-              shadowColor: shadowColor,
-              highlightColor: highlightColor,
+          RepaintBoundary(
+            child: CustomPaint(
+              size: Size(MediaQuery.of(context).size.width, barHeight + 10),
+              painter: _WaveCradlePainter(
+                color: bgColor,
+                shadowColor: shadowColor,
+                highlightColor: highlightColor,
+              ),
             ),
           ),
 
@@ -737,7 +742,7 @@ class _SearchResultCard extends StatelessWidget {
         HapticFeedback.lightImpact();
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => DetailScreen(item: item)),
+          SmoothPageRoute(child: DetailScreen(item: item)),
         );
       },
       child: Container(

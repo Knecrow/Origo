@@ -14,6 +14,7 @@ Widget loadLocalImage(
   return Image.file(
     file,
     fit: fit,
+    cacheWidth: 800,
     errorBuilder: (_, _, e) => fallback,
   );
 }
