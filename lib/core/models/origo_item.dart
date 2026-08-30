@@ -9,10 +9,20 @@ const List<String> kCategories = [
   'Others',
 ];
 
+const Map<String, List<String>> kSuggestedSubCategories = {
+  'Garage': ['Cars', 'Bikes', 'Hypercars', 'Classics'],
+  'Home': ['Villas', 'Penthouses', 'Interiors', 'Architecture'],
+  'Places': ['Europe', 'Tropical', 'Mountains', 'Islands'],
+  'Jets': ['Private Jets', 'Helicopters', 'Cabins'],
+  'Yachts': ['Superyachts', 'Catamarans', 'Speedboats'],
+  'Others': ['Watches', 'Art', 'Fashion', 'Technology'],
+};
+
 class OrigoItem {
   final int? id;
   final String title;
   final String category;
+  final String? subCategory;
   final String imagePath;
   final String? targetTimeframe;
   final String? motivationNotes;
@@ -23,6 +33,7 @@ class OrigoItem {
     this.id,
     required this.title,
     required this.category,
+    this.subCategory,
     required this.imagePath,
     this.targetTimeframe,
     this.motivationNotes,
@@ -34,6 +45,7 @@ class OrigoItem {
     int? id,
     String? title,
     String? category,
+    String? subCategory,
     String? imagePath,
     String? targetTimeframe,
     String? motivationNotes,
@@ -44,6 +56,7 @@ class OrigoItem {
       id: id ?? this.id,
       title: title ?? this.title,
       category: category ?? this.category,
+      subCategory: subCategory ?? this.subCategory,
       imagePath: imagePath ?? this.imagePath,
       targetTimeframe: targetTimeframe ?? this.targetTimeframe,
       motivationNotes: motivationNotes ?? this.motivationNotes,
@@ -57,6 +70,7 @@ class OrigoItem {
       if (id != null) 'id': id,
       'title': title,
       'category': category,
+      'sub_category': subCategory,
       'image_path': imagePath,
       'target_timeframe': targetTimeframe,
       'motivation_notes': motivationNotes,
@@ -70,6 +84,7 @@ class OrigoItem {
       id: map['id'] as int?,
       title: map['title'] as String,
       category: map['category'] as String,
+      subCategory: map['sub_category'] as String?,
       imagePath: map['image_path'] as String,
       targetTimeframe: map['target_timeframe'] as String?,
       motivationNotes: map['motivation_notes'] as String?,
@@ -80,5 +95,5 @@ class OrigoItem {
 
   @override
   String toString() =>
-      'OrigoItem(id: $id, title: $title, category: $category, isSpotlight: $isSpotlight)';
+      'OrigoItem(id: $id, title: $title, category: $category, subCategory: $subCategory, isSpotlight: $isSpotlight)';
 }

@@ -113,6 +113,7 @@ class ItemsProvider extends ChangeNotifier {
   Future<void> addItem({
     required String title,
     required String category,
+    String? subCategory,
     required String imagePath,
     String? targetTimeframe,
     String? motivationNotes,
@@ -128,6 +129,7 @@ class ItemsProvider extends ChangeNotifier {
     final item = OrigoItem(
       title: title,
       category: category,
+      subCategory: subCategory?.trim().isNotEmpty == true ? subCategory : null,
       imagePath: finalPath,
       targetTimeframe: targetTimeframe?.trim().isNotEmpty == true
           ? targetTimeframe

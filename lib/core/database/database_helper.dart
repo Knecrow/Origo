@@ -24,7 +24,7 @@ class DatabaseHelper {
       return factory.openDatabase(
         'origo.db',
         options: OpenDatabaseOptions(
-          version: 2,
+          version: 3,
           onCreate: _onCreate,
           onUpgrade: _onUpgrade,
         ),
@@ -34,7 +34,7 @@ class DatabaseHelper {
       final path = join(dbPath, 'origo.db');
       return openDatabase(
         path,
-        version: 2,
+        version: 3,
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,
       );
@@ -48,6 +48,7 @@ class DatabaseHelper {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
         category TEXT NOT NULL,
+        sub_category TEXT,
         image_path TEXT NOT NULL,
         target_timeframe TEXT,
         motivation_notes TEXT,
@@ -109,12 +110,19 @@ class DatabaseHelper {
       }
       await catBatch.commit(noResult: true);
     }
+
+    if (oldVersion < 3) {
+      try {
+        await db.execute('ALTER TABLE origo_items ADD COLUMN sub_category TEXT');
+      } catch (_) {}
+    }
   }
 
   static const List<OrigoItem> _initialSeedItems = [
     OrigoItem(
       title: 'Architectural Cliffside Haven',
       category: 'Home',
+      subCategory: 'Villas',
       imagePath:
           'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
       targetTimeframe: 'By 2028',
@@ -125,6 +133,7 @@ class DatabaseHelper {
     OrigoItem(
       title: 'Porsche 911 GT3 RS',
       category: 'Garage',
+      subCategory: 'Cars',
       imagePath:
           'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1200&q=80',
       targetTimeframe: '2027 Q4',
@@ -135,6 +144,7 @@ class DatabaseHelper {
     OrigoItem(
       title: 'Gulfstream G700 Cabin Suite',
       category: 'Jets',
+      subCategory: 'Private Jets',
       imagePath:
           'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1200&q=80',
       targetTimeframe: 'By 2031',
@@ -145,6 +155,7 @@ class DatabaseHelper {
     OrigoItem(
       title: 'Amalfi Coast Villa & Marina',
       category: 'Places',
+      subCategory: 'Europe',
       imagePath:
           'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1200&q=80',
       targetTimeframe: 'Summer 2027',
@@ -155,6 +166,7 @@ class DatabaseHelper {
     OrigoItem(
       title: '85m Custom Explorer Yacht',
       category: 'Yachts',
+      subCategory: 'Superyachts',
       imagePath:
           'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=1200&q=80',
       targetTimeframe: 'By 2033',
@@ -165,6 +177,7 @@ class DatabaseHelper {
     OrigoItem(
       title: 'Patek Philippe Grandmaster Chime',
       category: 'Others',
+      subCategory: 'Watches',
       imagePath:
           'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1200&q=80',
       targetTimeframe: 'Milestone Year',

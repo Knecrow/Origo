@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../core/models/origo_category.dart';
+import '../../core/models/origo_item.dart';
 import '../../core/providers/items_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/clay_card.dart';
@@ -41,6 +42,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
   final _notesCtrl = TextEditingController();
 
   String? _selectedCategory;
+  String? _selectedSubCategory;
   String? _pickedImagePath;
   bool _isSpotlight = false;
   bool _saving = false;
@@ -89,7 +91,10 @@ class _AddItemSheetState extends State<AddItemSheet> {
     if (!mounted) return;
     final latestCats = context.read<ItemsProvider>().categories;
     if (latestCats.isNotEmpty) {
-      setState(() => _selectedCategory = latestCats.last.key);
+      setState(() {
+        _selectedCategory = latestCats.last.key;
+        _selectedSubCategory = null;
+      });
     }
   }
 
@@ -109,6 +114,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
       await context.read<ItemsProvider>().addItem(
             title: _titleCtrl.text.trim(),
             category: cat,
+            subCategory: _selectedSubCategory,
             imagePath: _pickedImagePath!,
             targetTimeframe: _timeframeCtrl.text,
             motivationNotes: _notesCtrl.text,
@@ -216,8 +222,63 @@ class _AddItemSheetState extends State<AddItemSheet> {
               _CategorySelector(
                 categories: categories,
                 selected: activeCategory,
-                onChanged: (c) => setState(() => _selectedCategory = c),
+                onChanged: (c) => setState(() {
+                  _selectedCategory = c;
+                  _selectedSubCategory = null;
+                }),
               ),
+              if ((kSuggestedSubCategories[activeCategory] ?? []).isNotEmpty) ...[
+                const SizedBox(height: 14),
+                Text(
+                  'Sub-Category (Optional)',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: ext.textMuted,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 34,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: (kSuggestedSubCategories[activeCategory] ?? []).length,
+                    separatorBuilder: (_, _) => const SizedBox(width: 8),
+                    itemBuilder: (context, idx) {
+                      final sub = (kSuggestedSubCategories[activeCategory] ?? [])[idx];
+                      final isSelected = sub == _selectedSubCategory;
+                      return GestureDetector(
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          setState(() {
+                            _selectedSubCategory = isSelected ? null : sub;
+                          });
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 160),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? ext.accent.withValues(alpha: 0.85)
+                                : ext.cardColor,
+                            borderRadius: BorderRadius.circular(17),
+                          ),
+                          child: Center(
+                            child: Text(
+                              sub,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                                color: isSelected ? Colors.white : ext.textPrimary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
               const SizedBox(height: 20),
 
               // Title Field
