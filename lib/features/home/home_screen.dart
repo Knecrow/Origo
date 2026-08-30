@@ -120,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 controller: _scrollCtrl,
                 physics: const BouncingScrollPhysics(),
                 slivers: [
-                  // ── 1. Reference Top Dome Notch Header Bar ───────────────────
+                  // ── 1. Reference Top Header with UPWARD Dome Notch ────────────
                   SliverToBoxAdapter(
                     child: _SculptedTopDomeHeader(
                       searchCtrl: _searchCtrl,
@@ -306,7 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// ── Top Header with Sculpted Center Dome Notch ────────────────────────────────
+// ── Top Header with Sculpted UPWARD Dome Notch ────────────────────────────────
 
 class _SculptedTopDomeHeader extends StatelessWidget {
   final TextEditingController searchCtrl;
@@ -336,113 +336,91 @@ class _SculptedTopDomeHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
+    final notchBgColor = isDark ? const Color(0xFF1B1D2E) : Colors.white;
+    final notchShadow = isDark ? Colors.black.withValues(alpha: 0.45) : const Color(0xFF757E9E).withValues(alpha: 0.18);
+    final notchHighlight = isDark ? Colors.white.withValues(alpha: 0.06) : Colors.white;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+      padding: const EdgeInsets.fromLTRB(20, 6, 20, 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Top Notch Bar with Sculpted Dome Arch
+          // 1. Top Custom Painted Bar with UPWARD Arching Dome Notch
           SizedBox(
-            height: 52,
+            height: 64,
             child: Stack(
               clipBehavior: Clip.none,
               alignment: Alignment.center,
               children: [
-                // Top Action Row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Left: Cloud / Theme Button
-                    GestureDetector(
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        onToggleTheme();
-                      },
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1B1D2E) : Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: isDark
-                              ? [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.4),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ]
-                              : [
-                                  BoxShadow(
-                                    color: const Color(0xFF757E9E).withValues(alpha: 0.16),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                        ),
-                        child: Icon(
-                          isDark ? Icons.wb_sunny_rounded : Icons.cloud_outlined,
-                          size: 19,
-                          color: isDark ? const Color(0xFFFFD60A) : ext.textPrimary,
-                        ),
-                      ),
-                    ),
-
-                    // Right: Menu Button
-                    GestureDetector(
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        onOpenSettings();
-                      },
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1B1D2E) : Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: isDark
-                              ? [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.4),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ]
-                              : [
-                                  BoxShadow(
-                                    color: const Color(0xFF757E9E).withValues(alpha: 0.16),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                        ),
-                        child: Icon(
-                          Icons.menu_rounded,
-                          size: 20,
-                          color: ext.textPrimary,
-                        ),
-                      ),
-                    ),
-                  ],
+                // Sculpted Upward Arch Panel
+                CustomPaint(
+                  size: Size(MediaQuery.of(context).size.width - 40, 64),
+                  painter: _TopUpwardDomePainter(
+                    color: notchBgColor,
+                    shadowColor: notchShadow,
+                    highlightColor: notchHighlight,
+                  ),
                 ),
 
-                // Center: Sculpted Dome Notch with Avatar
+                // Action Icons (Cloud & Menu)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Left: Cloud / Theme Button
+                      GestureDetector(
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          onToggleTheme();
+                        },
+                        behavior: HitTestBehavior.opaque,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Icon(
+                            isDark ? Icons.wb_sunny_rounded : Icons.cloud_outlined,
+                            size: 20,
+                            color: isDark ? const Color(0xFFFFD60A) : ext.textPrimary,
+                          ),
+                        ),
+                      ),
+
+                      // Right: Menu Button
+                      GestureDetector(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          onOpenSettings();
+                        },
+                        behavior: HitTestBehavior.opaque,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Icon(
+                            Icons.menu_rounded,
+                            size: 21,
+                            color: ext.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Center: Avatar sitting on the UPWARD Arching Dome Notch
                 Positioned(
-                  top: -2,
+                  top: -6,
                   child: Container(
-                    width: 50,
-                    height: 50,
+                    width: 48,
+                    height: 48,
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1B1D2E) : Colors.white,
+                      color: isDark ? const Color(0xFF22253B) : Colors.white,
                       shape: BoxShape.circle,
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: isDark
                             ? [
-                                const Color(0xFF24273E),
+                                const Color(0xFF282C48),
                                 const Color(0xFF161726),
                               ]
                             : [
@@ -458,14 +436,14 @@ class _SculptedTopDomeHeader extends StatelessWidget {
                                 offset: const Offset(0, 6),
                               ),
                               BoxShadow(
-                                color: const Color(0xFF7582FF).withValues(alpha: 0.2),
+                                color: const Color(0xFF7582FF).withValues(alpha: 0.25),
                                 blurRadius: 8,
                                 offset: const Offset(0, 0),
                               ),
                             ]
                           : [
                               BoxShadow(
-                                color: const Color(0xFF757E9E).withValues(alpha: 0.2),
+                                color: const Color(0xFF757E9E).withValues(alpha: 0.22),
                                 blurRadius: 14,
                                 offset: const Offset(0, 6),
                               ),
@@ -722,6 +700,90 @@ class _SculptedTopDomeHeader extends StatelessWidget {
   }
 }
 
+// ── Custom UPWARD Dome Notch Painter ──────────────────────────────────────────
+
+class _TopUpwardDomePainter extends CustomPainter {
+  final Color color;
+  final Color shadowColor;
+  final Color highlightColor;
+
+  _TopUpwardDomePainter({
+    required this.color,
+    required this.shadowColor,
+    required this.highlightColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final centerX = w / 2;
+    const domeRadius = 34.0;
+
+    final path = Path();
+    // Start bottom left
+    path.moveTo(0, h);
+
+    // Up to top-left shoulder
+    path.lineTo(0, 26);
+    path.quadraticBezierTo(0, 16, 16, 16);
+
+    // Line to left side of upward dome
+    path.lineTo(centerX - domeRadius - 14, 16);
+
+    // Smooth organic upward rise into dome
+    path.cubicTo(
+      centerX - domeRadius - 6, 16,
+      centerX - domeRadius, 6,
+      centerX - domeRadius + 2, 2,
+    );
+
+    // Rounded crest arching UPWARD
+    path.arcToPoint(
+      Offset(centerX + domeRadius - 2, 2),
+      radius: const Radius.circular(domeRadius),
+      clockwise: true,
+    );
+
+    // Smooth organic downward slope out of dome
+    path.cubicTo(
+      centerX + domeRadius, 6,
+      centerX + domeRadius + 6, 16,
+      centerX + domeRadius + 14, 16,
+    );
+
+    // Line to right shoulder
+    path.lineTo(w - 16, 16);
+    path.quadraticBezierTo(w, 16, w, 26);
+
+    // Down to bottom right
+    path.lineTo(w, h);
+    path.close();
+
+    // Draw ambient drop shadow
+    canvas.drawShadow(path, shadowColor, 14.0, true);
+
+    // Draw base fill
+    final fillPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+    canvas.drawPath(path, fillPaint);
+
+    // Draw subtle top-rim highlight
+    final strokePaint = Paint()
+      ..color = highlightColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+    canvas.drawPath(path, strokePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _TopUpwardDomePainter oldDelegate) =>
+      color != oldDelegate.color ||
+      shadowColor != oldDelegate.shadowColor ||
+      highlightColor != oldDelegate.highlightColor;
+}
+
 // ── Sculpted Organic Wave Cradle Notch Bottom Bar ─────────────────────────────
 
 class _SculptedWaveBottomBar extends StatelessWidget {
@@ -738,7 +800,7 @@ class _SculptedWaveBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bgColor = isDark ? const Color(0xFF141624) : const Color(0xFFFFFFFF);
-    final shadowColor = isDark ? Colors.black.withValues(alpha: 0.6) : const Color(0xFF757E9E).withValues(alpha: 0.2);
+    final shadowColor = isDark ? Colors.black.withValues(alpha: 0.55) : const Color(0xFF757E9E).withValues(alpha: 0.2);
     final highlightColor = isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final barHeight = 64.0 + bottomPadding;
