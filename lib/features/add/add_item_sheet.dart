@@ -10,24 +10,33 @@ import '../../core/models/origo_category.dart';
 import '../../core/models/origo_item.dart';
 import '../../core/providers/items_provider.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/widgets/clay_card.dart';
-import '../../core/widgets/clay_icon_badge.dart';
 import '../../core/widgets/origo_image.dart';
 import 'add_category_sheet.dart';
 
 class AddItemSheet extends StatefulWidget {
   final String? initialCategory;
-  const AddItemSheet({super.key, this.initialCategory});
+  final String? initialSubCategory;
 
-  static Future<void> show(BuildContext context, {String? initialCategory}) {
+  const AddItemSheet({
+    super.key,
+    this.initialCategory,
+    this.initialSubCategory,
+  });
+
+  static Future<void> show(
+    BuildContext context, {
+    String? initialCategory,
+    String? initialSubCategory,
+  }) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       useRootNavigator: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      backgroundColor: Colors.transparent,
+      builder: (_) => AddItemSheet(
+        initialCategory: initialCategory,
+        initialSubCategory: initialSubCategory,
       ),
-      builder: (_) => AddItemSheet(initialCategory: initialCategory),
     );
   }
 
@@ -45,6 +54,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
   String? _selectedSubCategory;
   String? _pickedImagePath;
   bool _isSpotlight = false;
+  bool _showMoreDetails = false;
   bool _saving = false;
 
   final _picker = ImagePicker();
@@ -53,6 +63,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
   void initState() {
     super.initState();
     _selectedCategory = widget.initialCategory;
+    _selectedSubCategory = widget.initialSubCategory;
   }
 
   @override
@@ -100,7 +111,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
 
   Future<void> _save() async {
     if (_pickedImagePath == null) {
-      _showError('Please select an image');
+      _showError('Please select an image for your dream');
       return;
     }
     if (!_formKey.currentState!.validate()) return;
@@ -143,6 +154,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
 
     final activeCategory = _selectedCategory ??
         (categories.isNotEmpty ? categories.first.key : 'Home');
+    final suggestedSubs = kSuggestedSubCategories[activeCategory] ?? [];
 
     return Container(
       decoration: BoxDecoration(
@@ -153,6 +165,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
       child: Form(
         key: _formKey,
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -168,57 +181,97 @@ class _AddItemSheetState extends State<AddItemSheet> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
-              // Title
-              Text(
-                'New Aspiration',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: ext.textPrimary,
-                  letterSpacing: -0.4,
-                ),
-              ),
-              const SizedBox(height: 18),
-
-              // Image Picker
-              _ImagePickerWidget(
-                imagePath: _pickedImagePath,
-                onTap: _pickImage,
-              ),
-              const SizedBox(height: 20),
-
-              // Category Header with Add Circle Popup on the Left
+              // Header Row
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  Text(
+                    'New Dream',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: ext.textPrimary,
+                      letterSpacing: -0.4,
+                    ),
+                  ),
                   GestureDetector(
-                    onTap: _openAddCategory,
+                    onTap: () => Navigator.pop(context),
                     child: Container(
-                      padding: const EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: ext.accent.withValues(alpha: 0.15),
+                        color: ext.textMuted.withValues(alpha: 0.12),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        Icons.add_rounded,
-                        size: 15,
-                        color: ext.accent,
+                        Icons.close_rounded,
+                        size: 18,
+                        color: ext.textMuted,
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Category',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: ext.textMuted,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 16),
+
+              // 1. Image Drop Box
+              _ImagePickerWidget(
+                imagePath: _pickedImagePath,
+                onTap: _pickImage,
+              ),
+              const SizedBox(height: 18),
+
+              // 2. Title Field
+              TextFormField(
+                controller: _titleCtrl,
+                style: TextStyle(
+                  color: ext.textPrimary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'What is your vision? (e.g. Villa in Como)',
+                  filled: true,
+                  fillColor: ext.bgColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(18),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                ),
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? 'Please name your dream' : null,
+              ),
+              const SizedBox(height: 16),
+
+              // 3. Category Selector Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Collection',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: ext.textMuted,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: _openAddCategory,
+                    child: Text(
+                      '+ Custom Category',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: ext.accent,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
               _CategorySelector(
                 categories: categories,
                 selected: activeCategory,
@@ -227,25 +280,18 @@ class _AddItemSheetState extends State<AddItemSheet> {
                   _selectedSubCategory = null;
                 }),
               ),
-              if ((kSuggestedSubCategories[activeCategory] ?? []).isNotEmpty) ...[
-                const SizedBox(height: 14),
-                Text(
-                  'Sub-Category (Optional)',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: ext.textMuted,
-                  ),
-                ),
-                const SizedBox(height: 8),
+
+              // Sub-Categories Chips (if available)
+              if (suggestedSubs.isNotEmpty) ...[
+                const SizedBox(height: 12),
                 SizedBox(
-                  height: 34,
+                  height: 32,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
-                    itemCount: (kSuggestedSubCategories[activeCategory] ?? []).length,
+                    itemCount: suggestedSubs.length,
                     separatorBuilder: (_, _) => const SizedBox(width: 8),
                     itemBuilder: (context, idx) {
-                      final sub = (kSuggestedSubCategories[activeCategory] ?? [])[idx];
+                      final sub = suggestedSubs[idx];
                       final isSelected = sub == _selectedSubCategory;
                       return GestureDetector(
                         onTap: () {
@@ -255,21 +301,26 @@ class _AddItemSheetState extends State<AddItemSheet> {
                           });
                         },
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 160),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                          duration: const Duration(milliseconds: 140),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? ext.accent.withValues(alpha: 0.85)
-                                : ext.cardColor,
-                            borderRadius: BorderRadius.circular(17),
+                                ? ext.accent
+                                : ext.bgColor,
+                            borderRadius: BorderRadius.circular(14),
                           ),
                           child: Center(
                             child: Text(
                               sub,
                               style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                                color: isSelected ? Colors.white : ext.textPrimary,
+                                fontSize: 11.5,
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w600,
+                                color: isSelected
+                                    ? Colors.white
+                                    : ext.textPrimary,
                               ),
                             ),
                           ),
@@ -279,117 +330,143 @@ class _AddItemSheetState extends State<AddItemSheet> {
                   ),
                 ),
               ],
-              const SizedBox(height: 20),
-
-              // Title Field
-              Text(
-                'Title',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: ext.textMuted,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _titleCtrl,
-                style: TextStyle(color: ext.textPrimary),
-                decoration: const InputDecoration(
-                  hintText: 'e.g. Villa in Como, Porsche 911 GT3',
-                ),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Please enter a title' : null,
-              ),
               const SizedBox(height: 16),
 
-              // Timeframe
-              Text(
-                'Target Date / Timeframe',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: ext.textMuted,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _timeframeCtrl,
-                style: TextStyle(color: ext.textPrimary),
-                decoration: const InputDecoration(
-                  hintText: 'e.g. By Age 30, Q4 2027, In 3 Years',
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Notes
-              Text(
-                'Motivation & Notes',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: ext.textMuted,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _notesCtrl,
-                style: TextStyle(color: ext.textPrimary),
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  hintText: 'Why does this matter to you?',
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Spotlight toggle
-              ClayCard(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.star_rounded,
-                      color: _isSpotlight
-                          ? const Color(0xFFFFD700)
-                          : ext.textMuted,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+              // 4. Optional Details Collapsible Accordion
+              GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  setState(() => _showMoreDetails = !_showMoreDetails);
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: ext.bgColor,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
                         children: [
-                          Text(
-                            'Add to Spotlight',
-                            style: TextStyle(
-                              color: ext.textPrimary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
+                          Icon(
+                            _showMoreDetails
+                                ? Icons.tune_rounded
+                                : Icons.more_horiz_rounded,
+                            size: 16,
+                            color: ext.textMuted,
                           ),
+                          const SizedBox(width: 8),
                           Text(
-                            'Feature in hero carousel',
+                            _showMoreDetails ? 'Hide Options' : 'More Options (Timeframe, Notes, Spotlight)',
                             style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
                               color: ext.textMuted,
-                              fontSize: 11,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    Switch(
-                      value: _isSpotlight,
-                      onChanged: (v) => setState(() => _isSpotlight = v),
-                      activeThumbColor: ext.accent,
-                    ),
-                  ],
+                      Icon(
+                        _showMoreDetails
+                            ? Icons.keyboard_arrow_up_rounded
+                            : Icons.keyboard_arrow_down_rounded,
+                        color: ext.textMuted,
+                        size: 18,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 24),
 
-              // Save button
+              // Expanded Details
+              if (_showMoreDetails) ...[
+                const SizedBox(height: 14),
+                // Timeframe Field
+                TextFormField(
+                  controller: _timeframeCtrl,
+                  style: TextStyle(color: ext.textPrimary, fontSize: 14),
+                  decoration: InputDecoration(
+                    hintText: 'Target Timeframe (e.g. 2027, In 3 Years)',
+                    filled: true,
+                    fillColor: ext.bgColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Motivation Notes Field
+                TextFormField(
+                  controller: _notesCtrl,
+                  maxLines: 2,
+                  style: TextStyle(color: ext.textPrimary, fontSize: 14),
+                  decoration: InputDecoration(
+                    hintText: 'Personal Motivation / Affirmation (Optional)',
+                    filled: true,
+                    fillColor: ext.bgColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Spotlight Switcher
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: ext.bgColor,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.auto_awesome_rounded,
+                            size: 16,
+                            color: _isSpotlight
+                                ? const Color(0xFFFFD700)
+                                : ext.textMuted,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            'Featured Spotlight',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: ext.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Switch.adaptive(
+                        value: _isSpotlight,
+                        activeTrackColor: ext.accent,
+                        onChanged: (v) {
+                          HapticFeedback.selectionClick();
+                          setState(() => _isSpotlight = v);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              const SizedBox(height: 20),
+
+              // 5. Submit Button
               SizedBox(
                 width: double.infinity,
-                height: 54,
+                height: 52,
                 child: _saving
                     ? Center(
                         child: CircularProgressIndicator(color: ext.accent),
@@ -422,7 +499,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
   }
 }
 
-// ── Image Picker Widget ────────────────────────────────────────────────────────
+// ── Minimalist Image Picker Widget ───────────────────────────────────────────
 
 class _ImagePickerWidget extends StatelessWidget {
   final String? imagePath;
@@ -433,19 +510,20 @@ class _ImagePickerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 180,
         width: double.infinity,
+        height: imagePath != null ? 180 : 120,
         decoration: BoxDecoration(
           color: ext.bgColor,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
         ),
-        child: imagePath != null
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Stack(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: imagePath != null
+              ? Stack(
                   fit: StackFit.expand,
                   children: [
                     OrigoImage(imagePath: imagePath!, fit: BoxFit.cover),
@@ -456,59 +534,65 @@ class _ImagePickerWidget extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: Colors.black54,
+                          color: Colors.black.withValues(alpha: 0.65),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.edit_rounded,
-                                color: Colors.white, size: 14),
+                            Icon(Icons.photo_library_rounded,
+                                color: Colors.white, size: 12),
                             SizedBox(width: 4),
-                            Text('Change',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 11)),
+                            Text(
+                              'Change',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ],
+                )
+              : Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: ext.accent.withValues(alpha: 0.14),
+                        ),
+                        child: Icon(
+                          Icons.add_photo_alternate_rounded,
+                          color: ext.accent,
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Select Dream Photo',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: ext.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ClayIconBadge(
-                    icon: Icons.add_photo_alternate_rounded,
-                    size: 32,
-                    padding: 16,
-                    iconColor: ext.accent,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Tap to select image',
-                    style: TextStyle(
-                      color: ext.textMuted,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'From your gallery or files',
-                    style: TextStyle(
-                      color: ext.textMuted.withValues(alpha: 0.6),
-                      fontSize: 11,
-                    ),
-                  ),
-                ],
-              ),
+        ),
       ),
     );
   }
 }
 
-// ── Dynamic Category Selector ──────────────────────────────────────────────────
+// ── Compact Category Selector ────────────────────────────────────────────────
 
 class _CategorySelector extends StatelessWidget {
   final List<OrigoCategory> categories;
@@ -525,51 +609,52 @@ class _CategorySelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final ext = context.ext;
 
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: categories.map((cat) {
-        final isSelected = cat.key == selected;
-        final color = ext.accent;
-        final icon = cat.icon;
+    return SizedBox(
+      height: 44,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: categories.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        itemBuilder: (context, idx) {
+          final cat = categories[idx];
+          final isSelected = cat.key == selected;
 
-        return GestureDetector(
-          onTap: () {
-            HapticFeedback.selectionClick();
-            onChanged(cat.key);
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? color.withValues(alpha: 0.85)
-                  : ext.cardColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  icon,
-                  size: 14,
-                  color: isSelected ? Colors.white : ext.textMuted,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  cat.displayName,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : ext.textMuted,
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.4,
+          return GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              onChanged(cat.key);
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 160),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: isSelected ? ext.accent : ext.bgColor,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    cat.icon,
+                    size: 14,
+                    color: isSelected ? Colors.white : ext.textPrimary,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 6),
+                  Text(
+                    cat.displayName,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w600,
+                      color: isSelected ? Colors.white : ext.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      }).toList(),
+          );
+        },
+      ),
     );
   }
 }

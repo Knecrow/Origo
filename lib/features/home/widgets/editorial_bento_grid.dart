@@ -6,9 +6,8 @@ import '../../../core/models/origo_category.dart';
 import '../../../core/models/origo_item.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/origo_image.dart';
-import '../../add/add_item_sheet.dart';
-import '../../gallery/gallery_screen.dart';
 import 'card_quick_actions_sheet.dart';
+import 'sub_category_sheet.dart';
 
 class EditorialBentoGrid extends StatelessWidget {
   final List<OrigoCategory> categories;
@@ -24,16 +23,7 @@ class EditorialBentoGrid extends StatelessWidget {
 
   void _handleCardTap(BuildContext context, OrigoCategory category, int count) {
     HapticFeedback.lightImpact();
-    if (count == 0) {
-      AddItemSheet.show(context, initialCategory: category.key);
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => GalleryScreen(category: category.key),
-        ),
-      );
-    }
+    SubCategorySheet.show(context, category: category);
   }
 
   void _showQuickActions(BuildContext context, OrigoCategory category) {

@@ -13,8 +13,9 @@ import '../detail/detail_screen.dart';
 
 class GalleryScreen extends StatefulWidget {
   final String category;
+  final String? initialSubFilter;
 
-  const GalleryScreen({super.key, required this.category});
+  const GalleryScreen({super.key, required this.category, this.initialSubFilter});
 
   @override
   State<GalleryScreen> createState() => _GalleryScreenState();
@@ -23,6 +24,12 @@ class GalleryScreen extends StatefulWidget {
 class _GalleryScreenState extends State<GalleryScreen> {
   int _columns = 2;
   String? _selectedSubFilter;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedSubFilter = widget.initialSubFilter;
+  }
 
   @override
   Widget build(BuildContext context) {
