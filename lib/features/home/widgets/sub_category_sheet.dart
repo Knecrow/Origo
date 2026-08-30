@@ -163,7 +163,7 @@ class SubCategorySheet extends StatelessWidget {
                   // "All Dreams" Card
                   final latestAll = items.isNotEmpty ? items.first : null;
                   return _SubCategoryCard(
-                    title: 'All ${category.displayName}',
+                    title: 'All ${category.key}',
                     count: items.length,
                     latestItem: latestAll,
                     icon: category.icon,

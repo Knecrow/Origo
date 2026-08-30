@@ -64,7 +64,12 @@ class ItemsProvider extends ChangeNotifier {
     try {
       final loadedCategories = await _db.getAllCategories();
       if (loadedCategories.isNotEmpty) {
-        _categories = loadedCategories;
+        _categories = loadedCategories.map((c) {
+          if (c.isDefault) {
+            return c.copyWith(displayName: c.key);
+          }
+          return c;
+        }).toList();
       }
     } catch (_) {}
 
