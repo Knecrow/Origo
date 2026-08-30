@@ -365,37 +365,16 @@ class _SubCategorySheetState extends State<SubCategorySheet> {
                 mainAxisSpacing: 12,
                 childAspectRatio: 1.25,
               ),
-              itemCount: allSubCategories.length + 2, // +1 for "All", +1 for "+ Add Sub-Category"
+              itemCount: allSubCategories.length + 1, // Sub-categories + "+ Add Sub-Category"
               itemBuilder: (context, idx) {
-                if (idx == 0) {
-                  // "All Dreams" Card
-                  final latestAll = items.isNotEmpty ? items.first : null;
-                  return _SubCategoryCard(
-                    title: 'All ${widget.category.key}',
-                    count: items.length,
-                    latestItem: latestAll,
-                    icon: widget.category.icon,
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => GalleryScreen(category: widget.category.key),
-                        ),
-                      );
-                    },
-                  );
-                }
-
-                if (idx == allSubCategories.length + 1) {
+                if (idx == allSubCategories.length) {
                   // "+ Add Sub-Category" Action Card
                   return _AddSubCategoryCard(
                     onTap: () => _promptAddSubCategory(context),
                   );
                 }
 
-                final subName = allSubCategories[idx - 1];
+                final subName = allSubCategories[idx];
                 final subItems = items.where((i) => i.subCategory == subName).toList();
                 final latestSub = subItems.isNotEmpty ? subItems.first : null;
 
