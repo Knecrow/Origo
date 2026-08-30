@@ -340,37 +340,36 @@ class _SculptedTopDomeHeader extends StatelessWidget {
     final notchShadow = isDark ? Colors.black.withValues(alpha: 0.45) : const Color(0xFF757E9E).withValues(alpha: 0.18);
     final notchHighlight = isDark ? Colors.white.withValues(alpha: 0.06) : Colors.white;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 1. Top Custom Painted Bar with UPWARD Arching Dome Notch
-          SizedBox(
-            height: 72,
-            child: Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.center,
-              children: [
-                // Sculpted Upward Arch Panel
-                CustomPaint(
-                  size: Size(MediaQuery.of(context).size.width - 40, 72),
-                  painter: _TopUpwardDomePainter(
-                    color: notchBgColor,
-                    shadowColor: notchShadow,
-                    highlightColor: notchHighlight,
-                  ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 1. Top Custom Painted Bar with UPWARD Arching Dome Notch (Full Width)
+        SizedBox(
+          height: 72,
+          width: double.infinity,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: [
+              // Sculpted Upward Arch Panel
+              CustomPaint(
+                size: Size(MediaQuery.of(context).size.width, 72),
+                painter: _TopUpwardDomePainter(
+                  color: notchBgColor,
+                  shadowColor: notchShadow,
+                  highlightColor: notchHighlight,
                 ),
+              ),
 
-                // Action Icons (Cloud & Menu)
-                Positioned(
-                  bottom: 12,
-                  left: 16,
-                  right: 16,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
+              // Action Icons (Cloud & Menu)
+              Positioned(
+                bottom: 12,
+                left: 28,
+                right: 28,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
                       // Left: Cloud / Theme Button
                       GestureDetector(
                         onTap: () {
@@ -470,12 +469,14 @@ class _SculptedTopDomeHeader extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // 2. Inset Search Bar
-          Container(
-            height: 46,
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF161726) : const Color(0xFFFFFFFF),
-              borderRadius: BorderRadius.circular(23),
+          // 2. Inset Search Bar & Hero Card (Padded)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Container(
+              height: 46,
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF161726) : const Color(0xFFFFFFFF),
+                borderRadius: BorderRadius.circular(23),
               boxShadow: isDark
                   ? [
                       BoxShadow(
@@ -538,167 +539,170 @@ class _SculptedTopDomeHeader extends StatelessWidget {
               ],
             ),
           ),
+          ),
           const SizedBox(height: 16),
 
           // 3. Featured Hero Card ("MyDocs" style from the Reference Image)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1B1D2E) : Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: isDark
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1B1D2E) : Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDark
+                      ? [
+                          const Color(0xFF22253B),
+                          const Color(0xFF161726),
+                        ]
+                      : [
+                          const Color(0xFFFFFFFF),
+                          const Color(0xFFF3F4FB),
+                        ],
+                ),
+                boxShadow: isDark
                     ? [
-                        const Color(0xFF22253B),
-                        const Color(0xFF161726),
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.45),
+                          blurRadius: 16,
+                          offset: const Offset(0, 8),
+                        ),
+                        BoxShadow(
+                          color: const Color(0xFF7582FF).withValues(alpha: 0.15),
+                          blurRadius: 10,
+                          offset: const Offset(0, 0),
+                        ),
                       ]
                     : [
-                        const Color(0xFFFFFFFF),
-                        const Color(0xFFF3F4FB),
+                        BoxShadow(
+                          color: const Color(0xFF757E9E).withValues(alpha: 0.16),
+                          blurRadius: 18,
+                          offset: const Offset(0, 8),
+                        ),
                       ],
               ),
-              boxShadow: isDark
-                  ? [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.45),
-                        blurRadius: 16,
-                        offset: const Offset(0, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      // 3D Luminous Icon
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF7928CA), Color(0xFFFF0080)],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFFF0080).withValues(alpha: 0.35),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.folder_special_rounded,
+                            color: Colors.white,
+                            size: 22,
+                          ),
+                        ),
                       ),
-                      BoxShadow(
-                        color: const Color(0xFF7582FF).withValues(alpha: 0.15),
-                        blurRadius: 10,
-                        offset: const Offset(0, 0),
-                      ),
-                    ]
-                  : [
-                      BoxShadow(
-                        color: const Color(0xFF757E9E).withValues(alpha: 0.16),
-                        blurRadius: 18,
-                        offset: const Offset(0, 8),
+                      const SizedBox(width: 14),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Origo',
+                            style: TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.w800,
+                              color: ext.textPrimary,
+                              letterSpacing: -0.4,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '$visionCount visions, $categoryCount collections',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: ext.textMuted,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    // 3D Luminous Icon
-                    Container(
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF7928CA), Color(0xFFFF0080)],
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFFFF0080).withValues(alpha: 0.35),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.folder_special_rounded,
-                          color: Colors.white,
-                          size: 22,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Origo',
-                          style: TextStyle(
-                            fontSize: 19,
-                            fontWeight: FontWeight.w800,
-                            color: ext.textPrimary,
-                            letterSpacing: -0.4,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '$visionCount visions, $categoryCount collections',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: ext.textMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
+                  ),
+                  const SizedBox(height: 16),
 
-                // Luminous Neon Blue Progress Bar
-                Stack(
-                  children: [
-                    Container(
-                      height: 6,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF131422)
-                            : const Color(0xFFE2E4F2),
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                    ),
-                    Container(
-                      height: 6,
-                      width: 140,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF00C6FF), Color(0xFF0072FF)],
+                  // Luminous Neon Blue Progress Bar
+                  Stack(
+                    children: [
+                      Container(
+                        height: 6,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF131422)
+                              : const Color(0xFFE2E4F2),
+                          borderRadius: BorderRadius.circular(3),
                         ),
-                        borderRadius: BorderRadius.circular(3),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF0072FF).withValues(alpha: 0.6),
-                            blurRadius: 8,
-                            offset: const Offset(0, 0),
+                      ),
+                      Container(
+                        height: 6,
+                        width: 140,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF00C6FF), Color(0xFF0072FF)],
                           ),
-                        ],
+                          borderRadius: BorderRadius.circular(3),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF0072FF).withValues(alpha: 0.6),
+                              blurRadius: 8,
+                              offset: const Offset(0, 0),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Life Vision Manifestation',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: ext.textMuted,
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Life Vision Manifestation',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: ext.textMuted,
+                        ),
                       ),
-                    ),
-                    Text(
-                      'Active',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? const Color(0xFF7582FF) : const Color(0xFF5360ED),
+                      Text(
+                        'Active',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: isDark ? const Color(0xFF7582FF) : const Color(0xFF5360ED),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],
-      ),
-    );
+      );
   }
 }
 
