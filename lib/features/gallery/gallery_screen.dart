@@ -225,14 +225,33 @@ class _SubCategoryPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 160),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? ext.textPrimary : ext.cardColor,
-          borderRadius: BorderRadius.circular(18),
+          color: isSelected
+              ? (isDark ? const Color(0xFF7582FF) : const Color(0xFF5360ED))
+              : ext.cardColor,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: isDark
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: const Color(0xFF757E9E).withValues(alpha: 0.12),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
         ),
         child: Center(
           child: Text(
@@ -240,7 +259,7 @@ class _SubCategoryPill extends StatelessWidget {
             style: TextStyle(
               fontSize: 12.5,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-              color: isSelected ? ext.bgColor : ext.textPrimary,
+              color: isSelected ? Colors.white : ext.textPrimary,
               letterSpacing: -0.1,
             ),
           ),
@@ -257,6 +276,8 @@ class _GalleryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
@@ -265,27 +286,46 @@ class _GalleryTile extends StatelessWidget {
           MaterialPageRoute(builder: (_) => DetailScreen(item: item)),
         );
       },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Hero(
-              tag: 'dream-hero-${item.id}',
-              child: OrigoImage(
-                imagePath: item.imagePath,
-                fit: BoxFit.cover,
-              ),
-            ),
-            // Adaptive Cinematic Ambient Scrim
-            DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: AppColors.adaptiveScrim(
-                  null,
-                  Theme.of(context).brightness == Brightness.dark,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: isDark
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF080912).withValues(alpha: 0.55),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: const Color(0xFF757E9E).withValues(alpha: 0.16),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Hero(
+                tag: 'dream-hero-${item.id}',
+                child: OrigoImage(
+                  imagePath: item.imagePath,
+                  fit: BoxFit.cover,
                 ),
               ),
-            ),
+              // Adaptive Cinematic Ambient Scrim
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: AppColors.adaptiveScrim(
+                    null,
+                    isDark,
+                  ),
+                ),
+              ),
 
             // Top Left SubCategory Badge
             if (item.subCategory != null && item.subCategory!.isNotEmpty)
@@ -366,6 +406,7 @@ class _GalleryTile extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

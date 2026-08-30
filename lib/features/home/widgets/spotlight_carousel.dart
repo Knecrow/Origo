@@ -103,10 +103,35 @@ class _SpotlightCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
           color: ext.cardColor,
-          borderRadius: BorderRadius.circular(26),
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: Theme.of(context).brightness == Brightness.dark
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF080912).withValues(alpha: 0.65),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                  BoxShadow(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    blurRadius: 2,
+                    offset: const Offset(-1, -1),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: const Color(0xFF757E9E).withValues(alpha: 0.20),
+                    blurRadius: 22,
+                    offset: const Offset(0, 10),
+                  ),
+                  const BoxShadow(
+                    color: Colors.white,
+                    blurRadius: 8,
+                    offset: Offset(-2, -2),
+                  ),
+                ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(26),
+          borderRadius: BorderRadius.circular(28),
           child: Stack(
             fit: StackFit.expand,
             children: [

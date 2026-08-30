@@ -6,6 +6,7 @@ import '../../../core/models/origo_category.dart';
 import '../../../core/models/origo_item.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/clay_icon_badge.dart';
 import '../../../core/widgets/origo_image.dart';
 import 'card_quick_actions_sheet.dart';
 import 'sub_category_sheet.dart';
@@ -146,6 +147,7 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final hasImage = widget.latestItem != null;
 
     return GestureDetector(
@@ -163,10 +165,35 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
         child: Container(
           decoration: BoxDecoration(
             color: ext.cardColor,
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: isDark
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFF080912).withValues(alpha: 0.6),
+                      blurRadius: 16,
+                      offset: const Offset(0, 8),
+                    ),
+                    BoxShadow(
+                      color: Colors.white.withValues(alpha: 0.04),
+                      blurRadius: 2,
+                      offset: const Offset(-1, -1),
+                    ),
+                  ]
+                : [
+                    BoxShadow(
+                      color: const Color(0xFF757E9E).withValues(alpha: 0.16),
+                      blurRadius: 18,
+                      offset: const Offset(0, 8),
+                    ),
+                    const BoxShadow(
+                      color: Colors.white,
+                      blurRadius: 6,
+                      offset: Offset(-2, -2),
+                    ),
+                  ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(24),
             child: hasImage
                 ? Stack(
                     fit: StackFit.expand,
@@ -267,6 +294,7 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final hasImage = widget.latestItem != null;
 
     return GestureDetector(
@@ -285,6 +313,31 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
           decoration: BoxDecoration(
             color: ext.cardColor,
             borderRadius: BorderRadius.circular(24),
+            boxShadow: isDark
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFF080912).withValues(alpha: 0.6),
+                      blurRadius: 18,
+                      offset: const Offset(0, 8),
+                    ),
+                    BoxShadow(
+                      color: Colors.white.withValues(alpha: 0.04),
+                      blurRadius: 2,
+                      offset: const Offset(-1, -1),
+                    ),
+                  ]
+                : [
+                    BoxShadow(
+                      color: const Color(0xFF757E9E).withValues(alpha: 0.16),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                    const BoxShadow(
+                      color: Colors.white,
+                      blurRadius: 6,
+                      offset: Offset(-2, -2),
+                    ),
+                  ],
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24),
@@ -464,12 +517,12 @@ class _EmptyInvitationContent extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: isDark
             ? [
-                const Color(0xFF1C1C1E),
-                const Color(0xFF121214),
+                const Color(0xFF1B1D2E),
+                const Color(0xFF131422),
               ]
             : [
                 const Color(0xFFFFFFFF),
-                const Color(0xFFE5E5EA),
+                const Color(0xFFE8EAF6),
               ],
         ),
       ),
@@ -478,18 +531,10 @@ class _EmptyInvitationContent extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            width: isCompact ? 42 : 48,
-            height: isCompact ? 42 : 48,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: ext.textMuted.withValues(alpha: 0.14),
-            ),
-            child: Icon(
-              category.icon,
-              color: ext.textPrimary,
-              size: isCompact ? 22 : 26,
-            ),
+          ClayIconBadge(
+            icon: category.icon,
+            size: isCompact ? 20 : 24,
+            padding: isCompact ? 8 : 10,
           ),
           SizedBox(height: isCompact ? 8 : 10),
           Text(

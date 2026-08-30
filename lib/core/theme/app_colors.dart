@@ -5,49 +5,53 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // ── Light Palette (Apple iOS / One UI Porcelain) ───────────────────────────
-  static const Color lightBackground = Color(0xFFF2F2F7);
+  // ── Light Palette (Cloud-Lilac Porcelain & Soft Ceramic) ───────────────────
+  static const Color lightBackground = Color(0xFFEBECF6);
   static const Color lightCard = Color(0xFFFFFFFF);
-  static const Color lightAccent = Color(0xFF000000);
-  static const Color lightTextPrimary = Color(0xFF000000);
-  static const Color lightTextMuted = Color(0xFF8E8E93);
+  static const Color lightCardSecondary = Color(0xFFE2E4F2);
+  static const Color lightAccent = Color(0xFF5360ED);
+  static const Color lightAccentSoft = Color(0xFFE0E3FA);
+  static const Color lightTextPrimary = Color(0xFF161828);
+  static const Color lightTextMuted = Color(0xFF7E83A0);
 
-  // Shadows
-  static const Color lightShadowDark = Color(0xFFE5E5EA);
+  // Soft Ambient Ceramic Shadows
+  static const Color lightShadowDark = Color(0xFFD3D6E8);
   static const Color lightShadowLight = Color(0xFFFFFFFF);
 
-  // ── Dark Palette (Apple OLED True Black & Titanium Slate) ──────────────────
-  static const Color darkBackground = Color(0xFF000000);
-  static const Color darkCard = Color(0xFF1C1C1E);
-  static const Color darkAccent = Color(0xFFFFFFFF);
+  // ── Dark Palette (Midnight Obsidian & Soft Glassmorphic Sheen) ─────────────
+  static const Color darkBackground = Color(0xFF11121F);
+  static const Color darkCard = Color(0xFF1B1D2E);
+  static const Color darkCardSecondary = Color(0xFF151624);
+  static const Color darkAccent = Color(0xFF7582FF);
+  static const Color darkAccentSoft = Color(0xFF252842);
   static const Color darkTextPrimary = Color(0xFFFFFFFF);
-  static const Color darkTextMuted = Color(0xFF8E8E93);
+  static const Color darkTextMuted = Color(0xFF888EA8);
 
-  // Shadows
-  static const Color darkShadowDark = Color(0xFF000000);
-  static const Color darkShadowLight = Color(0xFF2C2C2E);
+  // Deep Obsidian Shadows
+  static const Color darkShadowDark = Color(0xFF090A11);
+  static const Color darkShadowLight = Color(0xFF272A42);
 
   // ── Shared ─────────────────────────────────────────────────────────────────
   static const Color error = Color(0xFFFF453A);
   static const Color success = Color(0xFF30D158);
 
-  // ── Monochromatic Category Colors (Stealth Titanium & Slate) ───────────────
+  // ── Curated Ceramic Category Accents (Subtle & Elegant) ────────────────────
   static const Map<String, Color> categoryColors = {
-    'Home': Color(0xFF8E8E93),
-    'Garage': Color(0xFF8E8E93),
-    'Aviation': Color(0xFF8E8E93),
-    'Marine': Color(0xFF8E8E93),
-    'Places': Color(0xFF8E8E93),
-    'Sanctuary': Color(0xFF8E8E93),
-    'Experiences': Color(0xFF8E8E93),
-    'Collections': Color(0xFF8E8E93),
+    'Home': Color(0xFF5360ED),
+    'Garage': Color(0xFF7582FF),
+    'Aviation': Color(0xFF8E99F3),
+    'Marine': Color(0xFF5B78E5),
+    'Places': Color(0xFF6366F1),
+    'Sanctuary': Color(0xFF6B7FF5),
+    'Experiences': Color(0xFF7E8BFF),
+    'Collections': Color(0xFF8B96FF),
   };
 
   static Color getCategoryColor(String key) {
-    return const Color(0xFF8E8E93);
+    return categoryColors[key] ?? const Color(0xFF7582FF);
   }
 
-  // ── Pure Cinematic OLED True Black Scrim Gradient ──────────────────────────
+  // ── Smooth Cinematic Ambient Scrim ─────────────────────────────────────────
   static LinearGradient adaptiveScrim([
     Color? baseColor,
     bool isDark = true,
@@ -58,16 +62,15 @@ class AppColors {
       colors: isDark
           ? [
               Colors.transparent,
-              Colors.black.withValues(alpha: 0.35),
-              Colors.black.withValues(alpha: 0.92),
+              const Color(0xFF11121F).withValues(alpha: 0.35),
+              const Color(0xFF11121F).withValues(alpha: 0.94),
             ]
           : [
               Colors.transparent,
-              Colors.black.withValues(alpha: 0.28),
-              Colors.black.withValues(alpha: 0.88),
+              const Color(0xFF161828).withValues(alpha: 0.25),
+              const Color(0xFF161828).withValues(alpha: 0.88),
             ],
       stops: const [0.15, 0.55, 1.0],
     );
   }
 }
-

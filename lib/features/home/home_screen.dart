@@ -155,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
             // ── 4. The Dynamic Editorial Bento Grid ────────────────────────
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 100),
+                padding: const EdgeInsets.only(bottom: 120),
                 child: EditorialBentoGrid(
                   categories: itemsProv.categories,
                   counts: counts,
@@ -167,70 +167,170 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      // Floating Action Button
-      floatingActionButton: _AnimatedFAB(
-        onTap: () => AddItemSheet.show(context),
+      // ── Floating Ceramic Island Dock ──────────────────────────────────────
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: _FloatingCeramicDock(
+        onAdd: () => AddItemSheet.show(context),
+        onSettings: () => SettingsSheet.show(context),
+        onToggleTheme: () => themeProv.toggle(),
+        isDark: themeProv.isDark,
       ),
     );
   }
 }
 
-class _AnimatedFAB extends StatefulWidget {
-  final VoidCallback onTap;
-  const _AnimatedFAB({required this.onTap});
+class _FloatingCeramicDock extends StatelessWidget {
+  final VoidCallback onAdd;
+  final VoidCallback onSettings;
+  final VoidCallback onToggleTheme;
+  final bool isDark;
 
-  @override
-  State<_AnimatedFAB> createState() => _AnimatedFABState();
-}
-
-class _AnimatedFABState extends State<_AnimatedFAB>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _scale;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 150),
-      lowerBound: 0.92,
-      upperBound: 1.0,
-      value: 1.0,
-    );
-    _scale = _controller;
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  const _FloatingCeramicDock({
+    required this.onAdd,
+    required this.onSettings,
+    required this.onToggleTheme,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
-    return ScaleTransition(
-      scale: _scale,
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: isDark
+            ? const Color(0xFF181A2A).withValues(alpha: 0.92)
+            : const Color(0xFFFFFFFF).withValues(alpha: 0.95),
+        borderRadius: BorderRadius.circular(36),
+        boxShadow: isDark
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.6),
+                  blurRadius: 24,
+                  offset: const Offset(0, 10),
+                ),
+                BoxShadow(
+                  color: Colors.white.withValues(alpha: 0.05),
+                  blurRadius: 2,
+                  offset: const Offset(-1, -1),
+                ),
+              ]
+            : [
+                BoxShadow(
+                  color: const Color(0xFF757E9E).withValues(alpha: 0.22),
+                  blurRadius: 24,
+                  offset: const Offset(0, 10),
+                ),
+                const BoxShadow(
+                  color: Colors.white,
+                  blurRadius: 8,
+                  offset: Offset(-2, -2),
+                ),
+              ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Theme Toggle
+          ClayIconBadge(
+            icon: isDark ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
+            size: 19,
+            padding: 8,
+            iconColor: isDark ? const Color(0xFFFFD60A) : ext.textPrimary,
+            onTap: onToggleTheme,
+          ),
+          const SizedBox(width: 14),
+
+          // Central Embossed Ceramic Add Button
+          _CeramicActionPill(
+            onTap: onAdd,
+            isDark: isDark,
+          ),
+          const SizedBox(width: 14),
+
+          // Settings Button
+          ClayIconBadge(
+            icon: Icons.tune_rounded,
+            size: 19,
+            padding: 8,
+            iconColor: ext.textPrimary,
+            onTap: onSettings,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CeramicActionPill extends StatefulWidget {
+  final VoidCallback onTap;
+  final bool isDark;
+
+  const _CeramicActionPill({
+    required this.onTap,
+    required this.isDark,
+  });
+
+  @override
+  State<_CeramicActionPill> createState() => _CeramicActionPillState();
+}
+
+class _CeramicActionPillState extends State<_CeramicActionPill> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedScale(
+      scale: _pressed ? 0.90 : 1.0,
+      duration: const Duration(milliseconds: 120),
+      curve: Curves.easeOutCubic,
       child: GestureDetector(
-        onTapDown: (_) => _controller.reverse(),
+        onTapDown: (_) => setState(() => _pressed = true),
         onTapUp: (_) {
-          _controller.forward();
+          setState(() => _pressed = false);
           HapticFeedback.mediumImpact();
           widget.onTap();
         },
-        onTapCancel: () => _controller.forward(),
+        onTapCancel: () => setState(() => _pressed = false),
         child: Container(
-          width: 56,
-          height: 56,
+          width: 50,
+          height: 50,
           decoration: BoxDecoration(
-            color: ext.accent,
             shape: BoxShape.circle,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: widget.isDark
+                  ? [
+                      const Color(0xFF8B96FF),
+                      const Color(0xFF5E6BEE),
+                    ]
+                  : [
+                      const Color(0xFF6371F8),
+                      const Color(0xFF4350E0),
+                    ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF5360ED).withValues(alpha: 0.45),
+                blurRadius: 14,
+                offset: const Offset(0, 5),
+              ),
+              const BoxShadow(
+                color: Colors.white24,
+                blurRadius: 4,
+                offset: Offset(-1, -1),
+              ),
+            ],
           ),
-          child: const Icon(
-            Icons.add_rounded,
-            color: Colors.white,
-            size: 26,
+          child: const Center(
+            child: Icon(
+              Icons.add_rounded,
+              color: Colors.white,
+              size: 26,
+            ),
           ),
         ),
       ),

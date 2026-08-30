@@ -465,6 +465,31 @@ class _SubCategoryCardState extends State<_SubCategoryCard> {
           decoration: BoxDecoration(
             color: ext.bgColor,
             borderRadius: BorderRadius.circular(20),
+            boxShadow: isDark
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFF080912).withValues(alpha: 0.5),
+                      blurRadius: 12,
+                      offset: const Offset(0, 5),
+                    ),
+                    BoxShadow(
+                      color: Colors.white.withValues(alpha: 0.04),
+                      blurRadius: 2,
+                      offset: const Offset(-1, -1),
+                    ),
+                  ]
+                : [
+                    BoxShadow(
+                      color: const Color(0xFF757E9E).withValues(alpha: 0.14),
+                      blurRadius: 14,
+                      offset: const Offset(0, 5),
+                    ),
+                    const BoxShadow(
+                      color: Colors.white,
+                      blurRadius: 6,
+                      offset: Offset(-2, -2),
+                    ),
+                  ],
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
@@ -533,12 +558,12 @@ class _SubCategoryCardState extends State<_SubCategoryCard> {
                         end: Alignment.bottomRight,
                         colors: isDark
                             ? [
-                                const Color(0xFF1C1C1E),
-                                const Color(0xFF121214),
+                                const Color(0xFF1B1D2E),
+                                const Color(0xFF131422),
                               ]
                             : [
                                 const Color(0xFFFFFFFF),
-                                const Color(0xFFE5E5EA),
+                                const Color(0xFFE8EAF6),
                               ],
                       ),
                     ),
@@ -546,18 +571,10 @@ class _SubCategoryCardState extends State<_SubCategoryCard> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: ext.textMuted.withValues(alpha: 0.14),
-                          ),
-                          child: Icon(
-                            widget.icon,
-                            color: ext.textPrimary,
-                            size: 18,
-                          ),
+                        ClayIconBadge(
+                          icon: widget.icon,
+                          size: 18,
+                          padding: 8,
                         ),
                         const SizedBox(height: 8),
                         Text(
