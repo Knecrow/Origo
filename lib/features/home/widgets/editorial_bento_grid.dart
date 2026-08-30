@@ -483,12 +483,12 @@ class _EmptyInvitationContent extends StatelessWidget {
             height: isCompact ? 42 : 48,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: ext.accent.withValues(alpha: 0.15),
+              color: category.color.withValues(alpha: 0.18),
             ),
             child: Icon(
-              Icons.add_rounded,
-              color: ext.accent,
-              size: isCompact ? 24 : 28,
+              category.icon,
+              color: category.color,
+              size: isCompact ? 22 : 26,
             ),
           ),
           SizedBox(height: isCompact ? 8 : 10),

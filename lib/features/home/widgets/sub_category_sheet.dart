@@ -551,12 +551,12 @@ class _SubCategoryCardState extends State<_SubCategoryCard> {
                           height: 36,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: ext.accent.withValues(alpha: 0.14),
+                            color: widget.categoryColor.withValues(alpha: 0.16),
                           ),
                           child: Icon(
-                            Icons.add_rounded,
-                            color: ext.accent,
-                            size: 20,
+                            widget.icon,
+                            color: widget.categoryColor,
+                            size: 18,
                           ),
                         ),
                         const SizedBox(height: 8),
