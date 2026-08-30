@@ -40,11 +40,13 @@ class AppTheme {
         AppThemeExtension(
           bgColor: AppColors.lightBackground,
           cardColor: AppColors.lightCard,
+          cardSecondaryColor: AppColors.lightCardSecondary,
           accent: AppColors.lightAccent,
           textPrimary: AppColors.lightTextPrimary,
           textMuted: AppColors.lightTextMuted,
           shadowDark: AppColors.lightShadowDark,
           shadowLight: AppColors.lightShadowLight,
+          primaryGradient: AppColors.lightPrimaryGradient,
         ),
       ],
     );
@@ -72,7 +74,7 @@ class AppTheme {
         backgroundColor: AppColors.darkCard,
         modalBackgroundColor: AppColors.darkCard,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
         ),
       ),
       inputDecorationTheme: _inputTheme(
@@ -84,11 +86,13 @@ class AppTheme {
         AppThemeExtension(
           bgColor: AppColors.darkBackground,
           cardColor: AppColors.darkCard,
+          cardSecondaryColor: AppColors.darkCardSecondary,
           accent: AppColors.darkAccent,
           textPrimary: AppColors.darkTextPrimary,
           textMuted: AppColors.darkTextMuted,
           shadowDark: AppColors.darkShadowDark,
           shadowLight: AppColors.darkShadowLight,
+          primaryGradient: AppColors.darkPrimaryGradient,
         ),
       ],
     );
@@ -119,13 +123,21 @@ class AppTheme {
         fontWeight: FontWeight.w600,
         color: primary,
       ),
-      bodyLarge: TextStyle(fontSize: 15, color: primary),
-      bodyMedium: TextStyle(fontSize: 13, color: muted),
+      bodyLarge: TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.w400,
+        color: primary,
+      ),
+      bodyMedium: TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+        color: muted,
+      ),
       labelLarge: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w600,
-        color: muted,
-        letterSpacing: 0.8,
+        color: primary,
+        letterSpacing: 0.5,
       ),
     );
   }
@@ -138,7 +150,10 @@ class AppTheme {
     return InputDecorationTheme(
       filled: true,
       fillColor: fill,
-      hintStyle: TextStyle(color: hint, fontSize: 14),
+      hintStyle: TextStyle(
+        fontSize: 14,
+        color: hint.withValues(alpha: 0.6),
+      ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide.none,
@@ -161,40 +176,48 @@ class AppTheme {
 class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
   final Color bgColor;
   final Color cardColor;
+  final Color cardSecondaryColor;
   final Color accent;
   final Color textPrimary;
   final Color textMuted;
   final Color shadowDark;
   final Color shadowLight;
+  final List<Color> primaryGradient;
 
   const AppThemeExtension({
     required this.bgColor,
     required this.cardColor,
+    required this.cardSecondaryColor,
     required this.accent,
     required this.textPrimary,
     required this.textMuted,
     required this.shadowDark,
     required this.shadowLight,
+    required this.primaryGradient,
   });
 
   @override
   AppThemeExtension copyWith({
     Color? bgColor,
     Color? cardColor,
+    Color? cardSecondaryColor,
     Color? accent,
     Color? textPrimary,
     Color? textMuted,
     Color? shadowDark,
     Color? shadowLight,
+    List<Color>? primaryGradient,
   }) {
     return AppThemeExtension(
       bgColor: bgColor ?? this.bgColor,
       cardColor: cardColor ?? this.cardColor,
+      cardSecondaryColor: cardSecondaryColor ?? this.cardSecondaryColor,
       accent: accent ?? this.accent,
       textPrimary: textPrimary ?? this.textPrimary,
       textMuted: textMuted ?? this.textMuted,
       shadowDark: shadowDark ?? this.shadowDark,
       shadowLight: shadowLight ?? this.shadowLight,
+      primaryGradient: primaryGradient ?? this.primaryGradient,
     );
   }
 
@@ -204,11 +227,16 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
     return AppThemeExtension(
       bgColor: Color.lerp(bgColor, other.bgColor, t)!,
       cardColor: Color.lerp(cardColor, other.cardColor, t)!,
+      cardSecondaryColor: Color.lerp(cardSecondaryColor, other.cardSecondaryColor, t)!,
       accent: Color.lerp(accent, other.accent, t)!,
       textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
       textMuted: Color.lerp(textMuted, other.textMuted, t)!,
       shadowDark: Color.lerp(shadowDark, other.shadowDark, t)!,
       shadowLight: Color.lerp(shadowLight, other.shadowLight, t)!,
+      primaryGradient: [
+        Color.lerp(primaryGradient.first, other.primaryGradient.first, t)!,
+        Color.lerp(primaryGradient.last, other.primaryGradient.last, t)!,
+      ],
     );
   }
 }

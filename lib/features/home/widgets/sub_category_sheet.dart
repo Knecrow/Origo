@@ -269,7 +269,14 @@ class _SubCategorySheetState extends State<SubCategorySheet> {
     return Container(
       decoration: BoxDecoration(
         color: ext.cardColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        boxShadow: [
+          BoxShadow(
+            color: ext.shadowDark.withValues(alpha: 0.25),
+            blurRadius: 28,
+            offset: const Offset(0, -8),
+          ),
+        ],
       ),
       padding: EdgeInsets.only(
         top: 12,
@@ -467,7 +474,7 @@ class _SubCategoryCardState extends State<_SubCategoryCard> {
         curve: Curves.easeOutCubic,
         child: Container(
           decoration: BoxDecoration(
-            color: ext.bgColor,
+            color: ext.cardSecondaryColor,
             borderRadius: BorderRadius.circular(20),
             boxShadow: isDark
                 ? [

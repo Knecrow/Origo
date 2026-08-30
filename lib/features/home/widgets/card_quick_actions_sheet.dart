@@ -47,7 +47,14 @@ class CardQuickActionsSheet extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: ext.cardColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        boxShadow: [
+          BoxShadow(
+            color: ext.shadowDark.withValues(alpha: 0.25),
+            blurRadius: 28,
+            offset: const Offset(0, -8),
+          ),
+        ],
       ),
       padding: EdgeInsets.fromLTRB(
         24,
@@ -227,7 +234,7 @@ class _ActionTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: ext.bgColor,
+          color: ext.cardSecondaryColor,
           borderRadius: BorderRadius.circular(18),
         ),
         child: Row(

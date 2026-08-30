@@ -33,7 +33,14 @@ class SettingsSheet extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: ext.cardColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        boxShadow: [
+          BoxShadow(
+            color: ext.shadowDark.withValues(alpha: 0.25),
+            blurRadius: 28,
+            offset: const Offset(0, -8),
+          ),
+        ],
       ),
       padding: EdgeInsets.only(
         top: 12,
@@ -78,7 +85,7 @@ class SettingsSheet extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: ext.textMuted.withValues(alpha: 0.12),
+                      color: ext.cardSecondaryColor,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -98,7 +105,7 @@ class SettingsSheet extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: ext.bgColor,
+                color: ext.cardSecondaryColor,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -160,7 +167,7 @@ class SettingsSheet extends StatelessWidget {
             const SizedBox(height: 10),
             Container(
               decoration: BoxDecoration(
-                color: ext.bgColor,
+                color: ext.cardSecondaryColor,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
@@ -219,7 +226,7 @@ class SettingsSheet extends StatelessWidget {
             const SizedBox(height: 10),
             Container(
               decoration: BoxDecoration(
-                color: ext.bgColor,
+                color: ext.cardSecondaryColor,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(

@@ -331,10 +331,15 @@ class _SculptedWaveTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ext = context.ext;
     final profileProv = context.watch<ProfileProvider>();
-    final bgColor = isDark ? const Color(0xFF141624) : const Color(0xFFFFFFFF);
-    final shadowColor = isDark ? Colors.black.withValues(alpha: 0.55) : const Color(0xFF757E9E).withValues(alpha: 0.2);
-    final highlightColor = isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white;
+    final bgColor = ext.cardColor;
+    final shadowColor = isDark
+        ? Colors.black.withValues(alpha: 0.5)
+        : ext.shadowDark.withValues(alpha: 0.22);
+    final highlightColor = isDark
+        ? Colors.white.withValues(alpha: 0.05)
+        : Colors.white;
     const barHeight = 64.0;
 
     return SizedBox(
@@ -378,7 +383,7 @@ class _SculptedWaveTopBar extends StatelessWidget {
                     child: Icon(
                       isDark ? Icons.wb_sunny_rounded : Icons.cloud_outlined,
                       size: 24,
-                      color: isDark ? const Color(0xFFFFD60A) : const Color(0xFF5360ED),
+                      color: isDark ? const Color(0xFFFFD60A) : ext.accent,
                     ),
                   ),
                 ),
@@ -397,7 +402,7 @@ class _SculptedWaveTopBar extends StatelessWidget {
                     child: Icon(
                       Icons.menu_rounded,
                       size: 24,
-                      color: isDark ? Colors.white70 : const Color(0xFF2C324A),
+                      color: ext.textPrimary,
                     ),
                   ),
                 ),
@@ -477,9 +482,14 @@ class _SculptedWaveBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = isDark ? const Color(0xFF141624) : const Color(0xFFFFFFFF);
-    final shadowColor = isDark ? Colors.black.withValues(alpha: 0.55) : const Color(0xFF757E9E).withValues(alpha: 0.2);
-    final highlightColor = isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white;
+    final ext = context.ext;
+    final bgColor = ext.cardColor;
+    final shadowColor = isDark
+        ? Colors.black.withValues(alpha: 0.5)
+        : ext.shadowDark.withValues(alpha: 0.22);
+    final highlightColor = isDark
+        ? Colors.white.withValues(alpha: 0.05)
+        : Colors.white;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final barHeight = 64.0 + bottomPadding;
 
@@ -517,9 +527,7 @@ class _SculptedWaveBottomBar extends StatelessWidget {
                     child: Icon(
                       Icons.home_rounded,
                       size: 26,
-                      color: activeIndex == 0
-                          ? (isDark ? const Color(0xFF7582FF) : const Color(0xFF5360ED))
-                          : (isDark ? Colors.white38 : const Color(0xFF8E93A6)),
+                      color: activeIndex == 0 ? ext.accent : ext.textMuted,
                     ),
                   ),
                 ),
@@ -535,9 +543,7 @@ class _SculptedWaveBottomBar extends StatelessWidget {
                     child: Icon(
                       Icons.access_time_rounded,
                       size: 24,
-                      color: activeIndex == 3
-                          ? (isDark ? const Color(0xFF7582FF) : const Color(0xFF5360ED))
-                          : (isDark ? Colors.white38 : const Color(0xFF8E93A6)),
+                      color: activeIndex == 3 ? ext.accent : ext.textMuted,
                     ),
                   ),
                 ),

@@ -85,7 +85,14 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
     return Container(
       decoration: BoxDecoration(
         color: ext.cardColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        boxShadow: [
+          BoxShadow(
+            color: ext.shadowDark.withValues(alpha: 0.25),
+            blurRadius: 28,
+            offset: const Offset(0, -8),
+          ),
+        ],
       ),
       padding: EdgeInsets.fromLTRB(20, 12, 20, 24 + bottomInset),
       child: Form(
@@ -106,72 +113,107 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                   ),
                 ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 16),
 
-              // Title
-              Text(
-                'New Category',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: ext.textPrimary,
-                  letterSpacing: -0.4,
-                ),
+              // Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Add Collection',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: ext.textPrimary,
+                      letterSpacing: -0.4,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: ext.cardSecondaryColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 18,
+                        color: ext.textMuted,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
 
-              // Category Name Input
+              // Category Name
               Text(
-                'Category Name',
+                'COLLECTION NAME',
                 style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.2,
                   color: ext.textMuted,
                 ),
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _nameCtrl,
-                style: TextStyle(color: ext.textPrimary),
-                decoration: const InputDecoration(
+                style: TextStyle(color: ext.textPrimary, fontSize: 15),
+                decoration: InputDecoration(
                   hintText: 'e.g. Watches, Real Estate, Art',
+                  filled: true,
+                  fillColor: ext.cardSecondaryColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 14),
                 ),
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) {
-                    return 'Category name is required';
-                  }
-                  return null;
-                },
                 onChanged: (_) => setState(() {}),
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? 'Please enter a name' : null,
               ),
               const SizedBox(height: 16),
 
-              // Display Subtitle / Tagline
+              // Display Header Subtitle (Optional)
               Text(
-                'Editorial Tagline (Optional)',
+                'DISPLAY TITLE (OPTIONAL)',
                 style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.2,
                   color: ext.textMuted,
                 ),
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _displayCtrl,
-                style: TextStyle(color: ext.textPrimary),
-                decoration: const InputDecoration(
-                  hintText: 'e.g. Horology & Craft, Private Sanctuary',
+                style: TextStyle(color: ext.textPrimary, fontSize: 15),
+                decoration: InputDecoration(
+                  hintText: 'e.g. HOROLOGY & TIMEPIECES',
+                  filled: true,
+                  fillColor: ext.cardSecondaryColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 14),
                 ),
                 onChanged: (_) => setState(() {}),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
 
-              // Icon Selector
+              // Select Icon
               Text(
-                'Select Icon',
+                'SELECT ICON',
                 style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.2,
                   color: ext.textMuted,
                 ),
               ),
@@ -181,7 +223,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: kAllSupportedCategoryIcons.length,
-                  separatorBuilder: (_, _) => const SizedBox(width: 10),
+                  separatorBuilder: (context, _) => const SizedBox(width: 10),
                   itemBuilder: (context, idx) {
                     final icon = kAllSupportedCategoryIcons[idx];
                     final isSelected = icon == _selectedIcon;
@@ -194,10 +236,10 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                         icon: icon,
                         size: 18,
                         padding: 10,
-                        iconColor: isSelected ? ext.bgColor : ext.textMuted,
+                        iconColor: isSelected ? Colors.white : ext.textMuted,
                         badgeColor: isSelected
-                            ? ext.textPrimary
-                            : ext.cardColor,
+                            ? ext.accent
+                            : ext.cardSecondaryColor,
                       ),
                     );
                   },
@@ -207,10 +249,11 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
 
               // Live Preview Card
               Text(
-                'Live Preview',
+                'LIVE PREVIEW',
                 style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.2,
                   color: ext.textMuted,
                 ),
               ),
@@ -219,7 +262,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                 height: 74,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: ext.cardColor,
+                  color: ext.cardSecondaryColor,
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: Row(
@@ -228,8 +271,8 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                       icon: _selectedIcon,
                       size: 18,
                       padding: 8,
-                      iconColor: ext.textPrimary,
-                      badgeColor: ext.bgColor,
+                      iconColor: ext.accent,
+                      badgeColor: ext.cardColor,
                     ),
                     const SizedBox(width: 14),
                     Expanded(
@@ -242,7 +285,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                                 ? _displayCtrl.text.trim().toUpperCase()
                                 : (_nameCtrl.text.trim().isNotEmpty
                                     ? _nameCtrl.text.trim().toUpperCase()
-                                    : 'NEW CATEGORY'),
+                                    : 'NEW COLLECTION'),
                             style: TextStyle(
                               color: ext.textMuted,
                               fontSize: 9,
@@ -254,7 +297,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                           Text(
                             _nameCtrl.text.trim().isNotEmpty
                                 ? _nameCtrl.text.trim()
-                                : 'Category Name',
+                                : 'Collection Name',
                             style: TextStyle(
                               color: ext.textPrimary,
                               fontSize: 15,
@@ -272,7 +315,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
-                        '0 Assets',
+                        '0 Visions',
                         style: TextStyle(
                           color: ext.textPrimary,
                           fontSize: 10,
@@ -286,32 +329,38 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
               const SizedBox(height: 24),
 
               // Create Category Button
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: _saving
-                    ? Center(
-                        child: CircularProgressIndicator(color: ext.accent),
-                      )
-                    : ElevatedButton(
-                        onPressed: _save,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ext.accent,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: const Text(
-                          'Create Category',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.2,
-                          ),
-                        ),
+              GestureDetector(
+                onTap: _saving ? null : _save,
+                child: Container(
+                  width: double.infinity,
+                  height: 54,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(27),
+                    gradient: LinearGradient(
+                      colors: ext.primaryGradient,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: ext.accent.withValues(alpha: 0.4),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
                       ),
+                    ],
+                  ),
+                  child: Center(
+                    child: _saving
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            'Create Collection',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: -0.2,
+                            ),
+                          ),
+                  ),
+                ),
               ),
             ],
           ),

@@ -160,7 +160,14 @@ class _AddItemSheetState extends State<AddItemSheet> {
     return Container(
       decoration: BoxDecoration(
         color: ext.cardColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        boxShadow: [
+          BoxShadow(
+            color: ext.shadowDark.withValues(alpha: 0.25),
+            blurRadius: 28,
+            offset: const Offset(0, -8),
+          ),
+        ],
       ),
       padding: EdgeInsets.fromLTRB(20, 12, 20, 24 + bottomInset),
       child: Form(
@@ -202,7 +209,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: ext.textMuted.withValues(alpha: 0.12),
+                        color: ext.cardSecondaryColor,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -234,16 +241,20 @@ class _AddItemSheetState extends State<AddItemSheet> {
                 decoration: InputDecoration(
                   hintText: 'What is your vision? (e.g. Villa in Como)',
                   filled: true,
-                  fillColor: ext.bgColor,
+                  fillColor: ext.cardSecondaryColor,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(18),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 14),
                 ),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Please name your dream' : null,
+                validator: (val) {
+                  if (val == null || val.trim().isEmpty) {
+                    return 'Please enter a title for your dream';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
 
@@ -252,21 +263,36 @@ class _AddItemSheetState extends State<AddItemSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Collection',
+                    'COLLECTION',
                     style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.2,
                       color: ext.textMuted,
                     ),
                   ),
                   GestureDetector(
                     onTap: _openAddCategory,
-                    child: Text(
-                      '+ Custom Category',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: ext.accent,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: ext.cardSecondaryColor,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.add_rounded, size: 13, color: ext.accent),
+                          const SizedBox(width: 4),
+                          Text(
+                            'New Collection',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: ext.accent,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -290,7 +316,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: suggestedSubs.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 8),
+                    separatorBuilder: (context, _) => const SizedBox(width: 8),
                     itemBuilder: (context, idx) {
                       final sub = suggestedSubs[idx];
                       final isSelected = sub == _selectedSubCategory;
@@ -307,8 +333,8 @@ class _AddItemSheetState extends State<AddItemSheet> {
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? ext.textPrimary
-                                : ext.bgColor,
+                                ? ext.accent
+                                : ext.cardSecondaryColor,
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: Center(
@@ -320,7 +346,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
                                     ? FontWeight.w700
                                     : FontWeight.w600,
                                 color: isSelected
-                                    ? ext.bgColor
+                                    ? Colors.white
                                     : ext.textPrimary,
                               ),
                             ),
@@ -343,7 +369,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    color: ext.bgColor,
+                    color: ext.cardSecondaryColor,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(
@@ -391,7 +417,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
                   decoration: InputDecoration(
                     hintText: 'Target Timeframe (e.g. 2027, In 3 Years)',
                     filled: true,
-                    fillColor: ext.bgColor,
+                    fillColor: ext.cardSecondaryColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -409,7 +435,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
                   decoration: InputDecoration(
                     hintText: 'Personal Motivation / Affirmation (Optional)',
                     filled: true,
-                    fillColor: ext.bgColor,
+                    fillColor: ext.cardSecondaryColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -424,7 +450,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    color: ext.bgColor,
+                    color: ext.cardSecondaryColor,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
@@ -464,33 +490,39 @@ class _AddItemSheetState extends State<AddItemSheet> {
               ],
               const SizedBox(height: 20),
 
-              // 5. Submit Button
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: _saving
-                    ? Center(
-                        child: CircularProgressIndicator(color: ext.accent),
-                      )
-                    : ElevatedButton(
-                        onPressed: _save,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ext.accent,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: const Text(
-                          'Add Dream',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.2,
-                          ),
-                        ),
+              // 5. Submit Button (Gradient Unified)
+              GestureDetector(
+                onTap: _saving ? null : _save,
+                child: Container(
+                  width: double.infinity,
+                  height: 54,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(27),
+                    gradient: LinearGradient(
+                      colors: ext.primaryGradient,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: ext.accent.withValues(alpha: 0.4),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
                       ),
+                    ],
+                  ),
+                  child: Center(
+                    child: _saving
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            'Add Dream',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: -0.2,
+                            ),
+                          ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -518,7 +550,7 @@ class _ImagePickerWidget extends StatelessWidget {
         width: double.infinity,
         height: imagePath != null ? 180 : 120,
         decoration: BoxDecoration(
-          color: ext.bgColor,
+          color: ext.cardSecondaryColor,
           borderRadius: BorderRadius.circular(22),
         ),
         child: ClipRRect(

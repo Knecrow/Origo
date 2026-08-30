@@ -8,11 +8,12 @@ class AppColors {
   // ── Light Palette (Cloud-Lilac Porcelain & Soft Ceramic) ───────────────────
   static const Color lightBackground = Color(0xFFEBECF6);
   static const Color lightCard = Color(0xFFFFFFFF);
-  static const Color lightCardSecondary = Color(0xFFE2E4F2);
+  static const Color lightCardSecondary = Color(0xFFEFF1FA);
   static const Color lightAccent = Color(0xFF5360ED);
   static const Color lightAccentSoft = Color(0xFFE0E3FA);
   static const Color lightTextPrimary = Color(0xFF161828);
   static const Color lightTextMuted = Color(0xFF7E83A0);
+  static const List<Color> lightPrimaryGradient = [Color(0xFF5E6BEE), Color(0xFF4350E0)];
 
   // Soft Ambient Ceramic Shadows
   static const Color lightShadowDark = Color(0xFFD3D6E8);
@@ -21,11 +22,12 @@ class AppColors {
   // ── Dark Palette (Midnight Obsidian & Soft Glassmorphic Sheen) ─────────────
   static const Color darkBackground = Color(0xFF11121F);
   static const Color darkCard = Color(0xFF1B1D2E);
-  static const Color darkCardSecondary = Color(0xFF151624);
+  static const Color darkCardSecondary = Color(0xFF22253B);
   static const Color darkAccent = Color(0xFF7582FF);
   static const Color darkAccentSoft = Color(0xFF252842);
   static const Color darkTextPrimary = Color(0xFFFFFFFF);
   static const Color darkTextMuted = Color(0xFF888EA8);
+  static const List<Color> darkPrimaryGradient = [Color(0xFF7582FF), Color(0xFF5360ED)];
 
   // Deep Obsidian Shadows
   static const Color darkShadowDark = Color(0xFF090A11);
