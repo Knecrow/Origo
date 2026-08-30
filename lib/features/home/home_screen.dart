@@ -297,6 +297,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
 // ── Sculpted Organic Wave Cradle Notch Top Bar ────────────────────────────────
 
+// ── Sculpted Organic Wave Cradle Notch Top Bar (Exact Vertical Mirror) ────────
+
 class _SculptedWaveTopBar extends StatelessWidget {
   final VoidCallback onToggleTheme;
   final VoidCallback onOpenSettings;
@@ -313,28 +315,31 @@ class _SculptedWaveTopBar extends StatelessWidget {
     final bgColor = isDark ? const Color(0xFF141624) : const Color(0xFFFFFFFF);
     final shadowColor = isDark ? Colors.black.withValues(alpha: 0.55) : const Color(0xFF757E9E).withValues(alpha: 0.2);
     final highlightColor = isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white;
-    const barHeight = 68.0;
+    const barHeight = 64.0;
 
     return SizedBox(
-      height: barHeight + 16,
+      height: barHeight + 20,
       width: double.infinity,
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.topCenter,
         children: [
-          // Sculpted Custom Painted Wave Panel with Upward Scooped Cradle Notch
-          CustomPaint(
-            size: Size(MediaQuery.of(context).size.width, barHeight + 10),
-            painter: _TopWaveCradlePainter(
-              color: bgColor,
-              shadowColor: shadowColor,
-              highlightColor: highlightColor,
+          // Exact Vertical Mirror of the Bottom Wave Cradle Painter!
+          Transform.flip(
+            flipY: true,
+            child: CustomPaint(
+              size: Size(MediaQuery.of(context).size.width, barHeight + 10),
+              painter: _WaveCradlePainter(
+                color: bgColor,
+                shadowColor: shadowColor,
+                highlightColor: highlightColor,
+              ),
             ),
           ),
 
-          // Top Bar Action Icons (Cloud & Menu)
+          // Top Bar Action Icons (Cloud on left, Menu on right)
           Positioned(
-            top: 8,
+            top: 10,
             left: 36,
             right: 36,
             child: Row(
@@ -380,12 +385,12 @@ class _SculptedWaveTopBar extends StatelessWidget {
             ),
           ),
 
-          // Center: Elevated Avatar Circle Button sitting inside the UPWARD Scooped Cradle Notch
+          // Center: Avatar Button sitting in the exact Mirrored Cradle Position
           Positioned(
-            top: 24,
+            bottom: 0,
             child: Container(
-              width: 54,
-              height: 54,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: isDark ? const Color(0xFF1E2135) : Colors.white,
@@ -431,7 +436,7 @@ class _SculptedWaveTopBar extends StatelessWidget {
               child: Center(
                 child: Icon(
                   Icons.person_rounded,
-                  size: 24,
+                  size: 26,
                   color: isDark
                       ? const Color(0xFF7582FF)
                       : const Color(0xFF5360ED),
@@ -443,92 +448,6 @@ class _SculptedWaveTopBar extends StatelessWidget {
       ),
     );
   }
-}
-
-// ── Custom Top Wave Cradle Painter (Scooping UPWARDS) ──────────────────────────
-
-class _TopWaveCradlePainter extends CustomPainter {
-  final Color color;
-  final Color shadowColor;
-  final Color highlightColor;
-
-  _TopWaveCradlePainter({
-    required this.color,
-    required this.shadowColor,
-    required this.highlightColor,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final centerX = w / 2;
-    const cradleRadius = 36.0;
-    const baselineY = 62.0;
-
-    final path = Path();
-    // Start at top-left
-    path.moveTo(0, 0);
-    path.lineTo(w, 0);
-
-    // Right side line down to baseline
-    path.lineTo(w, baselineY - 10);
-    path.quadraticBezierTo(w, baselineY, w - 20, baselineY);
-
-    // Flat line towards right edge of cradle
-    path.lineTo(centerX + cradleRadius + 16, baselineY);
-
-    // Sculpted organic curve rising UPWARDS into cradle
-    path.cubicTo(
-      centerX + cradleRadius + 6, baselineY,
-      centerX + cradleRadius, baselineY - 10,
-      centerX + cradleRadius - 2, baselineY - 18,
-    );
-
-    // Deep smooth arched cradle basin curving UPWARD
-    path.arcToPoint(
-      Offset(centerX - cradleRadius + 2, baselineY - 18),
-      radius: const Radius.circular(cradleRadius),
-      clockwise: true,
-    );
-
-    // Sculpted organic curve sloping DOWNWARDS out of cradle
-    path.cubicTo(
-      centerX - cradleRadius, baselineY - 10,
-      centerX - cradleRadius - 6, baselineY,
-      centerX - cradleRadius - 16, baselineY,
-    );
-
-    // Flat line towards left shoulder
-    path.lineTo(20, baselineY);
-
-    // Bottom-left rounded shoulder
-    path.quadraticBezierTo(0, baselineY, 0, baselineY - 10);
-
-    // Close to top-left
-    path.close();
-
-    // Draw ambient drop shadow
-    canvas.drawShadow(path, shadowColor, 18.0, true);
-
-    // Draw base fill
-    final fillPaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-    canvas.drawPath(path, fillPaint);
-
-    // Draw subtle bottom-rim highlight
-    final strokePaint = Paint()
-      ..color = highlightColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
-    canvas.drawPath(path, strokePaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _TopWaveCradlePainter oldDelegate) =>
-      color != oldDelegate.color ||
-      shadowColor != oldDelegate.shadowColor ||
-      highlightColor != oldDelegate.highlightColor;
 }
 
 // ── Sculpted Organic Wave Cradle Notch Bottom Bar ─────────────────────────────
