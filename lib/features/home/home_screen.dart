@@ -744,8 +744,8 @@ class _CenterReferenceCircleButtonState
           ),
           child: Center(
             child: Icon(
-              Icons.sync_rounded,
-              size: 26,
+              Icons.add_rounded,
+              size: 28,
               color: widget.isDark
                   ? const Color(0xFF7582FF)
                   : const Color(0xFF5360ED),
