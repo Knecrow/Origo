@@ -109,7 +109,19 @@ class ItemsProvider extends ChangeNotifier {
 
   Future<void> deleteCategory(String key) async {
     await _db.deleteCategory(key);
-    _categories.removeWhere((c) => c.key == key && !c.isDefault);
+    _categories.removeWhere((c) => c.key == key);
+    _items.removeWhere((i) => i.category == key);
+    notifyListeners();
+  }
+
+  Future<void> deleteSubCategory(String categoryKey, String subCategory) async {
+    for (int i = 0; i < _items.length; i++) {
+      if (_items[i].category == categoryKey && _items[i].subCategory == subCategory) {
+        final updated = _items[i].copyWith(subCategory: '');
+        await _db.updateItem(updated);
+        _items[i] = updated;
+      }
+    }
     notifyListeners();
   }
 

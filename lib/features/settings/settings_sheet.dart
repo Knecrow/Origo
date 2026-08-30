@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../../core/models/origo_category.dart';
 import '../../core/providers/items_provider.dart';
 import '../../core/providers/theme_provider.dart';
 import '../../core/theme/app_colors.dart';
@@ -38,7 +39,7 @@ class SettingsSheet extends StatelessWidget {
         top: 12,
         left: 20,
         right: 20,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 32,
+        bottom: MediaQuery.of(context).padding.bottom + 24,
       ),
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -46,7 +47,7 @@ class SettingsSheet extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Drag Handle
+            // Drag handle
             Center(
               child: Container(
                 width: 40,
@@ -165,6 +166,20 @@ class SettingsSheet extends StatelessWidget {
               child: Column(
                 children: [
                   _SettingsActionTile(
+                    icon: Icons.tune_rounded,
+                    title: 'Manage & Delete Categories',
+                    subtitle: 'View, add, or delete any collection',
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      _showManageCategoriesModal(context, itemsProv);
+                    },
+                  ),
+                  Divider(
+                    height: 1,
+                    indent: 52,
+                    color: ext.textMuted.withValues(alpha: 0.1),
+                  ),
+                  _SettingsActionTile(
                     icon: Icons.add_circle_outline_rounded,
                     title: 'Add Custom Category',
                     subtitle: 'Create bespoke category with custom icon',
@@ -222,10 +237,10 @@ class SettingsSheet extends StatelessWidget {
                     color: ext.textMuted.withValues(alpha: 0.1),
                   ),
                   _SettingsActionTile(
-                    icon: Icons.delete_sweep_outlined,
+                    icon: Icons.delete_sweep_rounded,
                     iconColor: AppColors.error,
                     title: 'Clear All Dreams',
-                    subtitle: 'Erase all dream items (keeps categories)',
+                    subtitle: 'Erase all aspirations and start fresh with blank canvas',
                     isDestructive: true,
                     onTap: () => _confirmClearAll(context, itemsProv),
                   ),
@@ -234,48 +249,40 @@ class SettingsSheet extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // ── Section 4: About ────────────────────────────────────────────
-            _SectionHeader(title: 'ABOUT ORIGO'),
+            // ── Section 4: About ─────────────────────────────────────────────
+            _SectionHeader(title: 'ABOUT'),
             const SizedBox(height: 10),
             Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: ext.bgColor,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Origo Vision Board',
-                        style: TextStyle(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w700,
-                          color: ext.textPrimary,
-                        ),
-                      ),
-                      Text(
-                        'v1.0.0',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: ext.textMuted,
-                        ),
-                      ),
-                    ],
+                  _SettingsInfoTile(
+                    icon: Icons.info_outline_rounded,
+                    title: 'App Name',
+                    value: 'Origo',
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'A borderless, distraction-free visual portfolio designed for your life\'s highest aspirations.',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: ext.textMuted,
-                      height: 1.4,
-                    ),
+                  Divider(
+                    height: 1,
+                    indent: 52,
+                    color: ext.textMuted.withValues(alpha: 0.1),
+                  ),
+                  _SettingsInfoTile(
+                    icon: Icons.verified_rounded,
+                    title: 'Version',
+                    value: '1.0.0 (Release)',
+                  ),
+                  Divider(
+                    height: 1,
+                    indent: 52,
+                    color: ext.textMuted.withValues(alpha: 0.1),
+                  ),
+                  _SettingsInfoTile(
+                    icon: Icons.code_rounded,
+                    title: 'Architecture',
+                    value: 'Offline SQLite & Web',
                   ),
                 ],
               ),
@@ -286,25 +293,270 @@ class SettingsSheet extends StatelessWidget {
     );
   }
 
-  void _confirmResetToDefaults(BuildContext context, ItemsProvider prov) {
+  void _showManageCategoriesModal(BuildContext context, ItemsProvider itemsProv) {
+    final ext = context.ext;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useRootNavigator: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetCtx) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final categories = itemsProv.categories;
+
+            return Container(
+              decoration: BoxDecoration(
+                color: ext.cardColor,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+              ),
+              padding: EdgeInsets.fromLTRB(
+                20,
+                12,
+                20,
+                MediaQuery.of(context).padding.bottom + 24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Drag handle
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: ext.textMuted.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Manage Categories',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: ext.textPrimary,
+                          letterSpacing: -0.4,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.pop(sheetCtx),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: ext.textMuted.withValues(alpha: 0.12),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.close_rounded,
+                            size: 18,
+                            color: ext.textMuted,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Categories List
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.5,
+                    ),
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: categories.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 8),
+                      itemBuilder: (context, idx) {
+                        final cat = categories[idx];
+                        final count = itemsProv.itemsByCategory(cat.key).length;
+
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: ext.bgColor,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            children: [
+                              ClayIconBadge(
+                                icon: cat.icon,
+                                size: 16,
+                                padding: 8,
+                                iconColor: Colors.white,
+                                badgeColor: cat.color,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      cat.displayName,
+                                      style: TextStyle(
+                                        fontSize: 14.5,
+                                        fontWeight: FontWeight.w700,
+                                        color: ext.textPrimary,
+                                      ),
+                                    ),
+                                    Text(
+                                      '$count ${count == 1 ? 'dream' : 'dreams'}',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: ext.textMuted,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Delete Button
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.delete_outline_rounded,
+                                  color: Colors.redAccent,
+                                  size: 20,
+                                ),
+                                onPressed: () {
+                                  _confirmDeleteCategory(
+                                    context,
+                                    cat,
+                                    count,
+                                    itemsProv,
+                                    onDeleted: () => setModalState(() {}),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Add New Category Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(sheetCtx);
+                        Navigator.pop(context);
+                        AddCategorySheet.show(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ext.accent,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                      ),
+                      icon: const Icon(Icons.add_rounded, size: 18),
+                      label: const Text(
+                        'Add New Category',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _confirmDeleteCategory(
+    BuildContext context,
+    OrigoCategory category,
+    int count,
+    ItemsProvider itemsProv, {
+    required VoidCallback onDeleted,
+  }) {
     HapticFeedback.mediumImpact();
+    final ext = context.ext;
+
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: ctx.ext.cardColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Reset to Showcase?',
-            style: TextStyle(fontWeight: FontWeight.w700)),
-        content: const Text(
-            'This will restore the curated showcase dreams (Villa, Porsche GT3, Alps, etc.) and default categories.'),
+      builder: (dialogCtx) => AlertDialog(
+        backgroundColor: ext.cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(
+          'Delete ${category.displayName}?',
+          style: TextStyle(color: ext.textPrimary, fontWeight: FontWeight.w800),
+        ),
+        content: Text(
+          count > 0
+              ? 'This will remove the "${category.displayName}" collection and its $count dreams.'
+              : 'Are you sure you want to remove the "${category.displayName}" category?',
+          style: TextStyle(color: ext.textMuted, fontSize: 13.5),
+        ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel', style: TextStyle(color: ctx.ext.textMuted)),
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: Text('Cancel', style: TextStyle(color: ext.textMuted)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: ctx.ext.accent,
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              elevation: 0,
+            ),
+            onPressed: () async {
+              HapticFeedback.heavyImpact();
+              Navigator.pop(dialogCtx);
+              await itemsProv.deleteCategory(category.key);
+              onDeleted();
+            },
+            child: const Text('Delete', style: TextStyle(fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmResetToDefaults(BuildContext context, ItemsProvider prov) {
+    HapticFeedback.mediumImpact();
+    final ext = context.ext;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ext.cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(
+          'Reset Showcase',
+          style: TextStyle(
+            color: ext.textPrimary,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.3,
+          ),
+        ),
+        content: Text(
+          'This will restore default curated dreams and categories. Your current customizations will be replaced.',
+          style: TextStyle(color: ext.textMuted, fontSize: 13.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Cancel', style: TextStyle(color: ext.textMuted)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ext.accent,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14)),
@@ -317,7 +569,7 @@ class SettingsSheet extends StatelessWidget {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Showcase dreams restored successfully!'),
+                    content: Text('Showcase dreams restored successfully.'),
                     behavior: SnackBarBehavior.floating,
                   ),
                 );
@@ -332,21 +584,30 @@ class SettingsSheet extends StatelessWidget {
   }
 
   void _confirmClearAll(BuildContext context, ItemsProvider prov) {
-    HapticFeedback.mediumImpact();
+    HapticFeedback.heavyImpact();
+    final ext = context.ext;
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: ctx.ext.cardColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Clear All Dreams?',
-            style: TextStyle(
-                fontWeight: FontWeight.w700, color: AppColors.error)),
-        content: const Text(
-            'This will permanently delete all aspirations in your vision board. Categories will remain intact.'),
+        backgroundColor: ext.cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Text(
+          'Clear All Dreams?',
+          style: TextStyle(
+            color: AppColors.error,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.3,
+          ),
+        ),
+        content: Text(
+          'This action will permanently delete all your dreams and reset your canvas. This cannot be undone.',
+          style: TextStyle(color: ext.textMuted, fontSize: 13.5),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel', style: TextStyle(color: ctx.ext.textMuted)),
+            child: Text('Cancel', style: TextStyle(color: ext.textMuted)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(

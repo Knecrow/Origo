@@ -112,6 +112,139 @@ class _SubCategorySheetState extends State<SubCategorySheet> {
     );
   }
 
+  void _showSubCategoryActions(BuildContext context, String subName, int count) {
+    HapticFeedback.mediumImpact();
+    final ext = context.ext;
+    final itemsProv = context.read<ItemsProvider>();
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (sheetCtx) => Container(
+        decoration: BoxDecoration(
+          color: ext.cardColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        padding: EdgeInsets.fromLTRB(
+          20,
+          12,
+          20,
+          MediaQuery.of(context).padding.bottom + 20,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Drag handle
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: ext.textMuted.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              subName,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: ext.textPrimary,
+                letterSpacing: -0.3,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '$count dreams in this sub-category',
+              style: TextStyle(fontSize: 12.5, color: ext.textMuted),
+            ),
+            const SizedBox(height: 20),
+
+            // Action 1: View Gallery
+            ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              tileColor: ext.bgColor,
+              leading: Icon(Icons.grid_view_rounded, color: ext.accent),
+              title: Text(
+                'View Gallery',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: ext.textPrimary,
+                ),
+              ),
+              onTap: () {
+                Navigator.pop(sheetCtx);
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => GalleryScreen(
+                      category: widget.category.key,
+                      initialSubFilter: subName,
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+
+            // Action 2: Add Dream
+            ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              tileColor: ext.bgColor,
+              leading: Icon(Icons.add_photo_alternate_rounded, color: ext.accent),
+              title: Text(
+                'Add Dream to $subName',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: ext.textPrimary,
+                ),
+              ),
+              onTap: () {
+                Navigator.pop(sheetCtx);
+                Navigator.pop(context);
+                AddItemSheet.show(
+                  context,
+                  initialCategory: widget.category.key,
+                  initialSubCategory: subName,
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+
+            // Action 3: Delete Sub-Category
+            ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              tileColor: ext.bgColor,
+              leading: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+              title: const Text(
+                'Delete Sub-Category',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: Colors.redAccent,
+                ),
+              ),
+              subtitle: Text(
+                'Removes $subName tag from dreams',
+                style: TextStyle(fontSize: 11.5, color: ext.textMuted),
+              ),
+              onTap: () async {
+                HapticFeedback.heavyImpact();
+                Navigator.pop(sheetCtx);
+                setState(() {
+                  _customSubCategories.remove(subName);
+                });
+                await itemsProv.deleteSubCategory(widget.category.key, subName);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
@@ -271,6 +404,7 @@ class _SubCategorySheetState extends State<SubCategorySheet> {
                   count: subItems.length,
                   latestItem: latestSub,
                   icon: widget.category.icon,
+                  onLongPress: () => _showSubCategoryActions(context, subName, subItems.length),
                   onTap: () {
                     HapticFeedback.lightImpact();
                     Navigator.pop(context);
@@ -308,6 +442,7 @@ class _SubCategoryCard extends StatefulWidget {
   final OrigoItem? latestItem;
   final IconData icon;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
   const _SubCategoryCard({
     required this.title,
@@ -315,6 +450,7 @@ class _SubCategoryCard extends StatefulWidget {
     required this.latestItem,
     required this.icon,
     required this.onTap,
+    this.onLongPress,
   });
 
   @override
@@ -337,6 +473,7 @@ class _SubCategoryCardState extends State<_SubCategoryCard> {
         widget.onTap();
       },
       onTapCancel: () => setState(() => _pressed = false),
+      onLongPress: widget.onLongPress,
       child: AnimatedScale(
         scale: _pressed ? 0.96 : 1.0,
         duration: const Duration(milliseconds: 130),
