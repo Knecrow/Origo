@@ -12,7 +12,7 @@ import '../../../core/widgets/origo_image.dart';
 import '../../add/add_item_sheet.dart';
 import '../../gallery/gallery_screen.dart';
 
-class SubCategorySheet extends StatelessWidget {
+class SubCategorySheet extends StatefulWidget {
   final OrigoCategory category;
 
   const SubCategorySheet({super.key, required this.category});
@@ -28,10 +28,95 @@ class SubCategorySheet extends StatelessWidget {
   }
 
   @override
+  State<SubCategorySheet> createState() => _SubCategorySheetState();
+}
+
+class _SubCategorySheetState extends State<SubCategorySheet> {
+  final List<String> _customSubCategories = [];
+
+  void _promptAddSubCategory(BuildContext context) {
+    HapticFeedback.lightImpact();
+    final ext = context.ext;
+    final textCtrl = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        backgroundColor: ext.cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(
+          'New Sub-Category',
+          style: TextStyle(
+            color: ext.textPrimary,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Add a sub-category under ${widget.category.displayName} (e.g. Electric, Classics, Superbikes)',
+              style: TextStyle(color: ext.textMuted, fontSize: 13),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: textCtrl,
+              autofocus: true,
+              style: TextStyle(color: ext.textPrimary),
+              decoration: InputDecoration(
+                hintText: 'Sub-Category Name',
+                filled: true,
+                fillColor: ext.bgColor,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: Text('Cancel', style: TextStyle(color: ext.textMuted)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final val = textCtrl.text.trim();
+              if (val.isNotEmpty) {
+                HapticFeedback.mediumImpact();
+                setState(() {
+                  if (!_customSubCategories.contains(val)) {
+                    _customSubCategories.add(val);
+                  }
+                });
+                Navigator.pop(dialogCtx);
+                // Open Add Dream sheet directly for this newly created sub-category
+                AddItemSheet.show(
+                  context,
+                  initialCategory: widget.category.key,
+                  initialSubCategory: val,
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ext.accent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+            child: const Text('Add & Create Dream'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final ext = context.ext;
     final itemsProv = context.watch<ItemsProvider>();
-    final items = itemsProv.itemsByCategory(category.key);
+    final items = itemsProv.itemsByCategory(widget.category.key);
 
     // Extract all unique sub-categories
     final itemSubs = items
@@ -39,8 +124,12 @@ class SubCategorySheet extends StatelessWidget {
         .where((s) => s != null && s.isNotEmpty)
         .cast<String>()
         .toSet();
-    final suggestedSubs = kSuggestedSubCategories[category.key] ?? [];
-    final allSubCategories = {...itemSubs, ...suggestedSubs}.toList();
+    final suggestedSubs = kSuggestedSubCategories[widget.category.key] ?? [];
+    final allSubCategories = {
+      ...itemSubs,
+      ...suggestedSubs,
+      ..._customSubCategories,
+    }.toList();
 
     return Container(
       decoration: BoxDecoration(
@@ -70,7 +159,7 @@ class SubCategorySheet extends StatelessWidget {
           ),
           const SizedBox(height: 18),
 
-          // Header Row
+          // Header Row (Clean, no generic Add button)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -78,7 +167,7 @@ class SubCategorySheet extends StatelessWidget {
               Row(
                 children: [
                   ClayIconBadge(
-                    icon: category.icon,
+                    icon: widget.category.icon,
                     size: 20,
                     padding: 10,
                     iconColor: Colors.white,
@@ -89,7 +178,7 @@ class SubCategorySheet extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        category.displayName,
+                        widget.category.displayName,
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
@@ -111,31 +200,17 @@ class SubCategorySheet extends StatelessWidget {
                 ],
               ),
               GestureDetector(
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  Navigator.pop(context);
-                  AddItemSheet.show(context, initialCategory: category.key);
-                },
+                onTap: () => Navigator.pop(context),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: ext.accent,
-                    borderRadius: BorderRadius.circular(16),
+                    color: ext.textMuted.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
                   ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.add_rounded, color: Colors.white, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        'Add',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
+                  child: Icon(
+                    Icons.close_rounded,
+                    size: 18,
+                    color: ext.textMuted,
                   ),
                 ),
               ),
@@ -157,26 +232,33 @@ class SubCategorySheet extends StatelessWidget {
                 mainAxisSpacing: 12,
                 childAspectRatio: 1.25,
               ),
-              itemCount: allSubCategories.length + 1, // +1 for "All"
+              itemCount: allSubCategories.length + 2, // +1 for "All", +1 for "+ Add Sub-Category"
               itemBuilder: (context, idx) {
                 if (idx == 0) {
                   // "All Dreams" Card
                   final latestAll = items.isNotEmpty ? items.first : null;
                   return _SubCategoryCard(
-                    title: 'All ${category.key}',
+                    title: 'All ${widget.category.key}',
                     count: items.length,
                     latestItem: latestAll,
-                    icon: category.icon,
+                    icon: widget.category.icon,
                     onTap: () {
                       HapticFeedback.lightImpact();
                       Navigator.pop(context);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => GalleryScreen(category: category.key),
+                          builder: (_) => GalleryScreen(category: widget.category.key),
                         ),
                       );
                     },
+                  );
+                }
+
+                if (idx == allSubCategories.length + 1) {
+                  // "+ Add Sub-Category" Action Card
+                  return _AddSubCategoryCard(
+                    onTap: () => _promptAddSubCategory(context),
                   );
                 }
 
@@ -188,14 +270,14 @@ class SubCategorySheet extends StatelessWidget {
                   title: subName,
                   count: subItems.length,
                   latestItem: latestSub,
-                  icon: category.icon,
+                  icon: widget.category.icon,
                   onTap: () {
                     HapticFeedback.lightImpact();
                     Navigator.pop(context);
                     if (subItems.isEmpty) {
                       AddItemSheet.show(
                         context,
-                        initialCategory: category.key,
+                        initialCategory: widget.category.key,
                         initialSubCategory: subName,
                       );
                     } else {
@@ -203,7 +285,7 @@ class SubCategorySheet extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (_) => GalleryScreen(
-                            category: category.key,
+                            category: widget.category.key,
                             initialSubFilter: subName,
                           ),
                         ),
@@ -351,8 +433,8 @@ class _SubCategoryCardState extends State<_SubCategoryCard> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          width: 38,
-                          height: 38,
+                          width: 36,
+                          height: 36,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: ext.accent.withValues(alpha: 0.14),
@@ -388,6 +470,70 @@ class _SubCategoryCardState extends State<_SubCategoryCard> {
                       ],
                     ),
                   ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AddSubCategoryCard extends StatefulWidget {
+  final VoidCallback onTap;
+
+  const _AddSubCategoryCard({required this.onTap});
+
+  @override
+  State<_AddSubCategoryCard> createState() => _AddSubCategoryCardState();
+}
+
+class _AddSubCategoryCardState extends State<_AddSubCategoryCard> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final ext = context.ext;
+
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.96 : 1.0,
+        duration: const Duration(milliseconds: 130),
+        curve: Curves.easeOutCubic,
+        child: Container(
+          decoration: BoxDecoration(
+            color: ext.bgColor,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: ext.textMuted.withValues(alpha: 0.18),
+              width: 1.2,
+            ),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.add_circle_outline_rounded,
+                  color: ext.accent,
+                  size: 26,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'New Sub-Category',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: ext.textPrimary,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
