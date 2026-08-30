@@ -8,6 +8,7 @@ import 'core/providers/profile_provider.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'features/home/home_screen.dart';
+import 'features/onboarding/onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,15 +44,30 @@ class OrigoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeMode = context.watch<ThemeProvider>().mode;
+    final themeProv = context.watch<ThemeProvider>();
+    final profileProv = context.watch<ProfileProvider>();
+
+    Widget homeWidget;
+    if (!profileProv.isLoaded) {
+      homeWidget = Scaffold(
+        backgroundColor: themeProv.isDark
+            ? const Color(0xFF11121F)
+            : const Color(0xFFEBECF6),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    } else if (!profileProv.isFirstLaunchDone) {
+      homeWidget = const OnboardingScreen();
+    } else {
+      homeWidget = const HomeScreen();
+    }
 
     return MaterialApp(
       title: 'ORIGO',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: themeMode,
-      home: const HomeScreen(),
+      themeMode: themeProv.mode,
+      home: homeWidget,
     );
   }
 }

@@ -14,7 +14,6 @@ import '../../core/widgets/origo_image.dart';
 import '../add/add_item_sheet.dart';
 import '../detail/detail_screen.dart';
 import '../gallery/gallery_screen.dart';
-import '../profile/first_time_setup_sheet.dart';
 import '../profile/profile_screen.dart';
 import '../settings/settings_sheet.dart';
 import 'widgets/editorial_bento_grid.dart';
@@ -37,15 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ItemsProvider>().loadAll();
-      final profile = context.read<ProfileProvider>();
-      if (!profile.isLoaded) {
-        await profile.loadProfile();
-      }
-      if (mounted && !profile.isFirstLaunchDone) {
-        FirstTimeSetupSheet.show(context);
-      }
     });
   }
 
