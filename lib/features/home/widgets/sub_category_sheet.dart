@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../core/models/origo_category.dart';
 import '../../../core/models/origo_item.dart';
 import '../../../core/providers/items_provider.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/clay_icon_badge.dart';
 import '../../../core/widgets/origo_image.dart';
@@ -383,6 +384,7 @@ class _SubCategorySheetState extends State<SubCategorySheet> {
                   count: subItems.length,
                   latestItem: latestSub,
                   icon: widget.category.icon,
+                  categoryColor: widget.category.color,
                   onLongPress: () => _showSubCategoryActions(context, subName, subItems.length),
                   onTap: () {
                     HapticFeedback.lightImpact();
@@ -420,6 +422,7 @@ class _SubCategoryCard extends StatefulWidget {
   final int count;
   final OrigoItem? latestItem;
   final IconData icon;
+  final Color categoryColor;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
 
@@ -428,6 +431,7 @@ class _SubCategoryCard extends StatefulWidget {
     required this.count,
     required this.latestItem,
     required this.icon,
+    required this.categoryColor,
     required this.onTap,
     this.onLongPress,
   });
@@ -472,18 +476,12 @@ class _SubCategoryCardState extends State<_SubCategoryCard> {
                         imagePath: widget.latestItem!.imagePath,
                         fit: BoxFit.cover,
                       ),
-                      // Scrim
+                      // Adaptive Ambient Scrim
                       DecoratedBox(
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              Colors.black.withValues(alpha: 0.3),
-                              Colors.black.withValues(alpha: 0.82),
-                            ],
-                            stops: const [0.25, 0.6, 1.0],
+                          gradient: AppColors.adaptiveScrim(
+                            widget.categoryColor,
+                            isDark: isDark,
                           ),
                         ),
                       ),

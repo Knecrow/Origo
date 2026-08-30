@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../core/models/origo_item.dart';
 import '../../core/providers/items_provider.dart';
+import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/clay_icon_badge.dart';
 import '../../core/widgets/origo_image.dart';
@@ -277,18 +278,12 @@ class _GalleryTile extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-            // Scrim
+            // Adaptive Cinematic Ambient Scrim
             DecoratedBox(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withValues(alpha: 0.1),
-                    Colors.black.withValues(alpha: 0.25),
-                    Colors.black.withValues(alpha: 0.8),
-                  ],
-                  stops: const [0.0, 0.5, 1.0],
+                gradient: AppColors.adaptiveScrim(
+                  AppColors.getCategoryColor(item.category),
+                  isDark: Theme.of(context).brightness == Brightness.dark,
                 ),
               ),
             ),

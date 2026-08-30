@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../core/models/origo_item.dart';
 import '../../../core/providers/items_provider.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/frosted_glass_container.dart';
 import '../../../core/widgets/origo_image.dart';
@@ -124,18 +125,13 @@ class _SpotlightCard extends StatelessWidget {
                   ),
                 ),
               ),
-              // Gradient overlay
+              // Adaptive Cinematic Gradient overlay
               Positioned.fill(
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withValues(alpha: 0.55),
-                      ],
-                      stops: const [0.4, 1.0],
+                    gradient: AppColors.adaptiveScrim(
+                      AppColors.getCategoryColor(item.category),
+                      isDark: Theme.of(context).brightness == Brightness.dark,
                     ),
                   ),
                 ),

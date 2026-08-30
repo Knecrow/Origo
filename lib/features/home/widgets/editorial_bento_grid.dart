@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/models/origo_category.dart';
 import '../../../core/models/origo_item.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/origo_image.dart';
 import 'card_quick_actions_sheet.dart';
@@ -179,18 +180,12 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
                         ),
                       ),
 
-                      // Scrim
+                      // Adaptive Ambient Scrim
                       DecoratedBox(
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withValues(alpha: 0.15),
-                              Colors.black.withValues(alpha: 0.35),
-                              Colors.black.withValues(alpha: 0.88),
-                            ],
-                            stops: const [0.0, 0.45, 1.0],
+                          gradient: AppColors.adaptiveScrim(
+                            widget.category.color,
+                            isDark: Theme.of(context).brightness == Brightness.dark,
                           ),
                         ),
                       ),
@@ -305,18 +300,12 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
                         ),
                       ),
 
-                      // Scrim
+                      // Adaptive Ambient Scrim
                       DecoratedBox(
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withValues(alpha: 0.1),
-                              Colors.black.withValues(alpha: 0.35),
-                              Colors.black.withValues(alpha: 0.88),
-                            ],
-                            stops: const [0.0, 0.4, 1.0],
+                          gradient: AppColors.adaptiveScrim(
+                            widget.category.color,
+                            isDark: Theme.of(context).brightness == Brightness.dark,
                           ),
                         ),
                       ),
