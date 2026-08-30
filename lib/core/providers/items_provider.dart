@@ -66,10 +66,28 @@ class ItemsProvider extends ChangeNotifier {
       if (loadedCategories.isNotEmpty) {
         _categories = loadedCategories.map((c) {
           if (c.isDefault) {
-            return c.copyWith(displayName: c.key);
+            final def = OrigoCategory.defaultCategories.firstWhere(
+              (d) => d.key.toLowerCase() == c.key.toLowerCase(),
+              orElse: () => c,
+            );
+            return c.copyWith(
+              displayName: def.displayName,
+              icon: def.icon,
+              color: def.color,
+            );
           }
           return c;
         }).toList();
+
+        // Ensure newly added default categories (Aviation, Marine, Sanctuary, Experiences) exist
+        for (final def in OrigoCategory.defaultCategories) {
+          if (!_categories.any((c) => c.key.toLowerCase() == def.key.toLowerCase())) {
+            _categories.add(def);
+            _db.insertCategory(def);
+          }
+        }
+      } else {
+        _categories = List.from(OrigoCategory.defaultCategories);
       }
     } catch (_) {}
 

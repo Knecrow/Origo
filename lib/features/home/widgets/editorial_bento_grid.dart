@@ -38,17 +38,18 @@ class EditorialBentoGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final widgets = <Widget>[];
     int i = 0;
+    int step = 0;
 
     while (i < categories.length) {
-      // Pattern cycle: Dual (2) -> Panoramic Hero (1) -> Dual (2) -> Wide (1) ...
-      final cycleIndex = i % 4;
+      // Alternating 2-1-2-1-2 Bento rhythm
+      final isDualStep = (step % 2 == 0);
 
-      if (cycleIndex == 0) {
-        // Dual Square Cards (Take up to 2 items)
+      if (isDualStep && (i + 1 < categories.length)) {
+        // Dual Square Cards (2 items)
         final first = categories[i];
-        final second = (i + 1 < categories.length) ? categories[i + 1] : null;
+        final second = categories[i + 1];
         final count1 = counts[first.key] ?? 0;
-        final count2 = second != null ? (counts[second.key] ?? 0) : 0;
+        final count2 = counts[second.key] ?? 0;
 
         widgets.add(
           Row(
@@ -65,31 +66,29 @@ class EditorialBentoGrid extends StatelessWidget {
                   ),
                 ),
               ),
-              if (second != null) ...[
-                const SizedBox(width: 14),
-                Expanded(
-                  child: SizedBox(
-                    height: 172,
-                    child: _BentoSquareCard(
-                      category: second,
-                      itemCount: count2,
-                      latestItem: covers[second.key],
-                      onTap: () => _handleCardTap(context, second, count2),
-                      onLongPress: () => _showQuickActions(context, second),
-                    ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: SizedBox(
+                  height: 172,
+                  child: _BentoSquareCard(
+                    category: second,
+                    itemCount: count2,
+                    latestItem: covers[second.key],
+                    onTap: () => _handleCardTap(context, second, count2),
+                    onLongPress: () => _showQuickActions(context, second),
                   ),
                 ),
-              ] else
-                const Spacer(),
+              ),
             ],
           ),
         );
         widgets.add(const SizedBox(height: 14));
-        i += (second != null ? 2 : 1);
-      } else if (cycleIndex == 2 || (cycleIndex == 1 && i % 3 == 2)) {
+        i += 2;
+      } else {
         // Panoramic Hero Card (1 item)
         final current = categories[i];
         final count = counts[current.key] ?? 0;
+
         widgets.add(
           SizedBox(
             width: double.infinity,
@@ -105,67 +104,8 @@ class EditorialBentoGrid extends StatelessWidget {
         );
         widgets.add(const SizedBox(height: 14));
         i += 1;
-      } else {
-        // Wide or Dual Row
-        final first = categories[i];
-        final second = (i + 1 < categories.length) ? categories[i + 1] : null;
-        final count1 = counts[first.key] ?? 0;
-        final count2 = second != null ? (counts[second.key] ?? 0) : 0;
-
-        if (second != null && i + 2 == categories.length) {
-          // If 2 remaining, show dual
-          widgets.add(
-            Row(
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    height: 172,
-                    child: _BentoSquareCard(
-                      category: first,
-                      itemCount: count1,
-                      latestItem: covers[first.key],
-                      onTap: () => _handleCardTap(context, first, count1),
-                      onLongPress: () => _showQuickActions(context, first),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: SizedBox(
-                    height: 172,
-                    child: _BentoSquareCard(
-                      category: second,
-                      itemCount: count2,
-                      latestItem: covers[second.key],
-                      onTap: () => _handleCardTap(context, second, count2),
-                      onLongPress: () => _showQuickActions(context, second),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-          widgets.add(const SizedBox(height: 14));
-          i += 2;
-        } else {
-          // Wide Footer Card
-          widgets.add(
-            SizedBox(
-              width: double.infinity,
-              height: 154,
-              child: _BentoFooterCard(
-                category: first,
-                itemCount: count1,
-                latestItem: covers[first.key],
-                onTap: () => _handleCardTap(context, first, count1),
-                onLongPress: () => _showQuickActions(context, first),
-              ),
-            ),
-          );
-          widgets.add(const SizedBox(height: 14));
-          i += 1;
-        }
       }
+      step++;
     }
 
     return Padding(
@@ -481,138 +421,7 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
   }
 }
 
-// ── Wide Footer Card ─────────────────────────────────────────────────────────
 
-class _BentoFooterCard extends StatefulWidget {
-  final OrigoCategory category;
-  final int itemCount;
-  final OrigoItem? latestItem;
-  final VoidCallback onTap;
-  final VoidCallback? onLongPress;
-
-  const _BentoFooterCard({
-    required this.category,
-    required this.itemCount,
-    required this.latestItem,
-    required this.onTap,
-    this.onLongPress,
-  });
-
-  @override
-  State<_BentoFooterCard> createState() => _BentoFooterCardState();
-}
-
-class _BentoFooterCardState extends State<_BentoFooterCard> {
-  bool _pressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final ext = context.ext;
-    final hasImage = widget.latestItem != null;
-
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) {
-        setState(() => _pressed = false);
-        widget.onTap();
-      },
-      onTapCancel: () => setState(() => _pressed = false),
-      onLongPress: widget.onLongPress,
-      child: AnimatedScale(
-        scale: _pressed ? 0.98 : 1.0,
-        duration: const Duration(milliseconds: 140),
-        curve: Curves.easeOutCubic,
-        child: Container(
-          decoration: BoxDecoration(
-            color: ext.cardColor,
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: hasImage
-                ? Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      OrigoImage(
-                        imagePath: widget.latestItem!.imagePath,
-                        fit: BoxFit.cover,
-                        errorWidget: _EmptyInvitationContent(
-                          category: widget.category,
-                          isCompact: true,
-                        ),
-                      ),
-
-                      // Scrim
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withValues(alpha: 0.1),
-                              Colors.black.withValues(alpha: 0.4),
-                              Colors.black.withValues(alpha: 0.88),
-                            ],
-                            stops: const [0.0, 0.45, 1.0],
-                          ),
-                        ),
-                      ),
-
-                      // Top Right Pill
-                      if (widget.itemCount > 0)
-                        Positioned(
-                          top: 12,
-                          right: 12,
-                          child: _CornerPill(
-                            label:
-                                '${widget.itemCount} ${widget.itemCount == 1 ? 'Asset' : 'Assets'}',
-                          ),
-                        ),
-
-                      // Bottom Left Title
-                      Positioned(
-                        left: 16,
-                        right: 16,
-                        bottom: 14,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              widget.category.displayName,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 0.8,
-                                shadows: [
-                                  Shadow(
-                                    color: Colors.black87,
-                                    blurRadius: 8,
-                                    offset: Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              color: Colors.white.withValues(alpha: 0.6),
-                              size: 14,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  )
-                : _EmptyInvitationContent(
-                    category: widget.category,
-                    isCompact: true,
-                  ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 // ── Shared Corner Pill (Clean & Borderless) ──────────────────────────────────
 

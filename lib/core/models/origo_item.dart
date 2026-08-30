@@ -2,20 +2,24 @@
 
 const List<String> kCategories = [
   'Home',
-  'Places',
   'Garage',
-  'Jets',
-  'Yachts',
-  'Others',
+  'Aviation',
+  'Marine',
+  'Places',
+  'Sanctuary',
+  'Experiences',
+  'Collections',
 ];
 
 const Map<String, List<String>> kSuggestedSubCategories = {
+  'Home': ['Villas', 'Penthouses', 'Estates', 'Architecture'],
   'Garage': ['Cars', 'Bikes', 'Hypercars', 'Classics'],
-  'Home': ['Villas', 'Penthouses', 'Interiors', 'Architecture'],
+  'Aviation': ['Private Jets', 'Helicopters', 'Seaplanes', 'Cabins'],
+  'Marine': ['Superyachts', 'Speedboats', 'Catamarans', 'Sailboats'],
   'Places': ['Europe', 'Tropical', 'Mountains', 'Islands'],
-  'Jets': ['Private Jets', 'Helicopters', 'Cabins'],
-  'Yachts': ['Superyachts', 'Catamarans', 'Speedboats'],
-  'Others': ['Watches', 'Art', 'Fashion', 'Technology'],
+  'Sanctuary': ['Home Spas', 'Private Gyms', 'Zen Gardens', 'Libraries'],
+  'Experiences': ['Polar Expeditions', 'Supercar Tours', 'Space Flight', 'Private Islands'],
+  'Collections': ['Watches', 'Art', 'Fashion', 'Technology'],
 };
 
 class OrigoItem {

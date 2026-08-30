@@ -24,7 +24,7 @@ class DatabaseHelper {
       return factory.openDatabase(
         'origo.db',
         options: OpenDatabaseOptions(
-          version: 3,
+          version: 4,
           onCreate: _onCreate,
           onUpgrade: _onUpgrade,
         ),
@@ -34,7 +34,7 @@ class DatabaseHelper {
       final path = join(dbPath, 'origo.db');
       return openDatabase(
         path,
-        version: 3,
+        version: 4,
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,
       );
@@ -87,7 +87,6 @@ class DatabaseHelper {
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      // Create categories table if upgrading
       await db.execute('''
         CREATE TABLE IF NOT EXISTS origo_categories (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -114,6 +113,46 @@ class DatabaseHelper {
     if (oldVersion < 3) {
       try {
         await db.execute('ALTER TABLE origo_items ADD COLUMN sub_category TEXT');
+      } catch (_) {}
+    }
+
+    if (oldVersion < 4) {
+      try {
+        // Migrate old category keys to new taxonomy
+        await db.execute("UPDATE origo_items SET category = 'Aviation' WHERE category = 'Jets'");
+        await db.execute("UPDATE origo_items SET category = 'Marine' WHERE category = 'Yachts'");
+        await db.execute("UPDATE origo_items SET category = 'Collections' WHERE category = 'Others'");
+
+        // Refresh default categories
+        await db.execute("DELETE FROM origo_categories WHERE is_default = 1");
+        final catBatch = db.batch();
+        for (final cat in OrigoCategory.defaultCategories) {
+          catBatch.insert(
+            'origo_categories',
+            cat.toMap(),
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
+        }
+        await catBatch.commit(noResult: true);
+
+        // Seed new categories items if missing
+        final existingSanctuary = await db.query(
+          'origo_items',
+          where: 'category = ?',
+          whereArgs: ['Sanctuary'],
+        );
+        if (existingSanctuary.isEmpty) {
+          await db.insert('origo_items', _initialSeedItems[5].toMap());
+        }
+
+        final existingExp = await db.query(
+          'origo_items',
+          where: 'category = ?',
+          whereArgs: ['Experiences'],
+        );
+        if (existingExp.isEmpty) {
+          await db.insert('origo_items', _initialSeedItems[6].toMap());
+        }
       } catch (_) {}
     }
   }
@@ -143,13 +182,24 @@ class DatabaseHelper {
     ),
     OrigoItem(
       title: 'Gulfstream G700 Cabin Suite',
-      category: 'Jets',
+      category: 'Aviation',
       subCategory: 'Private Jets',
       imagePath:
           'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1200&q=80',
       targetTimeframe: 'By 2031',
       motivationNotes:
           'Limitless global range with zero jetlag circadian lighting and an ultra-quiet private master stateroom.',
+      isSpotlight: true,
+    ),
+    OrigoItem(
+      title: '85m Custom Explorer Yacht',
+      category: 'Marine',
+      subCategory: 'Superyachts',
+      imagePath:
+          'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=1200&q=80',
+      targetTimeframe: 'By 2033',
+      motivationNotes:
+          'Ice-class exploration vessel equipped with helicopter hangar and submarine dock for polar expeditions.',
       isSpotlight: true,
     ),
     OrigoItem(
@@ -164,19 +214,30 @@ class DatabaseHelper {
       isSpotlight: true,
     ),
     OrigoItem(
-      title: '85m Custom Explorer Yacht',
-      category: 'Yachts',
-      subCategory: 'Superyachts',
+      title: 'Nordic Cliffside Spa & Sauna Pavilion',
+      category: 'Sanctuary',
+      subCategory: 'Home Spas',
       imagePath:
-          'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=1200&q=80',
-      targetTimeframe: 'By 2033',
+          'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80',
+      targetTimeframe: 'By 2028',
       motivationNotes:
-          'Ice-class exploration vessel equipped with helicopter hangar and submarine dock for polar expeditions.',
+          'Private thermal hydrotherapy pools and cedar saunas facing panoramic fjord waters.',
+      isSpotlight: true,
+    ),
+    OrigoItem(
+      title: 'Aurora Borealis Glass Igloo Expedition',
+      category: 'Experiences',
+      subCategory: 'Polar Expeditions',
+      imagePath:
+          'https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?auto=format&fit=crop&w=1200&q=80',
+      targetTimeframe: 'Winter 2027',
+      motivationNotes:
+          'Stargazing beneath the Northern Lights in Finnish Lapland with private snowmobile safaris.',
       isSpotlight: true,
     ),
     OrigoItem(
       title: 'Patek Philippe Grandmaster Chime',
-      category: 'Others',
+      category: 'Collections',
       subCategory: 'Watches',
       imagePath:
           'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1200&q=80',
