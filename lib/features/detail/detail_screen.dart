@@ -194,9 +194,7 @@ class _InfoSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ext = context.ext;
     final itemsProv = context.watch<ItemsProvider>();
-    final accentColor = ext.accent;
     final categoryIcon =
         itemsProv.categoryIcons[item.category] ?? Icons.category_rounded;
     final displayCategory =
@@ -246,7 +244,7 @@ class _InfoSheet extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: accentColor.withValues(alpha: 0.8),
+                            color: Colors.white.withValues(alpha: 0.18),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Row(

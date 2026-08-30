@@ -37,7 +37,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
     final ext = context.ext;
     final itemsProv = context.watch<ItemsProvider>();
     final items = itemsProv.itemsByCategory(widget.category);
-    final accentColor = ext.accent;
     final icon =
         itemsProv.categoryIcons[widget.category] ?? Icons.category_rounded;
     final displayName =
@@ -106,8 +105,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
                     icon: icon,
                     size: 16,
                     padding: 8,
-                    iconColor: Colors.white,
-                    badgeColor: accentColor,
+                    iconColor: ext.textPrimary,
+                    badgeColor: ext.cardColor,
                   ),
                   const SizedBox(width: 10),
                   Text(
@@ -198,12 +197,12 @@ class _GalleryScreenState extends State<GalleryScreen> {
           HapticFeedback.lightImpact();
           AddItemSheet.show(context, initialCategory: widget.category);
         },
-        backgroundColor: accentColor,
-        icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: const Text(
+        backgroundColor: ext.textPrimary,
+        icon: Icon(Icons.add_rounded, color: ext.bgColor),
+        label: Text(
           'Add Dream',
           style: TextStyle(
-            color: Colors.white,
+            color: ext.bgColor,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -232,7 +231,7 @@ class _SubCategoryPill extends StatelessWidget {
         duration: const Duration(milliseconds: 160),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? ext.accent : ext.cardColor,
+          color: isSelected ? ext.textPrimary : ext.cardColor,
           borderRadius: BorderRadius.circular(18),
         ),
         child: Center(
@@ -241,7 +240,7 @@ class _SubCategoryPill extends StatelessWidget {
             style: TextStyle(
               fontSize: 12.5,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-              color: isSelected ? Colors.white : ext.textPrimary,
+              color: isSelected ? ext.bgColor : ext.textPrimary,
               letterSpacing: -0.1,
             ),
           ),
@@ -282,8 +281,8 @@ class _GalleryTile extends StatelessWidget {
             DecoratedBox(
               decoration: BoxDecoration(
                 gradient: AppColors.adaptiveScrim(
-                  AppColors.getCategoryColor(item.category),
-                  isDark: Theme.of(context).brightness == Brightness.dark,
+                  null,
+                  Theme.of(context).brightness == Brightness.dark,
                 ),
               ),
             ),

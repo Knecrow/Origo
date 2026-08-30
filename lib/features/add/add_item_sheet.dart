@@ -306,7 +306,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? ext.accent
+                                ? ext.textPrimary
                                 : ext.bgColor,
                             borderRadius: BorderRadius.circular(14),
                           ),
@@ -319,7 +319,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
                                     ? FontWeight.w700
                                     : FontWeight.w600,
                                 color: isSelected
-                                    ? Colors.white
+                                    ? ext.bgColor
                                     : ext.textPrimary,
                               ),
                             ),
@@ -628,7 +628,7 @@ class _CategorySelector extends StatelessWidget {
               duration: const Duration(milliseconds: 160),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: isSelected ? ext.accent : ext.bgColor,
+                color: isSelected ? ext.textPrimary : ext.bgColor,
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Row(
@@ -637,7 +637,7 @@ class _CategorySelector extends StatelessWidget {
                   Icon(
                     cat.icon,
                     size: 14,
-                    color: isSelected ? Colors.white : ext.textPrimary,
+                    color: isSelected ? ext.bgColor : ext.textPrimary,
                   ),
                   const SizedBox(width: 6),
                   Text(
@@ -646,7 +646,7 @@ class _CategorySelector extends StatelessWidget {
                       fontSize: 12,
                       fontWeight:
                           isSelected ? FontWeight.w700 : FontWeight.w600,
-                      color: isSelected ? Colors.white : ext.textPrimary,
+                      color: isSelected ? ext.bgColor : ext.textPrimary,
                     ),
                   ),
                 ],

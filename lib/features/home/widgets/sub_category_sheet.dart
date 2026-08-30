@@ -304,8 +304,8 @@ class _SubCategorySheetState extends State<SubCategorySheet> {
                     icon: widget.category.icon,
                     size: 20,
                     padding: 10,
-                    iconColor: Colors.white,
-                    badgeColor: ext.accent,
+                    iconColor: ext.textPrimary,
+                    badgeColor: ext.bgColor,
                   ),
                   const SizedBox(width: 14),
                   Column(
@@ -480,8 +480,8 @@ class _SubCategoryCardState extends State<_SubCategoryCard> {
                       DecoratedBox(
                         decoration: BoxDecoration(
                           gradient: AppColors.adaptiveScrim(
-                            widget.categoryColor,
-                            isDark: isDark,
+                            null,
+                            isDark,
                           ),
                         ),
                       ),
@@ -533,8 +533,8 @@ class _SubCategoryCardState extends State<_SubCategoryCard> {
                         end: Alignment.bottomRight,
                         colors: isDark
                             ? [
-                                const Color(0xFF262628),
-                                const Color(0xFF161618),
+                                const Color(0xFF1C1C1E),
+                                const Color(0xFF121214),
                               ]
                             : [
                                 const Color(0xFFFFFFFF),
@@ -551,11 +551,11 @@ class _SubCategoryCardState extends State<_SubCategoryCard> {
                           height: 36,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: widget.categoryColor.withValues(alpha: 0.16),
+                            color: ext.textMuted.withValues(alpha: 0.14),
                           ),
                           child: Icon(
                             widget.icon,
-                            color: widget.categoryColor,
+                            color: ext.textPrimary,
                             size: 18,
                           ),
                         ),

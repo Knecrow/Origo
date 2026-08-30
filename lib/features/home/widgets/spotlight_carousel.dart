@@ -130,8 +130,8 @@ class _SpotlightCard extends StatelessWidget {
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: AppColors.adaptiveScrim(
-                      AppColors.getCategoryColor(item.category),
-                      isDark: Theme.of(context).brightness == Brightness.dark,
+                      null,
+                      Theme.of(context).brightness == Brightness.dark,
                     ),
                   ),
                 ),
@@ -188,7 +188,6 @@ class _CategoryPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ext = context.ext;
     final itemsProv = context.watch<ItemsProvider>();
     final displayName =
         itemsProv.categoryDisplayNames[category] ?? category.toUpperCase();
@@ -196,7 +195,7 @@ class _CategoryPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: ext.accent.withValues(alpha: 0.85),
+        color: Colors.black.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(

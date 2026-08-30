@@ -8,7 +8,7 @@ class AppColors {
   // ── Light Palette (Apple iOS / One UI Porcelain) ───────────────────────────
   static const Color lightBackground = Color(0xFFF2F2F7);
   static const Color lightCard = Color(0xFFFFFFFF);
-  static const Color lightAccent = Color(0xFF007AFF);
+  static const Color lightAccent = Color(0xFF000000);
   static const Color lightTextPrimary = Color(0xFF000000);
   static const Color lightTextMuted = Color(0xFF8E8E93);
 
@@ -16,10 +16,10 @@ class AppColors {
   static const Color lightShadowDark = Color(0xFFE5E5EA);
   static const Color lightShadowLight = Color(0xFFFFFFFF);
 
-  // ── Dark Palette (Apple OLED True Black & System Gray) ─────────────────────
+  // ── Dark Palette (Apple OLED True Black & Titanium Slate) ──────────────────
   static const Color darkBackground = Color(0xFF000000);
   static const Color darkCard = Color(0xFF1C1C1E);
-  static const Color darkAccent = Color(0xFF0A84FF);
+  static const Color darkAccent = Color(0xFFFFFFFF);
   static const Color darkTextPrimary = Color(0xFFFFFFFF);
   static const Color darkTextMuted = Color(0xFF8E8E93);
 
@@ -31,39 +31,43 @@ class AppColors {
   static const Color error = Color(0xFFFF453A);
   static const Color success = Color(0xFF30D158);
 
-  // ── Category Accent Colors (The Elite 8) ───────────────────────────────────
+  // ── Monochromatic Category Colors (Stealth Titanium & Slate) ───────────────
   static const Map<String, Color> categoryColors = {
-    'Home': Color(0xFF0A84FF),
-    'Garage': Color(0xFFFF9F0A),
-    'Aviation': Color(0xFFBF5AF2),
-    'Marine': Color(0xFF64D2FF),
-    'Places': Color(0xFF30D158),
-    'Sanctuary': Color(0xFF32D74B),
-    'Experiences': Color(0xFFFF453A),
-    'Collections': Color(0xFFFFD60A),
+    'Home': Color(0xFF8E8E93),
+    'Garage': Color(0xFF8E8E93),
+    'Aviation': Color(0xFF8E8E93),
+    'Marine': Color(0xFF8E8E93),
+    'Places': Color(0xFF8E8E93),
+    'Sanctuary': Color(0xFF8E8E93),
+    'Experiences': Color(0xFF8E8E93),
+    'Collections': Color(0xFF8E8E93),
   };
 
   static Color getCategoryColor(String key) {
-    return categoryColors[key] ?? const Color(0xFF0A84FF);
+    return const Color(0xFF8E8E93);
   }
 
-  // ── Smart Adaptive Cinematic Scrim Gradient ────────────────────────────────
-  static LinearGradient adaptiveScrim(Color baseColor, {bool isDark = true}) {
+  // ── Pure Cinematic OLED True Black Scrim Gradient ──────────────────────────
+  static LinearGradient adaptiveScrim([
+    Color? baseColor,
+    bool isDark = true,
+  ]) {
     return LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
       colors: isDark
           ? [
-              Colors.black.withValues(alpha: 0.08),
-              baseColor.withValues(alpha: 0.24),
-              Colors.black.withValues(alpha: 0.88),
+              Colors.transparent,
+              Colors.black.withValues(alpha: 0.35),
+              Colors.black.withValues(alpha: 0.92),
             ]
           : [
-              Colors.black.withValues(alpha: 0.05),
-              baseColor.withValues(alpha: 0.20),
-              Colors.black.withValues(alpha: 0.82),
+              Colors.transparent,
+              Colors.black.withValues(alpha: 0.28),
+              Colors.black.withValues(alpha: 0.88),
             ],
-      stops: const [0.0, 0.48, 1.0],
+      stops: const [0.15, 0.55, 1.0],
     );
   }
 }
+

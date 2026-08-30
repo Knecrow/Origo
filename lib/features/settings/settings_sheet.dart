@@ -392,8 +392,8 @@ class SettingsSheet extends StatelessWidget {
                                 icon: cat.icon,
                                 size: 16,
                                 padding: 8,
-                                iconColor: Colors.white,
-                                badgeColor: cat.color,
+                                iconColor: ext.textPrimary,
+                                badgeColor: ext.cardColor,
                               ),
                               const SizedBox(width: 12),
                               Expanded(

@@ -76,8 +76,8 @@ class CardQuickActionsSheet extends StatelessWidget {
                 icon: category.icon,
                 size: 20,
                 padding: 10,
-                iconColor: Colors.white,
-                badgeColor: ext.accent,
+                iconColor: ext.textPrimary,
+                badgeColor: ext.bgColor,
               ),
               const SizedBox(width: 14),
               Expanded(

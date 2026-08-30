@@ -194,9 +194,9 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                         icon: icon,
                         size: 18,
                         padding: 10,
-                        iconColor: isSelected ? Colors.white : ext.textMuted,
+                        iconColor: isSelected ? ext.bgColor : ext.textMuted,
                         badgeColor: isSelected
-                            ? ext.accent.withValues(alpha: 0.85)
+                            ? ext.textPrimary
                             : ext.cardColor,
                       ),
                     );
@@ -228,8 +228,8 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                       icon: _selectedIcon,
                       size: 18,
                       padding: 8,
-                      iconColor: Colors.white,
-                      badgeColor: ext.accent.withValues(alpha: 0.85),
+                      iconColor: ext.textPrimary,
+                      badgeColor: ext.bgColor,
                     ),
                     const SizedBox(width: 14),
                     Expanded(
@@ -244,7 +244,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                                     ? _nameCtrl.text.trim().toUpperCase()
                                     : 'NEW CATEGORY'),
                             style: TextStyle(
-                              color: ext.accent.withValues(alpha: 0.9),
+                              color: ext.textMuted,
                               fontSize: 9,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 1.2,
@@ -268,13 +268,13 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: ext.accent.withValues(alpha: 0.2),
+                        color: ext.textMuted.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         '0 Assets',
                         style: TextStyle(
-                          color: ext.accent,
+                          color: ext.textPrimary,
                           fontSize: 10,
                           fontWeight: FontWeight.w800,
                         ),

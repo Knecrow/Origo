@@ -184,8 +184,8 @@ class _BentoSquareCardState extends State<_BentoSquareCard> {
                       DecoratedBox(
                         decoration: BoxDecoration(
                           gradient: AppColors.adaptiveScrim(
-                            widget.category.color,
-                            isDark: Theme.of(context).brightness == Brightness.dark,
+                            null,
+                            Theme.of(context).brightness == Brightness.dark,
                           ),
                         ),
                       ),
@@ -304,8 +304,8 @@ class _BentoPanoramicHeroCardState extends State<_BentoPanoramicHeroCard> {
                       DecoratedBox(
                         decoration: BoxDecoration(
                           gradient: AppColors.adaptiveScrim(
-                            widget.category.color,
-                            isDark: Theme.of(context).brightness == Brightness.dark,
+                            null,
+                            Theme.of(context).brightness == Brightness.dark,
                           ),
                         ),
                       ),
@@ -463,14 +463,14 @@ class _EmptyInvitationContent extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [
-                  const Color(0xFF263344),
-                  const Color(0xFF19222E),
-                ]
-              : [
-                  const Color(0xFFFFFFFF),
-                  const Color(0xFFDDE7F0),
-                ],
+            ? [
+                const Color(0xFF1C1C1E),
+                const Color(0xFF121214),
+              ]
+            : [
+                const Color(0xFFFFFFFF),
+                const Color(0xFFE5E5EA),
+              ],
         ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -483,11 +483,11 @@ class _EmptyInvitationContent extends StatelessWidget {
             height: isCompact ? 42 : 48,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: category.color.withValues(alpha: 0.18),
+              color: ext.textMuted.withValues(alpha: 0.14),
             ),
             child: Icon(
               category.icon,
-              color: category.color,
+              color: ext.textPrimary,
               size: isCompact ? 22 : 26,
             ),
           ),
