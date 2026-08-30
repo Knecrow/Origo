@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'core/providers/items_provider.dart';
+import 'core/providers/profile_provider.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'features/home/home_screen.dart';
@@ -30,6 +31,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => ItemsProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileProvider()..loadProfile()),
       ],
       child: const OrigoApp(),
     ),

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../core/models/origo_item.dart';
 import '../../core/providers/items_provider.dart';
+import '../../core/providers/profile_provider.dart';
 import '../../core/providers/theme_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
@@ -13,6 +14,8 @@ import '../../core/widgets/origo_image.dart';
 import '../add/add_item_sheet.dart';
 import '../detail/detail_screen.dart';
 import '../gallery/gallery_screen.dart';
+import '../profile/first_time_setup_sheet.dart';
+import '../profile/profile_screen.dart';
 import '../settings/settings_sheet.dart';
 import 'widgets/editorial_bento_grid.dart';
 import 'widgets/spotlight_carousel.dart';
@@ -34,8 +37,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       context.read<ItemsProvider>().loadAll();
+      final profile = context.read<ProfileProvider>();
+      if (!profile.isLoaded) {
+        await profile.loadProfile();
+      }
+      if (mounted && !profile.isFirstLaunchDone) {
+        FirstTimeSetupSheet.show(context);
+      }
     });
   }
 
@@ -125,6 +135,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: _SculptedWaveTopBar(
                       onToggleTheme: () => themeProv.toggle(),
                       onOpenSettings: () => SettingsSheet.show(context),
+                      onOpenProfile: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                        );
+                      },
                       isDark: themeProv.isDark,
                     ),
                   ),
@@ -302,16 +318,28 @@ class _HomeScreenState extends State<HomeScreen> {
 class _SculptedWaveTopBar extends StatelessWidget {
   final VoidCallback onToggleTheme;
   final VoidCallback onOpenSettings;
+  final VoidCallback onOpenProfile;
   final bool isDark;
 
   const _SculptedWaveTopBar({
     required this.onToggleTheme,
     required this.onOpenSettings,
+    required this.onOpenProfile,
     required this.isDark,
   });
 
+  static const List<IconData> _avatarIcons = [
+    Icons.person_rounded,
+    Icons.auto_awesome_rounded,
+    Icons.military_tech_rounded,
+    Icons.account_balance_rounded,
+    Icons.diamond_rounded,
+    Icons.shield_rounded,
+  ];
+
   @override
   Widget build(BuildContext context) {
+    final profileProv = context.watch<ProfileProvider>();
     final bgColor = isDark ? const Color(0xFF141624) : const Color(0xFFFFFFFF);
     final shadowColor = isDark ? Colors.black.withValues(alpha: 0.55) : const Color(0xFF757E9E).withValues(alpha: 0.2);
     final highlightColor = isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white;
@@ -385,61 +413,74 @@ class _SculptedWaveTopBar extends StatelessWidget {
             ),
           ),
 
-          // Center: Avatar Button sitting in the exact Mirrored Cradle Position
+          // Center: Avatar Button (Opens Profile Screen)
           Positioned(
             bottom: 0,
-            child: Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isDark ? const Color(0xFF1E2135) : Colors.white,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: isDark
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                onOpenProfile();
+              },
+              child: Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isDark ? const Color(0xFF1E2135) : Colors.white,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: isDark
+                        ? [
+                            const Color(0xFF2B2F4C),
+                            const Color(0xFF171828),
+                          ]
+                        : [
+                            const Color(0xFFFFFFFF),
+                            const Color(0xFFEFF1FA),
+                          ],
+                  ),
+                  boxShadow: isDark
                       ? [
-                          const Color(0xFF2B2F4C),
-                          const Color(0xFF171828),
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.6),
+                            blurRadius: 16,
+                            offset: const Offset(0, 8),
+                          ),
+                          BoxShadow(
+                            color: const Color(0xFF7582FF).withValues(alpha: 0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 0),
+                          ),
                         ]
                       : [
-                          const Color(0xFFFFFFFF),
-                          const Color(0xFFEFF1FA),
+                          BoxShadow(
+                            color: const Color(0xFF757E9E).withValues(alpha: 0.24),
+                            blurRadius: 16,
+                            offset: const Offset(0, 8),
+                          ),
+                          const BoxShadow(
+                            color: Colors.white,
+                            blurRadius: 6,
+                            offset: Offset(-2, -2),
+                          ),
                         ],
                 ),
-                boxShadow: isDark
-                    ? [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.6),
-                          blurRadius: 16,
-                          offset: const Offset(0, 8),
+                child: ClipOval(
+                  child: profileProv.avatarPath != null
+                      ? OrigoImage(
+                          imagePath: profileProv.avatarPath!,
+                          fit: BoxFit.cover,
+                        )
+                      : Center(
+                          child: Icon(
+                            _avatarIcons[profileProv.avatarIndex.clamp(0, _avatarIcons.length - 1)],
+                            size: 26,
+                            color: isDark
+                                ? const Color(0xFF7582FF)
+                                : const Color(0xFF5360ED),
+                          ),
                         ),
-                        BoxShadow(
-                          color: const Color(0xFF7582FF).withValues(alpha: 0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 0),
-                        ),
-                      ]
-                    : [
-                        BoxShadow(
-                          color: const Color(0xFF757E9E).withValues(alpha: 0.24),
-                          blurRadius: 16,
-                          offset: const Offset(0, 8),
-                        ),
-                        const BoxShadow(
-                          color: Colors.white,
-                          blurRadius: 6,
-                          offset: Offset(-2, -2),
-                        ),
-                      ],
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.person_rounded,
-                  size: 26,
-                  color: isDark
-                      ? const Color(0xFF7582FF)
-                      : const Color(0xFF5360ED),
                 ),
               ),
             ),
