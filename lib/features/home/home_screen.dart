@@ -123,20 +123,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   // ── 1. Reference Top Header with UPWARD Dome Notch ────────────
                   SliverToBoxAdapter(
                     child: _SculptedTopDomeHeader(
-                      searchCtrl: _searchCtrl,
-                      searchFocus: _searchFocus,
-                      searchQuery: _searchQuery,
-                      onSearchChanged: (v) => setState(() => _searchQuery = v),
-                      onClearSearch: () {
-                        _searchCtrl.clear();
-                        setState(() => _searchQuery = '');
-                        _searchFocus.unfocus();
-                      },
                       onToggleTheme: () => themeProv.toggle(),
                       onOpenSettings: () => SettingsSheet.show(context),
                       isDark: themeProv.isDark,
-                      visionCount: allItems.length,
-                      categoryCount: itemsProv.categories.length,
                     ),
                   ),
 
@@ -309,28 +298,14 @@ class _HomeScreenState extends State<HomeScreen> {
 // ── Top Header with Sculpted UPWARD Dome Notch ────────────────────────────────
 
 class _SculptedTopDomeHeader extends StatelessWidget {
-  final TextEditingController searchCtrl;
-  final FocusNode searchFocus;
-  final String searchQuery;
-  final ValueChanged<String> onSearchChanged;
-  final VoidCallback onClearSearch;
   final VoidCallback onToggleTheme;
   final VoidCallback onOpenSettings;
   final bool isDark;
-  final int visionCount;
-  final int categoryCount;
 
   const _SculptedTopDomeHeader({
-    required this.searchCtrl,
-    required this.searchFocus,
-    required this.searchQuery,
-    required this.onSearchChanged,
-    required this.onClearSearch,
     required this.onToggleTheme,
     required this.onOpenSettings,
     required this.isDark,
-    required this.visionCount,
-    required this.categoryCount,
   });
 
   @override
@@ -341,362 +316,128 @@ class _SculptedTopDomeHeader extends StatelessWidget {
     final notchHighlight = isDark ? Colors.white.withValues(alpha: 0.06) : Colors.white;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 1. Top Custom Painted Bar with UPWARD Arching Dome Notch
-          SizedBox(
-            height: 72,
-            child: Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.center,
-              children: [
-                // Sculpted Upward Arch Panel
-                CustomPaint(
-                  size: Size(MediaQuery.of(context).size.width - 40, 72),
-                  painter: _TopUpwardDomePainter(
-                    color: notchBgColor,
-                    shadowColor: notchShadow,
-                    highlightColor: notchHighlight,
-                  ),
-                ),
-
-                // Action Icons (Cloud & Menu)
-                Positioned(
-                  bottom: 12,
-                  left: 16,
-                  right: 16,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Left: Cloud / Theme Button
-                      GestureDetector(
-                        onTap: () {
-                          HapticFeedback.selectionClick();
-                          onToggleTheme();
-                        },
-                        behavior: HitTestBehavior.opaque,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Icon(
-                            isDark ? Icons.wb_sunny_rounded : Icons.cloud_outlined,
-                            size: 20,
-                            color: isDark ? const Color(0xFFFFD60A) : ext.textPrimary,
-                          ),
-                        ),
-                      ),
-
-                      // Right: Menu Button
-                      GestureDetector(
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          onOpenSettings();
-                        },
-                        behavior: HitTestBehavior.opaque,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Icon(
-                            Icons.menu_rounded,
-                            size: 21,
-                            color: ext.textPrimary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Center: Avatar sitting on the UPWARD Arching Dome Notch
-                Positioned(
-                  top: 2,
-                  child: Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF22253B) : Colors.white,
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: isDark
-                            ? [
-                                const Color(0xFF282C48),
-                                const Color(0xFF161726),
-                              ]
-                            : [
-                                const Color(0xFFFFFFFF),
-                                const Color(0xFFEFF0F9),
-                              ],
-                      ),
-                      boxShadow: isDark
-                          ? [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.5),
-                                blurRadius: 14,
-                                offset: const Offset(0, 6),
-                              ),
-                              BoxShadow(
-                                color: const Color(0xFF7582FF).withValues(alpha: 0.25),
-                                blurRadius: 8,
-                                offset: const Offset(0, 0),
-                              ),
-                            ]
-                          : [
-                              BoxShadow(
-                                color: const Color(0xFF757E9E).withValues(alpha: 0.22),
-                                blurRadius: 14,
-                                offset: const Offset(0, 6),
-                              ),
-                              const BoxShadow(
-                                color: Colors.white,
-                                blurRadius: 6,
-                                offset: Offset(-2, -2),
-                              ),
-                            ],
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.person_rounded,
-                        size: 22,
-                        color: isDark ? const Color(0xFF8B96FF) : const Color(0xFF5360ED),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // 2. Inset Search Bar
-          Container(
-            height: 46,
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF161726) : const Color(0xFFFFFFFF),
-              borderRadius: BorderRadius.circular(23),
-              boxShadow: isDark
-                  ? [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.35),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                      ),
-                    ]
-                  : [
-                      BoxShadow(
-                        color: const Color(0xFF757E9E).withValues(alpha: 0.12),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: searchCtrl,
-                    focusNode: searchFocus,
-                    onChanged: onSearchChanged,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: ext.textPrimary,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'Search...',
-                      hintStyle: TextStyle(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w500,
-                        color: ext.textMuted.withValues(alpha: 0.65),
-                      ),
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                ),
-                if (searchQuery.isNotEmpty)
-                  GestureDetector(
-                    onTap: onClearSearch,
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 6),
-                      child: Icon(
-                        Icons.close_rounded,
-                        size: 16,
-                        color: ext.textMuted,
-                      ),
-                    ),
-                  ),
-                Icon(
-                  Icons.search_rounded,
-                  size: 19,
-                  color: ext.textMuted,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // 3. Featured Hero Card ("MyDocs" style from the Reference Image)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1B1D2E) : Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: isDark
-                    ? [
-                        const Color(0xFF22253B),
-                        const Color(0xFF161726),
-                      ]
-                    : [
-                        const Color(0xFFFFFFFF),
-                        const Color(0xFFF3F4FB),
-                      ],
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 6),
+      child: SizedBox(
+        height: 72,
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            // Sculpted Upward Arch Panel
+            CustomPaint(
+              size: Size(MediaQuery.of(context).size.width - 40, 72),
+              painter: _TopUpwardDomePainter(
+                color: notchBgColor,
+                shadowColor: notchShadow,
+                highlightColor: notchHighlight,
               ),
-              boxShadow: isDark
-                  ? [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.45),
-                        blurRadius: 16,
-                        offset: const Offset(0, 8),
-                      ),
-                      BoxShadow(
-                        color: const Color(0xFF7582FF).withValues(alpha: 0.15),
-                        blurRadius: 10,
-                        offset: const Offset(0, 0),
-                      ),
-                    ]
-                  : [
-                      BoxShadow(
-                        color: const Color(0xFF757E9E).withValues(alpha: 0.16),
-                        blurRadius: 18,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    // 3D Luminous Icon
-                    Container(
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF7928CA), Color(0xFFFF0080)],
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFFFF0080).withValues(alpha: 0.35),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.folder_special_rounded,
-                          color: Colors.white,
-                          size: 22,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Origo',
-                          style: TextStyle(
-                            fontSize: 19,
-                            fontWeight: FontWeight.w800,
-                            color: ext.textPrimary,
-                            letterSpacing: -0.4,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '$visionCount visions, $categoryCount collections',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: ext.textMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
 
-                // Luminous Neon Blue Progress Bar
-                Stack(
-                  children: [
-                    Container(
-                      height: 6,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF131422)
-                            : const Color(0xFFE2E4F2),
-                        borderRadius: BorderRadius.circular(3),
+            // Action Icons (Cloud & Menu)
+            Positioned(
+              bottom: 12,
+              left: 16,
+              right: 16,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Left: Cloud / Theme Button
+                  GestureDetector(
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      onToggleTheme();
+                    },
+                    behavior: HitTestBehavior.opaque,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(
+                        isDark ? Icons.wb_sunny_rounded : Icons.cloud_outlined,
+                        size: 20,
+                        color: isDark ? const Color(0xFFFFD60A) : ext.textPrimary,
                       ),
                     ),
-                    Container(
-                      height: 6,
-                      width: 140,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF00C6FF), Color(0xFF0072FF)],
-                        ),
-                        borderRadius: BorderRadius.circular(3),
-                        boxShadow: [
+                  ),
+
+                  // Right: Menu Button
+                  GestureDetector(
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      onOpenSettings();
+                    },
+                    behavior: HitTestBehavior.opaque,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(
+                        Icons.menu_rounded,
+                        size: 21,
+                        color: ext.textPrimary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Center: Avatar sitting on the UPWARD Arching Dome Notch
+            Positioned(
+              top: 2,
+              child: Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF22253B) : Colors.white,
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: isDark
+                        ? [
+                            const Color(0xFF282C48),
+                            const Color(0xFF161726),
+                          ]
+                        : [
+                            const Color(0xFFFFFFFF),
+                            const Color(0xFFEFF0F9),
+                          ],
+                  ),
+                  boxShadow: isDark
+                      ? [
                           BoxShadow(
-                            color: const Color(0xFF0072FF).withValues(alpha: 0.6),
+                            color: Colors.black.withValues(alpha: 0.5),
+                            blurRadius: 14,
+                            offset: const Offset(0, 6),
+                          ),
+                          BoxShadow(
+                            color: const Color(0xFF7582FF).withValues(alpha: 0.25),
                             blurRadius: 8,
                             offset: const Offset(0, 0),
                           ),
+                        ]
+                      : [
+                          BoxShadow(
+                            color: const Color(0xFF757E9E).withValues(alpha: 0.22),
+                            blurRadius: 14,
+                            offset: const Offset(0, 6),
+                          ),
+                          const BoxShadow(
+                            color: Colors.white,
+                            blurRadius: 6,
+                            offset: Offset(-2, -2),
+                          ),
                         ],
-                      ),
-                    ),
-                  ],
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Life Vision Manifestation',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: ext.textMuted,
-                      ),
-                    ),
-                    Text(
-                      'Active',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? const Color(0xFF7582FF) : const Color(0xFF5360ED),
-                      ),
-                    ),
-                  ],
+                child: Center(
+                  child: Icon(
+                    Icons.person_rounded,
+                    size: 22,
+                    color: isDark ? const Color(0xFF8B96FF) : const Color(0xFF5360ED),
+                  ),
                 ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
