@@ -341,20 +341,20 @@ class _SculptedTopDomeHeader extends StatelessWidget {
     final notchHighlight = isDark ? Colors.white.withValues(alpha: 0.06) : Colors.white;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 6, 20, 10),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 1. Top Custom Painted Bar with UPWARD Arching Dome Notch
           SizedBox(
-            height: 64,
+            height: 72,
             child: Stack(
               clipBehavior: Clip.none,
               alignment: Alignment.center,
               children: [
                 // Sculpted Upward Arch Panel
                 CustomPaint(
-                  size: Size(MediaQuery.of(context).size.width - 40, 64),
+                  size: Size(MediaQuery.of(context).size.width - 40, 72),
                   painter: _TopUpwardDomePainter(
                     color: notchBgColor,
                     shadowColor: notchShadow,
@@ -363,8 +363,10 @@ class _SculptedTopDomeHeader extends StatelessWidget {
                 ),
 
                 // Action Icons (Cloud & Menu)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                Positioned(
+                  bottom: 12,
+                  left: 16,
+                  right: 16,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -408,7 +410,7 @@ class _SculptedTopDomeHeader extends StatelessWidget {
 
                 // Center: Avatar sitting on the UPWARD Arching Dome Notch
                 Positioned(
-                  top: -6,
+                  top: 2,
                   child: Container(
                     width: 48,
                     height: 48,
@@ -718,43 +720,43 @@ class _TopUpwardDomePainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
     final centerX = w / 2;
-    const domeRadius = 34.0;
+    const domeRadius = 36.0;
 
     final path = Path();
     // Start bottom left
     path.moveTo(0, h);
 
     // Up to top-left shoulder
-    path.lineTo(0, 26);
-    path.quadraticBezierTo(0, 16, 16, 16);
+    path.lineTo(0, 38);
+    path.quadraticBezierTo(0, 26, 16, 26);
 
     // Line to left side of upward dome
-    path.lineTo(centerX - domeRadius - 14, 16);
+    path.lineTo(centerX - domeRadius - 16, 26);
 
     // Smooth organic upward rise into dome
     path.cubicTo(
-      centerX - domeRadius - 6, 16,
-      centerX - domeRadius, 6,
-      centerX - domeRadius + 2, 2,
+      centerX - domeRadius - 6, 26,
+      centerX - domeRadius, 18,
+      centerX - domeRadius + 2, 10,
     );
 
     // Rounded crest arching UPWARD
     path.arcToPoint(
-      Offset(centerX + domeRadius - 2, 2),
+      Offset(centerX + domeRadius - 2, 10),
       radius: const Radius.circular(domeRadius),
       clockwise: true,
     );
 
     // Smooth organic downward slope out of dome
     path.cubicTo(
-      centerX + domeRadius, 6,
-      centerX + domeRadius + 6, 16,
-      centerX + domeRadius + 14, 16,
+      centerX + domeRadius, 18,
+      centerX + domeRadius + 6, 26,
+      centerX + domeRadius + 16, 26,
     );
 
     // Line to right shoulder
-    path.lineTo(w - 16, 16);
-    path.quadraticBezierTo(w, 16, w, 26);
+    path.lineTo(w - 16, 26);
+    path.quadraticBezierTo(w, 26, w, 38);
 
     // Down to bottom right
     path.lineTo(w, h);
