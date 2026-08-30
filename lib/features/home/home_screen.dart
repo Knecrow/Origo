@@ -120,9 +120,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 controller: _scrollCtrl,
                 physics: const BouncingScrollPhysics(),
                 slivers: [
-                  // ── 1. Reference Top Header with UPWARD Dome Notch ────────────
+                  // ── 1. Sculpted Wave Cradle Top Header Bar ──────────────────
                   SliverToBoxAdapter(
-                    child: _SculptedTopDomeHeader(
+                    child: _SculptedWaveTopBar(
                       onToggleTheme: () => themeProv.toggle(),
                       onOpenSettings: () => SettingsSheet.show(context),
                       isDark: themeProv.isDark,
@@ -295,14 +295,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// ── Top Header with Sculpted UPWARD Dome Notch ────────────────────────────────
+// ── Sculpted Organic Wave Cradle Notch Top Bar ────────────────────────────────
 
-class _SculptedTopDomeHeader extends StatelessWidget {
+class _SculptedWaveTopBar extends StatelessWidget {
   final VoidCallback onToggleTheme;
   final VoidCallback onOpenSettings;
   final bool isDark;
 
-  const _SculptedTopDomeHeader({
+  const _SculptedWaveTopBar({
     required this.onToggleTheme,
     required this.onOpenSettings,
     required this.isDark,
@@ -310,147 +310,149 @@ class _SculptedTopDomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ext = context.ext;
-    final notchBgColor = isDark ? const Color(0xFF1B1D2E) : Colors.white;
-    final notchShadow = isDark ? Colors.black.withValues(alpha: 0.45) : const Color(0xFF757E9E).withValues(alpha: 0.18);
-    final notchHighlight = isDark ? Colors.white.withValues(alpha: 0.06) : Colors.white;
+    final bgColor = isDark ? const Color(0xFF141624) : const Color(0xFFFFFFFF);
+    final shadowColor = isDark ? Colors.black.withValues(alpha: 0.55) : const Color(0xFF757E9E).withValues(alpha: 0.2);
+    final highlightColor = isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white;
+    const barHeight = 64.0;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 6),
-      child: SizedBox(
-        height: 72,
-        child: Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.center,
-          children: [
-            // Sculpted Upward Arch Panel
-            CustomPaint(
-              size: Size(MediaQuery.of(context).size.width - 40, 72),
-              painter: _TopUpwardDomePainter(
-                color: notchBgColor,
-                shadowColor: notchShadow,
-                highlightColor: notchHighlight,
-              ),
+    return SizedBox(
+      height: barHeight + 20,
+      width: double.infinity,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.topCenter,
+        children: [
+          // Sculpted Custom Painted Wave Panel with Center Cradle Notch
+          CustomPaint(
+            size: Size(MediaQuery.of(context).size.width, barHeight + 10),
+            painter: _TopWaveCradlePainter(
+              color: bgColor,
+              shadowColor: shadowColor,
+              highlightColor: highlightColor,
             ),
+          ),
 
-            // Action Icons (Cloud & Menu)
-            Positioned(
-              bottom: 12,
-              left: 16,
-              right: 16,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Left: Cloud / Theme Button
-                  GestureDetector(
-                    onTap: () {
-                      HapticFeedback.selectionClick();
-                      onToggleTheme();
-                    },
-                    behavior: HitTestBehavior.opaque,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(
-                        isDark ? Icons.wb_sunny_rounded : Icons.cloud_outlined,
-                        size: 20,
-                        color: isDark ? const Color(0xFFFFD60A) : ext.textPrimary,
-                      ),
+          // Top Bar Action Icons (Cloud & Menu)
+          Positioned(
+            top: 10,
+            left: 36,
+            right: 36,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Left: Cloud / Theme Toggle Button
+                GestureDetector(
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    onToggleTheme();
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Icon(
+                      isDark ? Icons.wb_sunny_rounded : Icons.cloud_outlined,
+                      size: 24,
+                      color: isDark ? const Color(0xFFFFD60A) : (isDark ? Colors.white70 : const Color(0xFF5360ED)),
                     ),
                   ),
+                ),
 
-                  // Right: Menu Button
-                  GestureDetector(
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      onOpenSettings();
-                    },
-                    behavior: HitTestBehavior.opaque,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(
-                        Icons.menu_rounded,
-                        size: 21,
-                        color: ext.textPrimary,
-                      ),
+                const SizedBox(width: 56), // Gap for the center cradle
+
+                // Right: Menu Button
+                GestureDetector(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    onOpenSettings();
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Icon(
+                      Icons.menu_rounded,
+                      size: 24,
+                      color: isDark ? Colors.white70 : const Color(0xFF2C324A),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
+          ),
 
-            // Center: Avatar sitting on the UPWARD Arching Dome Notch
-            Positioned(
-              top: 2,
-              child: Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF22253B) : Colors.white,
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: isDark
-                        ? [
-                            const Color(0xFF282C48),
-                            const Color(0xFF161726),
-                          ]
-                        : [
-                            const Color(0xFFFFFFFF),
-                            const Color(0xFFEFF0F9),
-                          ],
-                  ),
-                  boxShadow: isDark
+          // Center: Elevated Avatar Circle Button sitting directly inside the Wave Cradle Notch
+          Positioned(
+            top: 18,
+            child: Container(
+              width: 54,
+              height: 54,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isDark ? const Color(0xFF1E2135) : Colors.white,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDark
                       ? [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.5),
-                            blurRadius: 14,
-                            offset: const Offset(0, 6),
-                          ),
-                          BoxShadow(
-                            color: const Color(0xFF7582FF).withValues(alpha: 0.25),
-                            blurRadius: 8,
-                            offset: const Offset(0, 0),
-                          ),
+                          const Color(0xFF2B2F4C),
+                          const Color(0xFF171828),
                         ]
                       : [
-                          BoxShadow(
-                            color: const Color(0xFF757E9E).withValues(alpha: 0.22),
-                            blurRadius: 14,
-                            offset: const Offset(0, 6),
-                          ),
-                          const BoxShadow(
-                            color: Colors.white,
-                            blurRadius: 6,
-                            offset: Offset(-2, -2),
-                          ),
+                          const Color(0xFFFFFFFF),
+                          const Color(0xFFEFF1FA),
                         ],
                 ),
-                child: Center(
-                  child: Icon(
-                    Icons.person_rounded,
-                    size: 22,
-                    color: isDark ? const Color(0xFF8B96FF) : const Color(0xFF5360ED),
-                  ),
+                boxShadow: isDark
+                    ? [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          blurRadius: 16,
+                          offset: const Offset(0, 8),
+                        ),
+                        BoxShadow(
+                          color: const Color(0xFF7582FF).withValues(alpha: 0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 0),
+                        ),
+                      ]
+                    : [
+                        BoxShadow(
+                          color: const Color(0xFF757E9E).withValues(alpha: 0.24),
+                          blurRadius: 16,
+                          offset: const Offset(0, 8),
+                        ),
+                        const BoxShadow(
+                          color: Colors.white,
+                          blurRadius: 6,
+                          offset: Offset(-2, -2),
+                        ),
+                      ],
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.person_rounded,
+                  size: 24,
+                  color: isDark
+                      ? const Color(0xFF7582FF)
+                      : const Color(0xFF5360ED),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
-// ── Custom UPWARD Dome Notch Painter ──────────────────────────────────────────
+// ── Custom Top Wave Cradle Painter ────────────────────────────────────────────
 
-class _TopUpwardDomePainter extends CustomPainter {
+class _TopWaveCradlePainter extends CustomPainter {
   final Color color;
   final Color shadowColor;
   final Color highlightColor;
 
-  _TopUpwardDomePainter({
+  _TopWaveCradlePainter({
     required this.color,
     required this.shadowColor,
     required this.highlightColor,
@@ -459,52 +461,54 @@ class _TopUpwardDomePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final w = size.width;
-    final h = size.height;
     final centerX = w / 2;
-    const domeRadius = 36.0;
+    const cradleRadius = 36.0;
+    const baselineY = 54.0;
 
     final path = Path();
-    // Start bottom left
-    path.moveTo(0, h);
+    // Start at top-left
+    path.moveTo(0, 0);
+    path.lineTo(w, 0);
 
-    // Up to top-left shoulder
-    path.lineTo(0, 38);
-    path.quadraticBezierTo(0, 26, 16, 26);
+    // Right side line down to baseline
+    path.lineTo(w, baselineY - 10);
+    path.quadraticBezierTo(w, baselineY, w - 20, baselineY);
 
-    // Line to left side of upward dome
-    path.lineTo(centerX - domeRadius - 16, 26);
+    // Flat line towards right edge of cradle
+    path.lineTo(centerX + cradleRadius + 16, baselineY);
 
-    // Smooth organic upward rise into dome
+    // Sculpted organic curve dropping into cradle
     path.cubicTo(
-      centerX - domeRadius - 6, 26,
-      centerX - domeRadius, 18,
-      centerX - domeRadius + 2, 10,
+      centerX + cradleRadius + 6, baselineY,
+      centerX + cradleRadius, baselineY + 10,
+      centerX + cradleRadius - 2, baselineY + 18,
     );
 
-    // Rounded crest arching UPWARD
+    // Deep smooth cradle basin
     path.arcToPoint(
-      Offset(centerX + domeRadius - 2, 10),
-      radius: const Radius.circular(domeRadius),
-      clockwise: true,
+      Offset(centerX - cradleRadius + 2, baselineY + 18),
+      radius: const Radius.circular(cradleRadius),
+      clockwise: false,
     );
 
-    // Smooth organic downward slope out of dome
+    // Sculpted organic curve rising out of cradle
     path.cubicTo(
-      centerX + domeRadius, 18,
-      centerX + domeRadius + 6, 26,
-      centerX + domeRadius + 16, 26,
+      centerX - cradleRadius, baselineY + 10,
+      centerX - cradleRadius - 6, baselineY,
+      centerX - cradleRadius - 16, baselineY,
     );
 
-    // Line to right shoulder
-    path.lineTo(w - 16, 26);
-    path.quadraticBezierTo(w, 26, w, 38);
+    // Flat line towards left shoulder
+    path.lineTo(20, baselineY);
 
-    // Down to bottom right
-    path.lineTo(w, h);
+    // Bottom-left rounded shoulder
+    path.quadraticBezierTo(0, baselineY, 0, baselineY - 10);
+
+    // Close to top-left
     path.close();
 
     // Draw ambient drop shadow
-    canvas.drawShadow(path, shadowColor, 14.0, true);
+    canvas.drawShadow(path, shadowColor, 18.0, true);
 
     // Draw base fill
     final fillPaint = Paint()
@@ -512,7 +516,7 @@ class _TopUpwardDomePainter extends CustomPainter {
       ..style = PaintingStyle.fill;
     canvas.drawPath(path, fillPaint);
 
-    // Draw subtle top-rim highlight
+    // Draw subtle bottom-rim highlight
     final strokePaint = Paint()
       ..color = highlightColor
       ..style = PaintingStyle.stroke
@@ -521,7 +525,7 @@ class _TopUpwardDomePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _TopUpwardDomePainter oldDelegate) =>
+  bool shouldRepaint(covariant _TopWaveCradlePainter oldDelegate) =>
       color != oldDelegate.color ||
       shadowColor != oldDelegate.shadowColor ||
       highlightColor != oldDelegate.highlightColor;
