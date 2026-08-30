@@ -67,13 +67,10 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }
         break;
-      case 1: // Search
-        _searchFocus.requestFocus();
-        break;
-      case 2: // Central Add Dream
+      case 2: // Central Elevated Button (Add Dream)
         AddItemSheet.show(context);
         break;
-      case 3: // Gallery / Showcase
+      case 3: // Clock / History / Gallery
         final categories = context.read<ItemsProvider>().categories;
         if (categories.isNotEmpty) {
           Navigator.push(
@@ -83,9 +80,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         }
-        break;
-      case 4: // Settings
-        SettingsSheet.show(context);
         break;
     }
   }
@@ -118,383 +112,601 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: ext.bgColor,
       body: SafeArea(
-        child: CustomScrollView(
-          controller: _scrollCtrl,
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            // ── 1. Top Header Island & Search Bar ───────────────────────────
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Top Brand Bar
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              'Origo',
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.w900,
-                                color: ext.textPrimary,
-                                letterSpacing: -0.8,
-                                height: 1.1,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: ext.textMuted.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                '${allItems.length} Visions',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  color: ext.textMuted,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            // Theme Switcher Button
-                            ClayIconBadge(
-                              icon: themeProv.isDark
-                                  ? Icons.wb_sunny_rounded
-                                  : Icons.dark_mode_rounded,
-                              size: 18,
-                              padding: 9,
-                              iconColor: themeProv.isDark
-                                  ? const Color(0xFFFFD60A)
-                                  : ext.textPrimary,
-                              onTap: () {
-                                HapticFeedback.selectionClick();
-                                themeProv.toggle();
-                              },
-                            ),
-                            const SizedBox(width: 8),
-                            // Quick Settings Button
-                            ClayIconBadge(
-                              icon: Icons.tune_rounded,
-                              size: 18,
-                              padding: 9,
-                              iconColor: ext.textPrimary,
-                              onTap: () {
-                                HapticFeedback.lightImpact();
-                                SettingsSheet.show(context);
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Floating Search & Filter Capsule
-                    _FloatingSearchCapsule(
-                      controller: _searchCtrl,
-                      focusNode: _searchFocus,
-                      isDark: themeProv.isDark,
-                      onChanged: (v) => setState(() => _searchQuery = v),
-                      onClear: () {
+        bottom: false,
+        child: Column(
+          children: [
+            Expanded(
+              child: CustomScrollView(
+                controller: _scrollCtrl,
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  // ── 1. Reference Top Dome Header Bar ──────────────────────────
+                  SliverToBoxAdapter(
+                    child: _ReferenceTopHeader(
+                      searchCtrl: _searchCtrl,
+                      searchFocus: _searchFocus,
+                      searchQuery: _searchQuery,
+                      onSearchChanged: (v) => setState(() => _searchQuery = v),
+                      onClearSearch: () {
                         _searchCtrl.clear();
                         setState(() => _searchQuery = '');
                         _searchFocus.unfocus();
                       },
+                      onToggleTheme: () => themeProv.toggle(),
+                      onOpenSettings: () => SettingsSheet.show(context),
+                      isDark: themeProv.isDark,
+                      visionCount: allItems.length,
+                      categoryCount: itemsProv.categories.length,
+                    ),
+                  ),
+
+                  // ── 2. Content View: Search Results OR Bento Grid ─────────────
+                  if (isSearching) ...[
+                    // Search Header
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 10, 20, 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Results for "$_searchQuery"',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: ext.textPrimary,
+                                letterSpacing: -0.3,
+                              ),
+                            ),
+                            Text(
+                              '${filteredItems.length} found',
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w600,
+                                color: ext.textMuted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    if (filteredItems.isEmpty)
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 60),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ClayIconBadge(
+                                  icon: Icons.search_off_rounded,
+                                  size: 32,
+                                  padding: 18,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No visions match "$_searchQuery"',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: ext.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  'Try searching for another keyword or category',
+                                  style: TextStyle(fontSize: 13, color: ext.textMuted),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+                        sliver: SliverGrid(
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 14,
+                            crossAxisSpacing: 14,
+                            childAspectRatio: 0.82,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final item = filteredItems[index];
+                              return _SearchResultCard(item: item);
+                            },
+                            childCount: filteredItems.length,
+                          ),
+                        ),
+                      ),
+                  ] else ...[
+                    // ── Featured Section (Spotlight Carousel) ─────────────────
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
+                        child: Text(
+                          'Featured',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                            color: ext.textPrimary,
+                            letterSpacing: -0.4,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: itemsProv.loading
+                          ? const SizedBox(
+                              height: 240,
+                              child: Center(child: CircularProgressIndicator()))
+                          : SpotlightCarousel(items: spotlightItems),
+                    ),
+
+                    // ── Categories Section Header ─────────────────────────────
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 26, 20, 14),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Text(
+                              'Categories',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w800,
+                                color: ext.textPrimary,
+                                letterSpacing: -0.4,
+                              ),
+                            ),
+                            Text(
+                              '${itemsProv.categories.length}',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: ext.textMuted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // ── Dynamic Editorial Bento Grid ──────────────────────────
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 40),
+                        child: EditorialBentoGrid(
+                          categories: itemsProv.categories,
+                          counts: counts,
+                          covers: covers,
+                        ),
+                      ),
                     ),
                   ],
-                ),
+                ],
               ),
             ),
 
-            // ── 2. Content View: Search Results OR Editorial Bento ─────────
-            if (isSearching) ...[
-              // Search Header
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Results for "$_searchQuery"',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: ext.textPrimary,
-                          letterSpacing: -0.3,
-                        ),
-                      ),
-                      Text(
-                        '${filteredItems.length} found',
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w600,
-                          color: ext.textMuted,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              if (filteredItems.isEmpty)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 60),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ClayIconBadge(
-                            icon: Icons.search_off_rounded,
-                            size: 32,
-                            padding: 18,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No visions match "$_searchQuery"',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: ext.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            'Try searching for another keyword or category',
-                            style: TextStyle(fontSize: 13, color: ext.textMuted),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-              else
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 120),
-                  sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 14,
-                      crossAxisSpacing: 14,
-                      childAspectRatio: 0.82,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final item = filteredItems[index];
-                        return _SearchResultCard(item: item);
-                      },
-                      childCount: filteredItems.length,
-                    ),
-                  ),
-                ),
-            ] else ...[
-              // ── Featured Section (Spotlight Carousel) ─────────────────────
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 6, 20, 12),
-                  child: Text(
-                    'Featured',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: ext.textPrimary,
-                      letterSpacing: -0.4,
-                    ),
-                  ),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: itemsProv.loading
-                    ? const SizedBox(
-                        height: 240,
-                        child: Center(child: CircularProgressIndicator()))
-                    : SpotlightCarousel(items: spotlightItems),
-              ),
-
-              // ── Categories Section Header ─────────────────────────────────
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 28, 20, 14),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: [
-                      Text(
-                        'Categories',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                          color: ext.textPrimary,
-                          letterSpacing: -0.4,
-                        ),
-                      ),
-                      Text(
-                        '${itemsProv.categories.length}',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: ext.textMuted,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // ── Dynamic Editorial Bento Grid ──────────────────────────────
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 120),
-                  child: EditorialBentoGrid(
-                    categories: itemsProv.categories,
-                    counts: counts,
-                    covers: covers,
-                  ),
-                ),
-              ),
-            ],
+            // ── 3. Reference Organic Contoured Wave Bottom Bar ───────────────
+            _ReferenceWaveBottomBar(
+              activeIndex: _activeNavIndex,
+              onTap: _onNavTap,
+              isDark: themeProv.isDark,
+            ),
           ],
         ),
-      ),
-
-      // ── 5-Item Floating Frosted Island Navigation Dock ────────────────────
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: _FloatingCeramicDock(
-        activeIndex: _activeNavIndex,
-        onTap: _onNavTap,
-        isDark: themeProv.isDark,
       ),
     );
   }
 }
 
-// ── Floating Search & Filter Capsule ─────────────────────────────────────────
+// ── Reference Top Header Bar (Dome Notch, Inset Search, Hero Card) ────────────
 
-class _FloatingSearchCapsule extends StatelessWidget {
-  final TextEditingController controller;
-  final FocusNode focusNode;
+class _ReferenceTopHeader extends StatelessWidget {
+  final TextEditingController searchCtrl;
+  final FocusNode searchFocus;
+  final String searchQuery;
+  final ValueChanged<String> onSearchChanged;
+  final VoidCallback onClearSearch;
+  final VoidCallback onToggleTheme;
+  final VoidCallback onOpenSettings;
   final bool isDark;
-  final ValueChanged<String> onChanged;
-  final VoidCallback onClear;
+  final int visionCount;
+  final int categoryCount;
 
-  const _FloatingSearchCapsule({
-    required this.controller,
-    required this.focusNode,
+  const _ReferenceTopHeader({
+    required this.searchCtrl,
+    required this.searchFocus,
+    required this.searchQuery,
+    required this.onSearchChanged,
+    required this.onClearSearch,
+    required this.onToggleTheme,
+    required this.onOpenSettings,
     required this.isDark,
-    required this.onChanged,
-    required this.onClear,
+    required this.visionCount,
+    required this.categoryCount,
   });
 
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
-    final hasText = controller.text.isNotEmpty;
 
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1B1D2E) : const Color(0xFFFFFFFF),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: isDark
-            ? [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.4),
-                  blurRadius: 14,
-                  offset: const Offset(0, 5),
-                ),
-                BoxShadow(
-                  color: Colors.white.withValues(alpha: 0.04),
-                  blurRadius: 2,
-                  offset: const Offset(-1, -1),
-                ),
-              ]
-            : [
-                BoxShadow(
-                  color: const Color(0xFF757E9E).withValues(alpha: 0.16),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
-                ),
-                const BoxShadow(
-                  color: Colors.white,
-                  blurRadius: 6,
-                  offset: Offset(-2, -2),
-                ),
-              ],
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      child: Row(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.search_rounded,
-            size: 20,
-            color: isDark ? const Color(0xFF7582FF) : const Color(0xFF5360ED),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: TextField(
-              controller: controller,
-              focusNode: focusNode,
-              onChanged: onChanged,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: ext.textPrimary,
-              ),
-              decoration: InputDecoration(
-                hintText: 'Search visions, collections, tags...',
-                hintStyle: TextStyle(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w500,
-                  color: ext.textMuted.withValues(alpha: 0.7),
+          // 1. Top Status & Dome Notch Row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Left: Cloud Theme Button
+              GestureDetector(
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  onToggleTheme();
+                },
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1B1D2E) : Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: isDark
+                        ? [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.4),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ]
+                        : [
+                            BoxShadow(
+                              color: const Color(0xFF757E9E).withValues(alpha: 0.16),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                  ),
+                  child: Icon(
+                    isDark ? Icons.wb_sunny_rounded : Icons.cloud_outlined,
+                    size: 19,
+                    color: isDark ? const Color(0xFFFFD60A) : ext.textPrimary,
+                  ),
                 ),
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.zero,
               ),
-            ),
-          ),
-          if (hasText)
-            GestureDetector(
-              onTap: onClear,
-              child: Container(
-                padding: const EdgeInsets.all(4),
+
+              // Center: Organic Center Dome Avatar
+              Container(
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
-                  color: ext.textMuted.withValues(alpha: 0.15),
+                  color: isDark ? const Color(0xFF1B1D2E) : Colors.white,
                   shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: isDark
+                        ? [
+                            const Color(0xFF22253A),
+                            const Color(0xFF161726),
+                          ]
+                        : [
+                            const Color(0xFFFFFFFF),
+                            const Color(0xFFEFF0F9),
+                          ],
+                  ),
+                  boxShadow: isDark
+                      ? [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.45),
+                            blurRadius: 12,
+                            offset: const Offset(0, 5),
+                          ),
+                        ]
+                      : [
+                          BoxShadow(
+                            color: const Color(0xFF757E9E).withValues(alpha: 0.18),
+                            blurRadius: 12,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
                 ),
-                child: Icon(
-                  Icons.close_rounded,
-                  size: 14,
+                child: Center(
+                  child: Icon(
+                    Icons.person_rounded,
+                    size: 20,
+                    color: isDark ? const Color(0xFF8B96FF) : const Color(0xFF5360ED),
+                  ),
+                ),
+              ),
+
+              // Right: Menu Button
+              GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  onOpenSettings();
+                },
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1B1D2E) : Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: isDark
+                        ? [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.4),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ]
+                        : [
+                            BoxShadow(
+                              color: const Color(0xFF757E9E).withValues(alpha: 0.16),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                  ),
+                  child: Icon(
+                    Icons.menu_rounded,
+                    size: 20,
+                    color: ext.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+
+          // 2. Inset Search Bar (Matching Reference Picture: Search... on left, search icon on right)
+          Container(
+            height: 46,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF161726) : const Color(0xFFFFFFFF),
+              borderRadius: BorderRadius.circular(23),
+              boxShadow: isDark
+                  ? [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.35),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ]
+                  : [
+                      BoxShadow(
+                        color: const Color(0xFF757E9E).withValues(alpha: 0.12),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: searchCtrl,
+                    focusNode: searchFocus,
+                    onChanged: onSearchChanged,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: ext.textPrimary,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'Search...',
+                      hintStyle: TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w500,
+                        color: ext.textMuted.withValues(alpha: 0.65),
+                      ),
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                ),
+                if (searchQuery.isNotEmpty)
+                  GestureDetector(
+                    onTap: onClearSearch,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 16,
+                        color: ext.textMuted,
+                      ),
+                    ),
+                  ),
+                Icon(
+                  Icons.search_rounded,
+                  size: 19,
                   color: ext.textMuted,
                 ),
-              ),
+              ],
             ),
+          ),
+          const SizedBox(height: 16),
+
+          // 3. Featured Hero Card ("MyDocs" style from the Reference Image)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1B1D2E) : Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? [
+                        const Color(0xFF22253B),
+                        const Color(0xFF161726),
+                      ]
+                    : [
+                        const Color(0xFFFFFFFF),
+                        const Color(0xFFF3F4FB),
+                      ],
+              ),
+              boxShadow: isDark
+                  ? [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.45),
+                        blurRadius: 16,
+                        offset: const Offset(0, 8),
+                      ),
+                      BoxShadow(
+                        color: const Color(0xFF7582FF).withValues(alpha: 0.15),
+                        blurRadius: 10,
+                        offset: const Offset(0, 0),
+                      ),
+                    ]
+                  : [
+                      BoxShadow(
+                        color: const Color(0xFF757E9E).withValues(alpha: 0.16),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    // 3D Luminous Icon
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF7928CA), Color(0xFFFF0080)],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFFF0080).withValues(alpha: 0.35),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.folder_special_rounded,
+                          color: Colors.white,
+                          size: 22,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Origo',
+                          style: TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w800,
+                            color: ext.textPrimary,
+                            letterSpacing: -0.4,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '$visionCount visions, $categoryCount collections',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: ext.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Luminous Neon Blue Progress Bar
+                Stack(
+                  children: [
+                    Container(
+                      height: 6,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF131422)
+                            : const Color(0xFFE2E4F2),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                    Container(
+                      height: 6,
+                      width: 140,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF00C6FF), Color(0xFF0072FF)],
+                        ),
+                        borderRadius: BorderRadius.circular(3),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF0072FF).withValues(alpha: 0.6),
+                            blurRadius: 8,
+                            offset: const Offset(0, 0),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Life Vision Manifestation',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: ext.textMuted,
+                      ),
+                    ),
+                    Text(
+                      'Active',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? const Color(0xFF7582FF) : const Color(0xFF5360ED),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-// ── 5-Item Floating Ceramic Navigation Island Dock ───────────────────────────
+// ── Reference Organic Contoured Wave Bottom Bar ───────────────────────────────
 
-class _FloatingCeramicDock extends StatelessWidget {
+class _ReferenceWaveBottomBar extends StatelessWidget {
   final int activeIndex;
   final ValueChanged<int> onTap;
   final bool isDark;
 
-  const _FloatingCeramicDock({
+  const _ReferenceWaveBottomBar({
     required this.activeIndex,
     required this.onTap,
     required this.isDark,
@@ -502,84 +714,86 @@ class _FloatingCeramicDock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bgColor = isDark ? const Color(0xFF141624) : const Color(0xFFFFFFFF);
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      width: double.infinity,
+      height: 72 + bottomPadding,
       decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF181A2A).withValues(alpha: 0.94)
-            : const Color(0xFFFFFFFF).withValues(alpha: 0.96),
-        borderRadius: BorderRadius.circular(36),
+        color: bgColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         boxShadow: isDark
             ? [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.65),
-                  blurRadius: 28,
-                  offset: const Offset(0, 12),
+                  color: Colors.black.withValues(alpha: 0.55),
+                  blurRadius: 24,
+                  offset: const Offset(0, -6),
                 ),
                 BoxShadow(
-                  color: Colors.white.withValues(alpha: 0.06),
+                  color: Colors.white.withValues(alpha: 0.04),
                   blurRadius: 2,
-                  offset: const Offset(-1, -1),
+                  offset: const Offset(0, -1),
                 ),
               ]
             : [
                 BoxShadow(
-                  color: const Color(0xFF757E9E).withValues(alpha: 0.22),
-                  blurRadius: 26,
-                  offset: const Offset(0, 10),
+                  color: const Color(0xFF757E9E).withValues(alpha: 0.18),
+                  blurRadius: 24,
+                  offset: const Offset(0, -6),
                 ),
                 const BoxShadow(
                   color: Colors.white,
-                  blurRadius: 8,
-                  offset: Offset(-2, -2),
+                  blurRadius: 6,
+                  offset: Offset(0, -2),
                 ),
               ],
       ),
+      padding: EdgeInsets.only(
+        left: 36,
+        right: 36,
+        bottom: bottomPadding + 4,
+      ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // 1. Home / Vision Grid
-          _NavDockItem(
-            icon: Icons.grid_view_rounded,
-            isSelected: activeIndex == 0,
-            isDark: isDark,
+          // Left: Home Icon (🏠)
+          GestureDetector(
             onTap: () => onTap(0),
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Icon(
+                Icons.home_rounded,
+                size: 26,
+                color: activeIndex == 0
+                    ? (isDark ? const Color(0xFF7582FF) : const Color(0xFF5360ED))
+                    : (isDark ? Colors.white38 : const Color(0xFF9E0B0B).withValues(alpha: 0.4)),
+              ),
+            ),
           ),
-          const SizedBox(width: 8),
 
-          // 2. Search / Explore
-          _NavDockItem(
-            icon: Icons.search_rounded,
-            isSelected: activeIndex == 1,
-            isDark: isDark,
-            onTap: () => onTap(1),
-          ),
-          const SizedBox(width: 10),
-
-          // 3. Central Elevated Ceramic Action Button
-          _CeramicActionPill(
+          // Center: Elevated Circular Action Button (Matching Reference Image)
+          _CenterReferenceCircleButton(
             onTap: () => onTap(2),
             isDark: isDark,
           ),
-          const SizedBox(width: 10),
 
-          // 4. Gallery / Showcase
-          _NavDockItem(
-            icon: Icons.photo_library_rounded,
-            isSelected: activeIndex == 3,
-            isDark: isDark,
+          // Right: History / Clock Icon (⏰)
+          GestureDetector(
             onTap: () => onTap(3),
-          ),
-          const SizedBox(width: 8),
-
-          // 5. Settings / Customize
-          _NavDockItem(
-            icon: Icons.tune_rounded,
-            isSelected: activeIndex == 4,
-            isDark: isDark,
-            onTap: () => onTap(4),
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Icon(
+                Icons.access_time_rounded,
+                size: 24,
+                color: activeIndex == 3
+                    ? (isDark ? const Color(0xFF7582FF) : const Color(0xFF5360ED))
+                    : (isDark ? Colors.white38 : const Color(0xFF8E93A6)),
+              ),
+            ),
           ),
         ],
       ),
@@ -587,62 +801,22 @@ class _FloatingCeramicDock extends StatelessWidget {
   }
 }
 
-class _NavDockItem extends StatelessWidget {
-  final IconData icon;
-  final bool isSelected;
-  final bool isDark;
-  final VoidCallback onTap;
-
-  const _NavDockItem({
-    required this.icon,
-    required this.isSelected,
-    required this.isDark,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final ext = context.ext;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? (isDark
-                  ? const Color(0xFF7582FF).withValues(alpha: 0.18)
-                  : const Color(0xFF5360ED).withValues(alpha: 0.12))
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Icon(
-          icon,
-          size: 20,
-          color: isSelected
-              ? (isDark ? const Color(0xFF7582FF) : const Color(0xFF5360ED))
-              : ext.textMuted,
-        ),
-      ),
-    );
-  }
-}
-
-class _CeramicActionPill extends StatefulWidget {
+class _CenterReferenceCircleButton extends StatefulWidget {
   final VoidCallback onTap;
   final bool isDark;
 
-  const _CeramicActionPill({
+  const _CenterReferenceCircleButton({
     required this.onTap,
     required this.isDark,
   });
 
   @override
-  State<_CeramicActionPill> createState() => _CeramicActionPillState();
+  State<_CenterReferenceCircleButton> createState() =>
+      _CenterReferenceCircleButtonState();
 }
 
-class _CeramicActionPillState extends State<_CeramicActionPill> {
+class _CenterReferenceCircleButtonState
+    extends State<_CenterReferenceCircleButton> {
   bool _pressed = false;
 
   @override
@@ -660,41 +834,57 @@ class _CeramicActionPillState extends State<_CeramicActionPill> {
         },
         onTapCancel: () => setState(() => _pressed = false),
         child: Container(
-          width: 48,
-          height: 48,
+          width: 52,
+          height: 52,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
+            color: widget.isDark ? const Color(0xFF1E2135) : Colors.white,
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: widget.isDark
                   ? [
-                      const Color(0xFF8B96FF),
-                      const Color(0xFF5E6BEE),
+                      const Color(0xFF252942),
+                      const Color(0xFF171828),
                     ]
                   : [
-                      const Color(0xFF6371F8),
-                      const Color(0xFF4350E0),
+                      const Color(0xFFFFFFFF),
+                      const Color(0xFFEFF1FA),
                     ],
             ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF5360ED).withValues(alpha: 0.45),
-                blurRadius: 14,
-                offset: const Offset(0, 5),
-              ),
-              const BoxShadow(
-                color: Colors.white24,
-                blurRadius: 4,
-                offset: Offset(-1, -1),
-              ),
-            ],
+            boxShadow: widget.isDark
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                    BoxShadow(
+                      color: const Color(0xFF7582FF).withValues(alpha: 0.25),
+                      blurRadius: 10,
+                      offset: const Offset(0, 0),
+                    ),
+                  ]
+                : [
+                    BoxShadow(
+                      color: const Color(0xFF757E9E).withValues(alpha: 0.22),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                    const BoxShadow(
+                      color: Colors.white,
+                      blurRadius: 6,
+                      offset: Offset(-2, -2),
+                    ),
+                  ],
           ),
-          child: const Center(
+          child: Center(
             child: Icon(
-              Icons.add_rounded,
-              color: Colors.white,
+              Icons.sync_rounded,
               size: 26,
+              color: widget.isDark
+                  ? const Color(0xFF7582FF)
+                  : const Color(0xFF5360ED),
             ),
           ),
         ),
