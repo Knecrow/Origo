@@ -418,45 +418,26 @@ class _SculptedWaveTopBar extends StatelessWidget {
                 height: 56,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: isDark ? const Color(0xFF1E2135) : Colors.white,
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: isDark
                         ? [
-                            const Color(0xFF2B2F4C),
-                            const Color(0xFF171828),
+                            const Color(0xFF7582FF),
+                            const Color(0xFF5360ED),
                           ]
                         : [
-                            const Color(0xFFFFFFFF),
-                            const Color(0xFFEFF1FA),
+                            const Color(0xFF5E6BEE),
+                            const Color(0xFF4350E0),
                           ],
                   ),
-                  boxShadow: isDark
-                      ? [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.6),
-                            blurRadius: 16,
-                            offset: const Offset(0, 8),
-                          ),
-                          BoxShadow(
-                            color: const Color(0xFF7582FF).withValues(alpha: 0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 0),
-                          ),
-                        ]
-                      : [
-                          BoxShadow(
-                            color: const Color(0xFF757E9E).withValues(alpha: 0.24),
-                            blurRadius: 16,
-                            offset: const Offset(0, 8),
-                          ),
-                          const BoxShadow(
-                            color: Colors.white,
-                            blurRadius: 6,
-                            offset: Offset(-2, -2),
-                          ),
-                        ],
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF5360ED).withValues(alpha: isDark ? 0.5 : 0.4),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
                 child: ClipOval(
                   child: profileProv.avatarPath != null
@@ -468,9 +449,7 @@ class _SculptedWaveTopBar extends StatelessWidget {
                           child: Icon(
                             _avatarIcons[profileProv.avatarIndex.clamp(0, _avatarIcons.length - 1)],
                             size: 26,
-                            color: isDark
-                                ? const Color(0xFF7582FF)
-                                : const Color(0xFF5360ED),
+                            color: Colors.white,
                           ),
                         ),
                 ),
@@ -702,53 +681,32 @@ class _CenterReferenceCircleButtonState
           height: 56,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: widget.isDark ? const Color(0xFF1E2135) : Colors.white,
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: widget.isDark
                   ? [
-                      const Color(0xFF2B2F4C),
-                      const Color(0xFF171828),
+                      const Color(0xFF7582FF),
+                      const Color(0xFF5360ED),
                     ]
                   : [
-                      const Color(0xFFFFFFFF),
-                      const Color(0xFFEFF1FA),
+                      const Color(0xFF5E6BEE),
+                      const Color(0xFF4350E0),
                     ],
             ),
-            boxShadow: widget.isDark
-                ? [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.6),
-                      blurRadius: 16,
-                      offset: const Offset(0, 8),
-                    ),
-                    BoxShadow(
-                      color: const Color(0xFF7582FF).withValues(alpha: 0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 0),
-                    ),
-                  ]
-                : [
-                    BoxShadow(
-                      color: const Color(0xFF757E9E).withValues(alpha: 0.24),
-                      blurRadius: 16,
-                      offset: const Offset(0, 8),
-                    ),
-                    const BoxShadow(
-                      color: Colors.white,
-                      blurRadius: 6,
-                      offset: Offset(-2, -2),
-                    ),
-                  ],
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF5360ED).withValues(alpha: widget.isDark ? 0.5 : 0.4),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
-          child: Center(
+          child: const Center(
             child: Icon(
               Icons.add_rounded,
               size: 28,
-              color: widget.isDark
-                  ? const Color(0xFF7582FF)
-                  : const Color(0xFF5360ED),
+              color: Colors.white,
             ),
           ),
         ),
