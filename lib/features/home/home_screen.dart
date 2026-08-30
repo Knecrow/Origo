@@ -313,16 +313,16 @@ class _SculptedWaveTopBar extends StatelessWidget {
     final bgColor = isDark ? const Color(0xFF141624) : const Color(0xFFFFFFFF);
     final shadowColor = isDark ? Colors.black.withValues(alpha: 0.55) : const Color(0xFF757E9E).withValues(alpha: 0.2);
     final highlightColor = isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white;
-    const barHeight = 64.0;
+    const barHeight = 68.0;
 
     return SizedBox(
-      height: barHeight + 20,
+      height: barHeight + 16,
       width: double.infinity,
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.topCenter,
         children: [
-          // Sculpted Custom Painted Wave Panel with Center Cradle Notch
+          // Sculpted Custom Painted Wave Panel with Upward Scooped Cradle Notch
           CustomPaint(
             size: Size(MediaQuery.of(context).size.width, barHeight + 10),
             painter: _TopWaveCradlePainter(
@@ -334,7 +334,7 @@ class _SculptedWaveTopBar extends StatelessWidget {
 
           // Top Bar Action Icons (Cloud & Menu)
           Positioned(
-            top: 10,
+            top: 8,
             left: 36,
             right: 36,
             child: Row(
@@ -353,7 +353,7 @@ class _SculptedWaveTopBar extends StatelessWidget {
                     child: Icon(
                       isDark ? Icons.wb_sunny_rounded : Icons.cloud_outlined,
                       size: 24,
-                      color: isDark ? const Color(0xFFFFD60A) : (isDark ? Colors.white70 : const Color(0xFF5360ED)),
+                      color: isDark ? const Color(0xFFFFD60A) : const Color(0xFF5360ED),
                     ),
                   ),
                 ),
@@ -380,9 +380,9 @@ class _SculptedWaveTopBar extends StatelessWidget {
             ),
           ),
 
-          // Center: Elevated Avatar Circle Button sitting directly inside the Wave Cradle Notch
+          // Center: Elevated Avatar Circle Button sitting inside the UPWARD Scooped Cradle Notch
           Positioned(
-            top: 18,
+            top: 24,
             child: Container(
               width: 54,
               height: 54,
@@ -445,7 +445,7 @@ class _SculptedWaveTopBar extends StatelessWidget {
   }
 }
 
-// ── Custom Top Wave Cradle Painter ────────────────────────────────────────────
+// ── Custom Top Wave Cradle Painter (Scooping UPWARDS) ──────────────────────────
 
 class _TopWaveCradlePainter extends CustomPainter {
   final Color color;
@@ -463,7 +463,7 @@ class _TopWaveCradlePainter extends CustomPainter {
     final w = size.width;
     final centerX = w / 2;
     const cradleRadius = 36.0;
-    const baselineY = 54.0;
+    const baselineY = 62.0;
 
     final path = Path();
     // Start at top-left
@@ -477,23 +477,23 @@ class _TopWaveCradlePainter extends CustomPainter {
     // Flat line towards right edge of cradle
     path.lineTo(centerX + cradleRadius + 16, baselineY);
 
-    // Sculpted organic curve dropping into cradle
+    // Sculpted organic curve rising UPWARDS into cradle
     path.cubicTo(
       centerX + cradleRadius + 6, baselineY,
-      centerX + cradleRadius, baselineY + 10,
-      centerX + cradleRadius - 2, baselineY + 18,
+      centerX + cradleRadius, baselineY - 10,
+      centerX + cradleRadius - 2, baselineY - 18,
     );
 
-    // Deep smooth cradle basin
+    // Deep smooth arched cradle basin curving UPWARD
     path.arcToPoint(
-      Offset(centerX - cradleRadius + 2, baselineY + 18),
+      Offset(centerX - cradleRadius + 2, baselineY - 18),
       radius: const Radius.circular(cradleRadius),
-      clockwise: false,
+      clockwise: true,
     );
 
-    // Sculpted organic curve rising out of cradle
+    // Sculpted organic curve sloping DOWNWARDS out of cradle
     path.cubicTo(
-      centerX - cradleRadius, baselineY + 10,
+      centerX - cradleRadius, baselineY - 10,
       centerX - cradleRadius - 6, baselineY,
       centerX - cradleRadius - 16, baselineY,
     );
