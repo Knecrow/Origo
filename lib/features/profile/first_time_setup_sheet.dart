@@ -1,5 +1,5 @@
-// lib/features/profile/first_time_setup_sheet.dart
-
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -62,15 +62,25 @@ class _FirstTimeSetupSheetState extends State<FirstTimeSetupSheet> {
 
   Future<void> _pickCustomAvatar() async {
     HapticFeedback.lightImpact();
-    final XFile? image = await _picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 85,
-    );
-    if (image != null) {
-      setState(() {
-        _customAvatarPath = image.path;
-      });
-    }
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85,
+      );
+      if (image != null) {
+        String path;
+        if (kIsWeb) {
+          final bytes = await image.readAsBytes();
+          final mime = image.mimeType ?? 'image/jpeg';
+          path = 'data:$mime;base64,${base64Encode(bytes)}';
+        } else {
+          path = image.path;
+        }
+        setState(() {
+          _customAvatarPath = path;
+        });
+      }
+    } catch (_) {}
   }
 
   Future<void> _onCompleteSetup() async {

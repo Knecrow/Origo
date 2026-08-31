@@ -1,7 +1,8 @@
-// lib/features/profile/profile_screen.dart
-
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../core/providers/items_provider.dart';
 import '../../core/providers/profile_provider.dart';
@@ -24,6 +25,132 @@ class ProfileScreen extends StatelessWidget {
     Icons.diamond_rounded,
     Icons.shield_rounded,
   ];
+
+  Future<void> _pickAvatar(BuildContext context, ImageSource source) async {
+    final picker = ImagePicker();
+    try {
+      final XFile? image = await picker.pickImage(
+        source: source,
+        imageQuality: 85,
+      );
+      if (image != null) {
+        String path;
+        if (kIsWeb) {
+          final bytes = await image.readAsBytes();
+          final mime = image.mimeType ?? 'image/jpeg';
+          path = 'data:$mime;base64,${base64Encode(bytes)}';
+        } else {
+          path = image.path;
+        }
+
+        if (!context.mounted) return;
+        final profile = context.read<ProfileProvider>();
+        await profile.saveProfile(
+          name: profile.name,
+          motto: profile.motto,
+          avatarPath: path,
+          avatarIndex: profile.avatarIndex,
+        );
+        HapticFeedback.mediumImpact();
+      }
+    } catch (_) {}
+  }
+
+  void _showAvatarOptions(BuildContext context) {
+    HapticFeedback.lightImpact();
+    final ext = context.ext;
+    final profileProv = context.read<ProfileProvider>();
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (sheetCtx) => Container(
+        decoration: BoxDecoration(
+          color: ext.cardColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          boxShadow: [
+            BoxShadow(
+              color: ext.shadowDark.withValues(alpha: 0.25),
+              blurRadius: 28,
+              offset: const Offset(0, -8),
+            ),
+          ],
+        ),
+        padding: EdgeInsets.fromLTRB(
+          20,
+          12,
+          20,
+          MediaQuery.of(context).padding.bottom + 20,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: ext.textMuted.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Profile Photo',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: ext.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Option 1: Gallery
+            ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              tileColor: ext.cardSecondaryColor,
+              leading: Icon(Icons.photo_library_rounded, color: ext.accent),
+              title: Text('Choose from Gallery', style: TextStyle(fontWeight: FontWeight.w700, color: ext.textPrimary)),
+              onTap: () {
+                Navigator.pop(sheetCtx);
+                _pickAvatar(context, ImageSource.gallery);
+              },
+            ),
+            const SizedBox(height: 8),
+            // Option 2: Camera
+            ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              tileColor: ext.cardSecondaryColor,
+              leading: Icon(Icons.camera_alt_rounded, color: ext.textPrimary),
+              title: Text('Take Photo', style: TextStyle(fontWeight: FontWeight.w700, color: ext.textPrimary)),
+              onTap: () {
+                Navigator.pop(sheetCtx);
+                _pickAvatar(context, ImageSource.camera);
+              },
+            ),
+            if (profileProv.avatarPath != null) ...[
+              const SizedBox(height: 8),
+              // Option 3: Remove
+              ListTile(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                tileColor: ext.cardSecondaryColor,
+                leading: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+                title: const Text('Remove Photo', style: TextStyle(fontWeight: FontWeight.w700, color: Colors.redAccent)),
+                onTap: () async {
+                  HapticFeedback.lightImpact();
+                  Navigator.pop(sheetCtx);
+                  await profileProv.saveProfile(
+                    name: profileProv.name,
+                    motto: profileProv.motto,
+                    avatarPath: null,
+                    avatarIndex: profileProv.avatarIndex,
+                  );
+                },
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,47 +258,85 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       child: Column(
                         children: [
-                          // Avatar Circle
-                          Container(
-                            width: 88,
-                            height: 88,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: isDark ? const Color(0xFF1B1D2E) : Colors.white,
-                              boxShadow: isDark
-                                  ? [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.6),
-                                        blurRadius: 18,
-                                        offset: const Offset(0, 8),
+                          // Avatar Circle with Camera Badge
+                          GestureDetector(
+                            onTap: () => _showAvatarOptions(context),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Container(
+                                  width: 92,
+                                  height: 92,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: isDark ? const Color(0xFF1B1D2E) : Colors.white,
+                                    boxShadow: isDark
+                                        ? [
+                                            BoxShadow(
+                                              color: Colors.black.withValues(alpha: 0.6),
+                                              blurRadius: 18,
+                                              offset: const Offset(0, 8),
+                                            ),
+                                            BoxShadow(
+                                              color: const Color(0xFF7582FF).withValues(alpha: 0.3),
+                                              blurRadius: 12,
+                                              offset: const Offset(0, 0),
+                                            ),
+                                          ]
+                                        : [
+                                            BoxShadow(
+                                              color: const Color(0xFF757E9E).withValues(alpha: 0.24),
+                                              blurRadius: 18,
+                                              offset: const Offset(0, 8),
+                                            ),
+                                          ],
+                                  ),
+                                  child: ClipOval(
+                                    child: profileProv.avatarPath != null
+                                        ? OrigoImage(
+                                            imagePath: profileProv.avatarPath!,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Center(
+                                            child: Icon(
+                                              _avatarIcons[profileProv.avatarIndex.clamp(0, _avatarIcons.length - 1)],
+                                              size: 44,
+                                              color: isDark ? const Color(0xFF8B96FF) : const Color(0xFF5360ED),
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                                // Floating Camera Badge
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(7),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: LinearGradient(
+                                        colors: ext.primaryGradient,
                                       ),
-                                      BoxShadow(
-                                        color: const Color(0xFF7582FF).withValues(alpha: 0.3),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 0),
+                                      border: Border.all(
+                                        color: isDark ? const Color(0xFF1B1D2E) : Colors.white,
+                                        width: 2.5,
                                       ),
-                                    ]
-                                  : [
-                                      BoxShadow(
-                                        color: const Color(0xFF757E9E).withValues(alpha: 0.24),
-                                        blurRadius: 18,
-                                        offset: const Offset(0, 8),
-                                      ),
-                                    ],
-                            ),
-                            child: ClipOval(
-                              child: profileProv.avatarPath != null
-                                  ? OrigoImage(
-                                      imagePath: profileProv.avatarPath!,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Center(
-                                      child: Icon(
-                                        _avatarIcons[profileProv.avatarIndex.clamp(0, _avatarIcons.length - 1)],
-                                        size: 44,
-                                        color: isDark ? const Color(0xFF8B96FF) : const Color(0xFF5360ED),
-                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: ext.accent.withValues(alpha: 0.4),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
                                     ),
+                                    child: const Icon(
+                                      Icons.camera_alt_rounded,
+                                      size: 14,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(height: 16),
