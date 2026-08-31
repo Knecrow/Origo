@@ -118,6 +118,104 @@ class _GalleryScreenState extends State<GalleryScreen> {
     );
   }
 
+  void _showSubCategoryActions(BuildContext context, String subName, int count) {
+    HapticFeedback.mediumImpact();
+    final ext = context.ext;
+    final itemsProv = context.read<ItemsProvider>();
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (sheetCtx) => Container(
+        decoration: BoxDecoration(
+          color: ext.cardColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          boxShadow: [
+            BoxShadow(
+              color: ext.shadowDark.withValues(alpha: 0.25),
+              blurRadius: 28,
+              offset: const Offset(0, -8),
+            ),
+          ],
+        ),
+        padding: EdgeInsets.fromLTRB(
+          20,
+          12,
+          20,
+          MediaQuery.of(context).padding.bottom + 20,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: ext.textMuted.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              subName,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: ext.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Action 1: Add Dream
+            ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              tileColor: ext.cardSecondaryColor,
+              leading: Icon(Icons.add_photo_alternate_rounded, color: ext.accent),
+              title: Text(
+                'Add Dream to $subName',
+                style: TextStyle(fontWeight: FontWeight.w700, color: ext.textPrimary),
+              ),
+              onTap: () {
+                Navigator.pop(sheetCtx);
+                AddItemSheet.show(
+                  context,
+                  initialCategory: widget.category,
+                  initialSubCategory: subName,
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+            // Action 2: Delete Sub-Category
+            ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              tileColor: ext.cardSecondaryColor,
+              leading: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+              title: const Text(
+                'Delete Sub-Category',
+                style: TextStyle(fontWeight: FontWeight.w700, color: Colors.redAccent),
+              ),
+              subtitle: Text(
+                'Removes $subName tag from dreams',
+                style: TextStyle(fontSize: 11.5, color: ext.textMuted),
+              ),
+              onTap: () async {
+                HapticFeedback.heavyImpact();
+                Navigator.pop(sheetCtx);
+                setState(() {
+                  _customSubCategories.remove(subName);
+                  if (_selectedSubFilter == subName) {
+                    _selectedSubFilter = null;
+                  }
+                });
+                await itemsProv.deleteSubCategory(widget.category, subName);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _confirmDeleteCategory(BuildContext context, String displayName, int count) {
     HapticFeedback.mediumImpact();
     final ext = context.ext;
@@ -304,106 +402,126 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   ],
 
                   // ── 4. Sub-Categories Section ────────────────────────────────
-                  if (allSubCategories.isNotEmpty) ...[
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Sub-Categories',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                                color: ext.textPrimary,
-                                letterSpacing: -0.4,
-                              ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Sub-Categories',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              color: ext.textPrimary,
+                              letterSpacing: -0.4,
                             ),
-                            GestureDetector(
-                              onTap: () => _promptAddSubCategory(context, displayName),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: ext.cardSecondaryColor,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.add_rounded, size: 16, color: ext.accent),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      'Add Sub',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        color: ext.accent,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    // Horizontal Filter Pills Strip
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: SizedBox(
-                          height: 38,
-                          child: ListView(
-                            scrollDirection: Axis.horizontal,
-                            physics: const BouncingScrollPhysics(),
-                            children: [
-                              // "All" Pill
-                              _CategoryFilterPill(
-                                label: 'All (${items.length})',
-                                isSelected: _selectedSubFilter == null,
-                                onTap: () {
-                                  HapticFeedback.selectionClick();
-                                  setState(() => _selectedSubFilter = null);
-                                },
-                              ),
-                              // Subcategory Pills
-                              ...allSubCategories.map((sub) {
-                                final count = items.where((i) => i.subCategory == sub).length;
-                                return _CategoryFilterPill(
-                                  label: '$sub ($count)',
-                                  isSelected: _selectedSubFilter == sub,
-                                  onTap: () {
-                                    HapticFeedback.selectionClick();
-                                    setState(() {
-                                      _selectedSubFilter = _selectedSubFilter == sub ? null : sub;
-                                    });
-                                  },
-                                );
-                              }),
-                            ],
                           ),
-                        ),
+                          GestureDetector(
+                            onTap: () => _promptAddSubCategory(context, displayName),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: ext.cardSecondaryColor,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.add_rounded, size: 16, color: ext.accent),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Add Sub',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: ext.accent,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 16)),
-                  ],
+                  ),
+
+                  // Subcategory Visual Cards Grid
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    sliver: SliverGrid(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 1.25,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, idx) {
+                          if (idx == allSubCategories.length) {
+                            // "+ Add Sub-Category" Card
+                            return _AddSubCategoryCard(
+                              onTap: () => _promptAddSubCategory(context, displayName),
+                            );
+                          }
+
+                          final subName = allSubCategories[idx];
+                          final subItems = items.where((i) => i.subCategory == subName).toList();
+                          final latestSub = subItems.isNotEmpty ? subItems.first : null;
+                          final isSelected = _selectedSubFilter == subName;
+
+                          return _SubCategoryCard(
+                            title: subName,
+                            count: subItems.length,
+                            latestItem: latestSub,
+                            isSelected: isSelected,
+                            onLongPress: () => _showSubCategoryActions(context, subName, subItems.length),
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              setState(() {
+                                _selectedSubFilter = _selectedSubFilter == subName ? null : subName;
+                              });
+                            },
+                          );
+                        },
+                        childCount: allSubCategories.length + 1,
+                      ),
+                    ),
+                  ),
+
+                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
 
                   // ── 5. Dreams Masonry Grid Feed ──────────────────────────────
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-                      child: Text(
-                        _selectedSubFilter == null
-                            ? 'All $displayName Visions'
-                            : '$_selectedSubFilter Visions',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: ext.textPrimary,
-                          letterSpacing: -0.3,
-                        ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _selectedSubFilter == null
+                                ? 'All $displayName Visions'
+                                : '$_selectedSubFilter Visions',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: ext.textPrimary,
+                              letterSpacing: -0.3,
+                            ),
+                          ),
+                          if (_selectedSubFilter != null)
+                            GestureDetector(
+                              onTap: () => setState(() => _selectedSubFilter = null),
+                              child: Text(
+                                'Clear Filter',
+                                style: TextStyle(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: ext.accent,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ),
@@ -497,6 +615,265 @@ class _GalleryScreenState extends State<GalleryScreen> {
               isSingleCol: _columns == 1,
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── SubCategory Visual Card ───────────────────────────────────────────────────
+
+class _SubCategoryCard extends StatefulWidget {
+  final String title;
+  final int count;
+  final OrigoItem? latestItem;
+  final bool isSelected;
+  final VoidCallback onTap;
+  final VoidCallback onLongPress;
+
+  const _SubCategoryCard({
+    required this.title,
+    required this.count,
+    required this.latestItem,
+    required this.isSelected,
+    required this.onTap,
+    required this.onLongPress,
+  });
+
+  @override
+  State<_SubCategoryCard> createState() => _SubCategoryCardState();
+}
+
+class _SubCategoryCardState extends State<_SubCategoryCard> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final ext = context.ext;
+    final hasImage = widget.latestItem != null;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      onLongPress: widget.onLongPress,
+      child: AnimatedScale(
+        scale: _pressed ? 0.96 : 1.0,
+        duration: const Duration(milliseconds: 130),
+        curve: Curves.easeOutCubic,
+        child: Container(
+          decoration: BoxDecoration(
+            color: ext.cardSecondaryColor,
+            borderRadius: BorderRadius.circular(20),
+            border: widget.isSelected
+                ? Border.all(color: ext.accent, width: 2)
+                : null,
+            boxShadow: isDark
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFF080912).withValues(alpha: 0.5),
+                      blurRadius: 12,
+                      offset: const Offset(0, 5),
+                    ),
+                  ]
+                : [
+                    BoxShadow(
+                      color: const Color(0xFF757E9E).withValues(alpha: 0.14),
+                      blurRadius: 14,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(18),
+            child: hasImage
+                ? Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      OrigoImage(
+                        imagePath: widget.latestItem!.imagePath,
+                        fit: BoxFit.cover,
+                      ),
+                      // Adaptive Ambient Scrim
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: AppColors.adaptiveScrim(
+                            null,
+                            isDark,
+                          ),
+                        ),
+                      ),
+                      // Content
+                      Positioned(
+                        left: 12,
+                        right: 12,
+                        bottom: 10,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              widget.title,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.2,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black54,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${widget.count} ${widget.count == 1 ? 'dream' : 'dreams'}',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.8),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: ext.cardColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.folder_open_rounded,
+                            size: 18,
+                            color: ext.accent,
+                          ),
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.title,
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w700,
+                                color: ext.textPrimary,
+                                letterSpacing: -0.2,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${widget.count} ${widget.count == 1 ? 'dream' : 'dreams'}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: ext.textMuted,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Add Sub-Category Card ─────────────────────────────────────────────────────
+
+class _AddSubCategoryCard extends StatefulWidget {
+  final VoidCallback onTap;
+
+  const _AddSubCategoryCard({required this.onTap});
+
+  @override
+  State<_AddSubCategoryCard> createState() => _AddSubCategoryCardState();
+}
+
+class _AddSubCategoryCardState extends State<_AddSubCategoryCard> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final ext = context.ext;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.96 : 1.0,
+        duration: const Duration(milliseconds: 130),
+        curve: Curves.easeOutCubic,
+        child: Container(
+          decoration: BoxDecoration(
+            color: ext.cardSecondaryColor.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: ext.textMuted.withValues(alpha: 0.2),
+              width: 1.5,
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF282C46) : Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: ext.shadowDark.withValues(alpha: 0.12),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.add_rounded,
+                  size: 20,
+                  color: ext.accent,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'New Sub',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                  color: ext.textPrimary,
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -843,58 +1220,6 @@ class _CategoryWaveCradlePainter extends CustomPainter {
     return oldDelegate.color != color ||
         oldDelegate.shadowColor != shadowColor ||
         oldDelegate.highlightColor != highlightColor;
-  }
-}
-
-// ── Category Filter Capsule Pill ──────────────────────────────────────────────
-
-class _CategoryFilterPill extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _CategoryFilterPill({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final ext = context.ext;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.only(right: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? ext.accent : ext.cardSecondaryColor,
-          borderRadius: BorderRadius.circular(19),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: ext.accent.withValues(alpha: 0.35),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w700,
-              color: isSelected ? Colors.white : ext.textPrimary,
-              letterSpacing: -0.2,
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
 
