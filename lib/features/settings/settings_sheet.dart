@@ -114,14 +114,12 @@ class SettingsSheet extends StatelessWidget {
                   Row(
                     children: [
                       ClayIconBadge(
-                        icon: themeProv.isDark
-                            ? Icons.dark_mode_rounded
-                            : Icons.wb_sunny_rounded,
+                        icon: Icons.contrast_rounded,
                         size: 18,
                         padding: 8,
                         iconColor: themeProv.isDark
                             ? const Color(0xFFFFD60A)
-                            : ext.textPrimary,
+                            : ext.accent,
                       ),
                       const SizedBox(width: 14),
                       Column(

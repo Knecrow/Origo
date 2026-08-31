@@ -163,7 +163,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                   // Theme Toggle
                   ClayIconBadge(
-                    icon: isDark ? Icons.wb_sunny_rounded : Icons.cloud_outlined,
+                    icon: Icons.contrast_rounded,
                     size: 19,
                     padding: 9,
                     iconColor: isDark ? const Color(0xFFFFD60A) : const Color(0xFF5360ED),

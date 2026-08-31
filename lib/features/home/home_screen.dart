@@ -374,7 +374,7 @@ class _SculptedWaveTopBar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Left: Cloud / Theme Toggle Button
+                // Left: Editorial Split Eclipse Theme Toggle Button
                 GestureDetector(
                   onTap: () {
                     HapticFeedback.selectionClick();
@@ -384,8 +384,8 @@ class _SculptedWaveTopBar extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(12),
                     child: Icon(
-                      isDark ? Icons.wb_sunny_rounded : Icons.cloud_outlined,
-                      size: 24,
+                      Icons.contrast_rounded,
+                      size: 22,
                       color: isDark ? const Color(0xFFFFD60A) : ext.accent,
                     ),
                   ),
