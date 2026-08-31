@@ -233,26 +233,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
               },
             ),
             const SizedBox(height: 8),
-            // Action 2: Add Dream
-            ListTile(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              tileColor: ext.cardSecondaryColor,
-              leading: Icon(Icons.add_photo_alternate_rounded, color: ext.textPrimary),
-              title: Text(
-                'Add Dream to $subName',
-                style: TextStyle(fontWeight: FontWeight.w700, color: ext.textPrimary),
-              ),
-              onTap: () {
-                Navigator.pop(sheetCtx);
-                AddItemSheet.show(
-                  context,
-                  initialCategory: widget.category,
-                  initialSubCategory: subName,
-                );
-              },
-            ),
-            const SizedBox(height: 8),
-            // Action 3: Delete Sub-Category
+            // Action 2: Delete Sub-Category
             ListTile(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               tileColor: ext.cardSecondaryColor,
