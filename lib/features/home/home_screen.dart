@@ -12,7 +12,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/utils/smooth_page_route.dart';
 import '../../core/widgets/clay_icon_badge.dart';
 import '../../core/widgets/origo_image.dart';
-import '../add/add_item_sheet.dart';
+import '../add/add_category_sheet.dart';
 import '../detail/detail_screen.dart';
 import '../gallery/gallery_screen.dart';
 import '../profile/profile_screen.dart';
@@ -70,16 +70,16 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }
         break;
-      case 2: // Central Elevated Button (Add Dream)
-        AddItemSheet.show(context);
+      case 2: // Central Elevated Button (Add Category / Collection)
+        AddCategorySheet.show(context);
         break;
       case 3: // Clock / History / Gallery
         final categories = context.read<ItemsProvider>().categories;
         if (categories.isNotEmpty) {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (_) => GalleryScreen(category: categories.first.key),
+            SmoothPageRoute(
+              child: GalleryScreen(category: categories.first.key),
             ),
           );
         }
