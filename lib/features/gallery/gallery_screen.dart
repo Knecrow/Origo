@@ -364,49 +364,22 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   // ── 2. Category Title Header ─────────────────────────────────
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            displayName,
-                            style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w800,
-                              color: ext.textPrimary,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '${items.length} ${items.length == 1 ? 'vision' : 'visions'} in collection',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: ext.textMuted,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 8),
+                      child: Text(
+                        displayName,
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800,
+                          color: ext.textPrimary,
+                          letterSpacing: -0.5,
+                        ),
                       ),
                     ),
                   ),
 
                   // ── 3. Featured Section (Category Spotlight) ─────────────────
                   if (items.isNotEmpty) ...[
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 12, 20, 10),
-                        child: Text(
-                          'Featured in $displayName',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                            color: ext.textPrimary,
-                            letterSpacing: -0.3,
-                          ),
-                        ),
-                      ),
-                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 6)),
                     SliverToBoxAdapter(
                       child: SpotlightCarousel(
                         items: items.where((i) => i.isSpotlight).isNotEmpty

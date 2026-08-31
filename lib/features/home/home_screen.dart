@@ -222,20 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                   ] else ...[
                     // ── Featured Section (Spotlight Carousel) ─────────────────
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
-                        child: Text(
-                          'Featured',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
-                            color: ext.textPrimary,
-                            letterSpacing: -0.4,
-                          ),
-                        ),
-                      ),
-                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 8)),
                     SliverToBoxAdapter(
                       child: itemsProv.loading
                           ? const SizedBox(
@@ -244,36 +231,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           : SpotlightCarousel(items: spotlightItems),
                     ),
 
-                    // ── Categories Section Header ─────────────────────────────
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 26, 20, 14),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.alphabetic,
-                          children: [
-                            Text(
-                              'Categories',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w800,
-                                color: ext.textPrimary,
-                                letterSpacing: -0.4,
-                              ),
-                            ),
-                            Text(
-                              '${itemsProv.categories.length}',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: ext.textMuted,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
                     // ── Dynamic Editorial Bento Grid ──────────────────────────
                     SliverToBoxAdapter(

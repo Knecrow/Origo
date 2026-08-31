@@ -235,29 +235,15 @@ class _SubCategoryViewScreenState extends State<SubCategoryViewScreen> {
                   // ── 2. Subcategory Header Title ──────────────────────────────
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 14),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.subCategory,
-                            style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w800,
-                              color: ext.textPrimary,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '${subItems.length} ${subItems.length == 1 ? 'vision' : 'visions'} in collection',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: ext.textMuted,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                      child: Text(
+                        widget.subCategory,
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800,
+                          color: ext.textPrimary,
+                          letterSpacing: -0.5,
+                        ),
                       ),
                     ),
                   ),
