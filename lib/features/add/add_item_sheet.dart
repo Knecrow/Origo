@@ -6,13 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import '../../core/models/origo_category.dart';
-import '../../core/models/origo_item.dart';
 import '../../core/providers/items_provider.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/origo_image.dart';
-import 'add_category_sheet.dart';
 
 class AddItemSheet extends StatefulWidget {
   final String? initialCategory;
@@ -48,30 +44,15 @@ class AddItemSheet extends StatefulWidget {
 class _AddItemSheetState extends State<AddItemSheet> {
   final _formKey = GlobalKey<FormState>();
   final _titleCtrl = TextEditingController();
-  final _timeframeCtrl = TextEditingController();
-  final _notesCtrl = TextEditingController();
 
-  String? _selectedCategory;
-  String? _selectedSubCategory;
   String? _pickedImagePath;
-  bool _isSpotlight = false;
-  bool _showMoreDetails = false;
   bool _saving = false;
 
   final _picker = ImagePicker();
 
   @override
-  void initState() {
-    super.initState();
-    _selectedCategory = widget.initialCategory;
-    _selectedSubCategory = widget.initialSubCategory;
-  }
-
-  @override
   void dispose() {
     _titleCtrl.dispose();
-    _timeframeCtrl.dispose();
-    _notesCtrl.dispose();
     super.dispose();
   }
 
@@ -97,28 +78,71 @@ class _AddItemSheetState extends State<AddItemSheet> {
     }
   }
 
-  Future<void> _openAddCategory() async {
-    HapticFeedback.lightImpact();
-    await AddCategorySheet.show(context);
-    if (!mounted) return;
-    final latestCats = context.read<ItemsProvider>().categories;
-    if (latestCats.isNotEmpty) {
-      setState(() {
-        _selectedCategory = latestCats.last.key;
-        _selectedSubCategory = null;
-      });
-    }
+  void _promptUrlInput() {
+    final ext = context.ext;
+    final urlCtrl = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        backgroundColor: ext.cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(
+          'Image URL',
+          style: TextStyle(
+            color: ext.textPrimary,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: TextField(
+          controller: urlCtrl,
+          autofocus: true,
+          style: TextStyle(color: ext.textPrimary),
+          decoration: InputDecoration(
+            hintText: 'https://example.com/image.jpg',
+            filled: true,
+            fillColor: ext.cardSecondaryColor,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: Text('Cancel', style: TextStyle(color: ext.textMuted)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final val = urlCtrl.text.trim();
+              if (val.isNotEmpty) {
+                setState(() => _pickedImagePath = val);
+                Navigator.pop(dialogCtx);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ext.accent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+            child: const Text('Use Image'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _save() async {
     if (_pickedImagePath == null) {
-      _showError('Please select an image for your dream');
+      _showError('Please add a photo for your dream');
       return;
     }
     if (!_formKey.currentState!.validate()) return;
 
     final categories = context.read<ItemsProvider>().categories;
-    final cat = _selectedCategory ??
+    final cat = widget.initialCategory ??
         (categories.isNotEmpty ? categories.first.key : 'Home');
 
     setState(() => _saving = true);
@@ -126,17 +150,14 @@ class _AddItemSheetState extends State<AddItemSheet> {
       await context.read<ItemsProvider>().addItem(
             title: _titleCtrl.text.trim(),
             category: cat,
-            subCategory: _selectedSubCategory,
+            subCategory: widget.initialSubCategory,
             imagePath: _pickedImagePath!,
-            targetTimeframe: _timeframeCtrl.text,
-            motivationNotes: _notesCtrl.text,
-            isSpotlight: _isSpotlight,
           );
       HapticFeedback.mediumImpact();
       if (mounted) Navigator.pop(context);
     } catch (e) {
       setState(() => _saving = false);
-      _showError('Failed to save item. Please try again.');
+      _showError('Failed to save dream. Please try again.');
     }
   }
 
@@ -150,12 +171,6 @@ class _AddItemSheetState extends State<AddItemSheet> {
   Widget build(BuildContext context) {
     final ext = context.ext;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-    final itemsProv = context.watch<ItemsProvider>();
-    final categories = itemsProv.categories;
-
-    final activeCategory = _selectedCategory ??
-        (categories.isNotEmpty ? categories.first.key : 'Home');
-    final suggestedSubs = kSuggestedSubCategories[activeCategory] ?? [];
 
     return Container(
       decoration: BoxDecoration(
@@ -223,23 +238,30 @@ class _AddItemSheetState extends State<AddItemSheet> {
               ),
               const SizedBox(height: 16),
 
-              // 1. Image Drop Box
+              // 1. Photo Adder Box
               _ImagePickerWidget(
                 imagePath: _pickedImagePath,
                 onTap: _pickImage,
+                onUrlTap: _promptUrlInput,
+                onRemove: () => setState(() => _pickedImagePath = null),
               ),
               const SizedBox(height: 18),
 
-              // 2. Title Field
+              // 2. Dream Name Field
               TextFormField(
                 controller: _titleCtrl,
+                autofocus: _pickedImagePath != null,
                 style: TextStyle(
                   color: ext.textPrimary,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'What is your vision? (e.g. Villa in Como)',
+                  hintText: 'Dream Name (e.g. Lake Como Villa)',
+                  hintStyle: TextStyle(
+                    color: ext.textMuted.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w400,
+                  ),
                   filled: true,
                   fillColor: ext.cardSecondaryColor,
                   border: OutlineInputBorder(
@@ -247,250 +269,20 @@ class _AddItemSheetState extends State<AddItemSheet> {
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 14),
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                 ),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {
-                    return 'Please enter a title for your dream';
+                    return 'Please enter a name for your dream';
                   }
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
-
-              // 3. Category Selector Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'COLLECTION',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.2,
-                      color: ext.textMuted,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: _openAddCategory,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: ext.cardSecondaryColor,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.add_rounded, size: 13, color: ext.accent),
-                          const SizedBox(width: 4),
-                          Text(
-                            'New Collection',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: ext.accent,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              _CategorySelector(
-                categories: categories,
-                selected: activeCategory,
-                onChanged: (c) => setState(() {
-                  _selectedCategory = c;
-                  _selectedSubCategory = null;
-                }),
-              ),
-
-              // Sub-Categories Chips (if available)
-              if (suggestedSubs.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                SizedBox(
-                  height: 32,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: suggestedSubs.length,
-                    separatorBuilder: (context, _) => const SizedBox(width: 8),
-                    itemBuilder: (context, idx) {
-                      final sub = suggestedSubs[idx];
-                      final isSelected = sub == _selectedSubCategory;
-                      return GestureDetector(
-                        onTap: () {
-                          HapticFeedback.selectionClick();
-                          setState(() {
-                            _selectedSubCategory = isSelected ? null : sub;
-                          });
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 140),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? ext.accent
-                                : ext.cardSecondaryColor,
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Center(
-                            child: Text(
-                              sub,
-                              style: TextStyle(
-                                fontSize: 11.5,
-                                fontWeight: isSelected
-                                    ? FontWeight.w700
-                                    : FontWeight.w600,
-                                color: isSelected
-                                    ? Colors.white
-                                    : ext.textPrimary,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-              const SizedBox(height: 16),
-
-              // 4. Optional Details Collapsible Accordion
-              GestureDetector(
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  setState(() => _showMoreDetails = !_showMoreDetails);
-                },
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: ext.cardSecondaryColor,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            _showMoreDetails
-                                ? Icons.tune_rounded
-                                : Icons.more_horiz_rounded,
-                            size: 16,
-                            color: ext.textMuted,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            _showMoreDetails ? 'Hide Options' : 'More Options (Timeframe, Notes, Spotlight)',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: ext.textMuted,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Icon(
-                        _showMoreDetails
-                            ? Icons.keyboard_arrow_up_rounded
-                            : Icons.keyboard_arrow_down_rounded,
-                        color: ext.textMuted,
-                        size: 18,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Expanded Details
-              if (_showMoreDetails) ...[
-                const SizedBox(height: 14),
-                // Timeframe Field
-                TextFormField(
-                  controller: _timeframeCtrl,
-                  style: TextStyle(color: ext.textPrimary, fontSize: 14),
-                  decoration: InputDecoration(
-                    hintText: 'Target Timeframe (e.g. 2027, In 3 Years)',
-                    filled: true,
-                    fillColor: ext.cardSecondaryColor,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 12),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                // Motivation Notes Field
-                TextFormField(
-                  controller: _notesCtrl,
-                  maxLines: 2,
-                  style: TextStyle(color: ext.textPrimary, fontSize: 14),
-                  decoration: InputDecoration(
-                    hintText: 'Personal Motivation / Affirmation (Optional)',
-                    filled: true,
-                    fillColor: ext.cardSecondaryColor,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 12),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                // Spotlight Switcher
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: ext.cardSecondaryColor,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.auto_awesome_rounded,
-                            size: 16,
-                            color: _isSpotlight
-                                ? const Color(0xFFFFD700)
-                                : ext.textMuted,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            'Featured Spotlight',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: ext.textPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Switch.adaptive(
-                        value: _isSpotlight,
-                        activeTrackColor: ext.accent,
-                        onChanged: (v) {
-                          HapticFeedback.selectionClick();
-                          setState(() => _isSpotlight = v);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
               const SizedBox(height: 20),
 
-              // 5. Submit Button (Gradient Unified)
+              // 3. Save Button
               GestureDetector(
                 onTap: _saving ? null : _save,
                 child: Container(
@@ -511,14 +303,21 @@ class _AddItemSheetState extends State<AddItemSheet> {
                   ),
                   child: Center(
                     child: _saving
-                        ? const CircularProgressIndicator(color: Colors.white)
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2.5,
+                            ),
+                          )
                         : const Text(
                             'Add Dream',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
                               color: Colors.white,
-                              letterSpacing: -0.2,
+                              letterSpacing: 0.2,
                             ),
                           ),
                   ),
@@ -532,181 +331,165 @@ class _AddItemSheetState extends State<AddItemSheet> {
   }
 }
 
-// ── Minimalist Image Picker Widget ───────────────────────────────────────────
+// ── Ultra-Clean Image Picker Widget ───────────────────────────────────────────
 
 class _ImagePickerWidget extends StatelessWidget {
   final String? imagePath;
   final VoidCallback onTap;
+  final VoidCallback onUrlTap;
+  final VoidCallback onRemove;
 
-  const _ImagePickerWidget({required this.imagePath, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final ext = context.ext;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        height: imagePath != null ? 180 : 120,
-        decoration: BoxDecoration(
-          color: ext.cardSecondaryColor,
-          borderRadius: BorderRadius.circular(22),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(22),
-          child: imagePath != null
-              ? Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    OrigoImage(imagePath: imagePath!, fit: BoxFit.cover),
-                    Positioned(
-                      bottom: 10,
-                      right: 10,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.65),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.photo_library_rounded,
-                                color: Colors.white, size: 12),
-                            SizedBox(width: 4),
-                            Text(
-                              'Change',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              : Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: ext.accent.withValues(alpha: 0.14),
-                        ),
-                        child: Icon(
-                          Icons.add_photo_alternate_rounded,
-                          color: ext.accent,
-                          size: 22,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Select Dream Photo',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: ext.textPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Compact Category Selector ────────────────────────────────────────────────
-
-class _CategorySelector extends StatelessWidget {
-  final List<OrigoCategory> categories;
-  final String selected;
-  final ValueChanged<String> onChanged;
-
-  const _CategorySelector({
-    required this.categories,
-    required this.selected,
-    required this.onChanged,
+  const _ImagePickerWidget({
+    required this.imagePath,
+    required this.onTap,
+    required this.onUrlTap,
+    required this.onRemove,
   });
 
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return SizedBox(
-      height: 44,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: categories.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (context, idx) {
-          final cat = categories[idx];
-          final isSelected = cat.key == selected;
-
-          return GestureDetector(
-            onTap: () {
-              HapticFeedback.selectionClick();
-              onChanged(cat.key);
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 160),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? (Theme.of(context).brightness == Brightness.dark
-                        ? const Color(0xFF7582FF)
-                        : const Color(0xFF5360ED))
-                    : ext.bgColor,
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: isSelected
-                    ? [
-                        BoxShadow(
-                          color: const Color(0xFF5360ED).withValues(alpha: 0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 3),
-                        ),
-                      ]
-                    : null,
+    if (imagePath != null) {
+      return Container(
+        height: 180,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(22),
+          color: ext.cardSecondaryColor,
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              OrigoImage(
+                imagePath: imagePath!,
+                fit: BoxFit.cover,
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ShaderMask(
-                    shaderCallback: (bounds) => LinearGradient(
-                      colors: isSelected
-                          ? [Colors.white, Colors.white]
-                          : AppColors.getCategoryGradient(cat.key),
-                    ).createShader(bounds),
-                    child: Icon(
-                      cat.icon,
-                      size: 15,
-                      color: Colors.white,
+              // Change photo tap area
+              GestureDetector(
+                onTap: onTap,
+                behavior: HitTestBehavior.translucent,
+              ),
+              // Remove / Replace badges
+              Positioned(
+                top: 10,
+                right: 10,
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: onTap,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.photo_library_rounded, size: 14, color: Colors.white),
+                            SizedBox(width: 4),
+                            Text('Change', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 7),
-                  Text(
-                    cat.displayName,
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight:
-                          isSelected ? FontWeight.w700 : FontWeight.w600,
-                      color: isSelected ? Colors.white : ext.textPrimary,
+                    const SizedBox(width: 6),
+                    GestureDetector(
+                      onTap: onRemove,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.close_rounded, size: 14, color: Colors.white),
+                      ),
                     ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      height: 150,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: ext.cardSecondaryColor,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: ext.textMuted.withValues(alpha: isDark ? 0.18 : 0.12),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          GestureDetector(
+            onTap: onTap,
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: ext.primaryGradient,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: ext.accent.withValues(alpha: 0.35),
+                    blurRadius: 14,
+                    offset: const Offset(0, 5),
                   ),
                 ],
               ),
+              child: const Icon(
+                Icons.add_a_photo_rounded,
+                size: 26,
+                color: Colors.white,
+              ),
             ),
-          );
-        },
+          ),
+          const SizedBox(height: 12),
+          GestureDetector(
+            onTap: onTap,
+            child: Text(
+              'Tap to Upload Photo',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: ext.textPrimary,
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'from gallery, camera or ',
+                style: TextStyle(fontSize: 11.5, color: ext.textMuted),
+              ),
+              GestureDetector(
+                onTap: onUrlTap,
+                child: Text(
+                  'paste URL',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    color: ext.accent,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
