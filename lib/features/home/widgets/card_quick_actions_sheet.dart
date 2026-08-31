@@ -7,10 +7,7 @@ import '../../../core/models/origo_category.dart';
 import '../../../core/providers/items_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/utils/smooth_page_route.dart';
 import '../../../core/widgets/clay_icon_badge.dart';
-import '../../add/add_item_sheet.dart';
-import '../../gallery/gallery_screen.dart';
 
 class CardQuickActionsSheet extends StatelessWidget {
   final OrigoCategory category;
@@ -187,40 +184,7 @@ class CardQuickActionsSheet extends StatelessWidget {
           ),
           const SizedBox(height: 10),
 
-          // Action 2: Add Dream
-          _ActionTile(
-            icon: Icons.add_photo_alternate_rounded,
-            iconColor: ext.textPrimary,
-            title: 'Add Dream to ${category.displayName}',
-            subtitle: 'Capture a new aspiration for this category',
-            onTap: () {
-              HapticFeedback.lightImpact();
-              Navigator.pop(context);
-              AddItemSheet.show(context, initialCategory: category.key);
-            },
-          ),
-          const SizedBox(height: 10),
-
-          // Action 3: View Gallery
-          _ActionTile(
-            icon: Icons.grid_view_rounded,
-            iconColor: ext.textPrimary,
-            title: 'Open Full Gallery',
-            subtitle: 'Browse all dreams and visual inspirations',
-            onTap: () {
-              HapticFeedback.lightImpact();
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                SmoothPageRoute(
-                  child: GalleryScreen(category: category.key),
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 10),
-
-          // Action 4: Delete Category
+          // Action 2: Delete Category
           _ActionTile(
             icon: Icons.delete_outline_rounded,
             iconColor: AppColors.error,
