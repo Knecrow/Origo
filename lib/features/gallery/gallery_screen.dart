@@ -274,8 +274,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
         itemsProv.categoryIcons[widget.category] ?? Icons.category_rounded;
     final displayName =
         itemsProv.categoryDisplayNames[widget.category] ?? widget.category.toUpperCase();
-    final accentColor =
-        AppColors.categoryColors[widget.category] ?? ext.accent;
 
     // Extract subcategories from items and suggestions
     final itemSubs = items
@@ -402,13 +400,15 @@ class _GalleryScreenState extends State<GalleryScreen> {
                     ),
                   ],
 
-                  // ── 4. Sub-Categories Section ────────────────────────────────
+                  // ── 4. Sub-Categories Section (Editorial Bento Grid) ─────────
                   if (allSubCategories.isNotEmpty) ...[
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 14),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
                           children: [
                             Text(
                               'Sub-Categories',
@@ -432,15 +432,15 @@ class _GalleryScreenState extends State<GalleryScreen> {
                       ),
                     ),
 
-                    // Subcategory Visual Cards Grid (Matching Home Page CategoryCard)
+                    // Subcategory Bento Grid (Exact EditorialBentoGrid Cards)
                     SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       sliver: SliverGrid(
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           crossAxisSpacing: 14,
                           mainAxisSpacing: 14,
-                          childAspectRatio: 0.88,
+                          childAspectRatio: 1.0,
                         ),
                         delegate: SliverChildBuilderDelegate(
                           (context, idx) {
@@ -448,12 +448,12 @@ class _GalleryScreenState extends State<GalleryScreen> {
                             final subItems = items.where((i) => i.subCategory == subName).toList();
                             final latestSub = subItems.isNotEmpty ? subItems.first : null;
 
-                            return _ExactCategoryCard(
+                            return _BentoSubCategoryCard(
                               title: subName,
                               itemCount: subItems.length,
                               latestItem: latestSub,
-                              accentColor: accentColor,
-                              icon: icon,
+                              categoryKey: widget.category,
+                              categoryIcon: icon,
                               onLongPress: () => _showSubCategoryActions(context, subName, subItems.length),
                               onTap: () {
                                 HapticFeedback.lightImpact();
@@ -470,7 +470,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                       ),
                     ),
 
-                    const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                    const SliverToBoxAdapter(child: SizedBox(height: 28)),
                   ],
 
                   // ── 5. Dreams Masonry Grid Feed ──────────────────────────────
@@ -596,123 +596,163 @@ class _GalleryScreenState extends State<GalleryScreen> {
   }
 }
 
-// ── Exact Home Page Category Card Structure for Subcategories ─────────────────
+// ── Exact Home Page Bento Square Card for Subcategories ───────────────────────
 
-class _ExactCategoryCard extends StatelessWidget {
+class _BentoSubCategoryCard extends StatefulWidget {
   final String title;
   final int itemCount;
   final OrigoItem? latestItem;
-  final Color accentColor;
-  final IconData icon;
+  final String categoryKey;
+  final IconData categoryIcon;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
 
-  const _ExactCategoryCard({
+  const _BentoSubCategoryCard({
     required this.title,
     required this.itemCount,
     required this.latestItem,
-    required this.accentColor,
-    required this.icon,
+    required this.categoryKey,
+    required this.categoryIcon,
     required this.onTap,
     required this.onLongPress,
   });
 
   @override
+  State<_BentoSubCategoryCard> createState() => _BentoSubCategoryCardState();
+}
+
+class _BentoSubCategoryCardState extends State<_BentoSubCategoryCard> {
+  bool _pressed = false;
+
+  @override
   Widget build(BuildContext context) {
     final ext = context.ext;
-    final hasImage = latestItem != null;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final hasImage = widget.latestItem != null;
 
     return GestureDetector(
-      onTap: onTap,
-      onLongPress: onLongPress,
-      child: Container(
-        decoration: BoxDecoration(
-          color: ext.cardColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Stack(
-            children: [
-              // Background image or gradient
-              Positioned.fill(
-                child: hasImage
-                    ? OrigoImage(
-                        imagePath: latestItem!.imagePath,
-                        fit: BoxFit.cover,
-                        errorWidget: _GradientBg(color: accentColor),
-                      )
-                    : _GradientBg(color: accentColor),
-              ),
-              // Dark ambient overlay
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.black.withValues(alpha: hasImage ? 0.3 : 0.1),
-                        Colors.black.withValues(alpha: hasImage ? 0.6 : 0.3),
-                      ],
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      onLongPress: widget.onLongPress,
+      child: AnimatedScale(
+        scale: _pressed ? 0.97 : 1.0,
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOutCubic,
+        child: Container(
+          decoration: BoxDecoration(
+            color: ext.cardColor,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: isDark
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFF080912).withValues(alpha: 0.6),
+                      blurRadius: 16,
+                      offset: const Offset(0, 8),
                     ),
-                  ),
-                ),
-              ),
-              // Content
-              Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ClayIconBadge(
-                          icon: icon,
-                          size: 20,
-                          padding: 10,
-                          iconColor: Colors.white,
-                          badgeColor: accentColor.withValues(alpha: 0.7),
-                        ),
-                        if (itemCount > 0)
-                          _CountBadge(count: itemCount),
-                      ],
+                    BoxShadow(
+                      color: Colors.white.withValues(alpha: 0.04),
+                      blurRadius: 2,
+                      offset: const Offset(-1, -1),
                     ),
-                    const Spacer(),
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.3,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black38,
-                            blurRadius: 4,
-                            offset: Offset(0, 1),
-                          )
-                        ],
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                  ]
+                : [
+                    BoxShadow(
+                      color: const Color(0xFF757E9E).withValues(alpha: 0.16),
+                      blurRadius: 18,
+                      offset: const Offset(0, 8),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      itemCount == 0
-                          ? 'No dreams'
-                          : '$itemCount dream${itemCount == 1 ? '' : 's'}',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    const BoxShadow(
+                      color: Colors.white,
+                      blurRadius: 6,
+                      offset: Offset(-2, -2),
                     ),
                   ],
-                ),
-              ),
-            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: hasImage
+                ? Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      OrigoImage(
+                        imagePath: widget.latestItem!.imagePath,
+                        fit: BoxFit.cover,
+                        errorWidget: _EmptySubInvitationContent(
+                          title: widget.title,
+                          categoryKey: widget.categoryKey,
+                          categoryIcon: widget.categoryIcon,
+                        ),
+                      ),
+
+                      // Adaptive Ambient Scrim
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: AppColors.adaptiveScrim(
+                            null,
+                            isDark,
+                          ),
+                        ),
+                      ),
+
+                      // Top right corner pill
+                      if (widget.itemCount > 0)
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.45),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Text(
+                              '${widget.itemCount} ${widget.itemCount == 1 ? 'Asset' : 'Assets'}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.4,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                      // Bottom left title
+                      Positioned(
+                        left: 14,
+                        right: 14,
+                        bottom: 14,
+                        child: Text(
+                          widget.title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.6,
+                            height: 1.25,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black87,
+                                blurRadius: 8,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  )
+                : _EmptySubInvitationContent(
+                    title: widget.title,
+                    categoryKey: widget.categoryKey,
+                    categoryIcon: widget.categoryIcon,
+                  ),
           ),
         ),
       ),
@@ -720,46 +760,66 @@ class _ExactCategoryCard extends StatelessWidget {
   }
 }
 
-class _GradientBg extends StatelessWidget {
-  final Color color;
-  const _GradientBg({required this.color});
+// ── Empty Subcategory Bento Invitation Content ────────────────────────────────
+
+class _EmptySubInvitationContent extends StatelessWidget {
+  final String title;
+  final String categoryKey;
+  final IconData categoryIcon;
+
+  const _EmptySubInvitationContent({
+    required this.title,
+    required this.categoryKey,
+    required this.categoryIcon,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final ext = context.ext;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
+      width: double.infinity,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            color.withValues(alpha: 0.7),
-            color.withValues(alpha: 0.4),
-          ],
+          colors: isDark
+              ? [
+                  const Color(0xFF1B1D2E),
+                  const Color(0xFF131422),
+                ]
+              : [
+                  const Color(0xFFFFFFFF),
+                  const Color(0xFFE8EAF6),
+                ],
         ),
       ),
-    );
-  }
-}
-
-class _CountBadge extends StatelessWidget {
-  final int count;
-  const _CountBadge({required this.count});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        '$count',
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-        ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ClayIconBadge(
+            icon: categoryIcon,
+            size: 22,
+            padding: 10,
+            gradientColors: AppColors.getCategoryGradient(categoryKey),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              color: ext.textPrimary,
+              letterSpacing: 0.5,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
