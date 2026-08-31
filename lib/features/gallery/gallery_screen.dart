@@ -926,37 +926,75 @@ class _CategoryBottomWaveBar extends StatelessWidget {
           // Center: Elevated Radiant Add Sub-Category Button
           Positioned(
             top: 0,
-            child: GestureDetector(
+            child: _CenterAddSubButton(
               onTap: onAddSub,
-              child: Container(
-                width: 58,
-                height: 58,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: ext.primaryGradient,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: ext.accent.withValues(alpha: isDark ? 0.55 : 0.45),
-                      blurRadius: 18,
-                      offset: const Offset(0, 7),
-                    ),
-                  ],
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.add_rounded,
-                    size: 28,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+              isDark: isDark,
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CenterAddSubButton extends StatefulWidget {
+  final VoidCallback onTap;
+  final bool isDark;
+
+  const _CenterAddSubButton({
+    required this.onTap,
+    required this.isDark,
+  });
+
+  @override
+  State<_CenterAddSubButton> createState() => _CenterAddSubButtonState();
+}
+
+class _CenterAddSubButtonState extends State<_CenterAddSubButton> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final ext = context.ext;
+
+    return AnimatedScale(
+      scale: _pressed ? 0.90 : 1.0,
+      duration: const Duration(milliseconds: 120),
+      curve: Curves.easeOutCubic,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _pressed = true),
+        onTapUp: (_) {
+          setState(() => _pressed = false);
+          HapticFeedback.mediumImpact();
+          widget.onTap();
+        },
+        onTapCancel: () => setState(() => _pressed = false),
+        child: Container(
+          width: 58,
+          height: 58,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: ext.primaryGradient,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: ext.accent.withValues(alpha: widget.isDark ? 0.55 : 0.45),
+                blurRadius: 18,
+                offset: const Offset(0, 7),
+              ),
+            ],
+          ),
+          child: const Center(
+            child: Icon(
+              Icons.add_rounded,
+              size: 28,
+              color: Colors.white,
+            ),
+          ),
+        ),
       ),
     );
   }
