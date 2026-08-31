@@ -475,12 +475,32 @@ class _GalleryScreenState extends State<GalleryScreen> {
                             count: subItems.length,
                             latestItem: latestSub,
                             isSelected: isSelected,
+                            categoryKey: widget.category,
+                            categoryIcon: icon,
                             onLongPress: () => _showSubCategoryActions(context, subName, subItems.length),
+                            onAddDirect: () {
+                              HapticFeedback.lightImpact();
+                              AddItemSheet.show(
+                                context,
+                                initialCategory: widget.category,
+                                initialSubCategory: subName,
+                              );
+                            },
                             onTap: () {
                               HapticFeedback.lightImpact();
-                              setState(() {
-                                _selectedSubFilter = _selectedSubFilter == subName ? null : subName;
-                              });
+                              if (subItems.isEmpty) {
+                                // 1-tap directly to add photo when empty!
+                                AddItemSheet.show(
+                                  context,
+                                  initialCategory: widget.category,
+                                  initialSubCategory: subName,
+                                );
+                              } else {
+                                // Filter dreams feed below
+                                setState(() {
+                                  _selectedSubFilter = _selectedSubFilter == subName ? null : subName;
+                                });
+                              }
                             },
                           );
                         },
@@ -628,7 +648,10 @@ class _SubCategoryCard extends StatefulWidget {
   final int count;
   final OrigoItem? latestItem;
   final bool isSelected;
+  final String categoryKey;
+  final IconData categoryIcon;
   final VoidCallback onTap;
+  final VoidCallback onAddDirect;
   final VoidCallback onLongPress;
 
   const _SubCategoryCard({
@@ -636,7 +659,10 @@ class _SubCategoryCard extends StatefulWidget {
     required this.count,
     required this.latestItem,
     required this.isSelected,
+    required this.categoryKey,
+    required this.categoryIcon,
     required this.onTap,
+    required this.onAddDirect,
     required this.onLongPress,
   });
 
@@ -707,6 +733,28 @@ class _SubCategoryCardState extends State<_SubCategoryCard> {
                           ),
                         ),
                       ),
+
+                      // Direct + Add Button in top right
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: GestureDetector(
+                          onTap: widget.onAddDirect,
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.add_rounded,
+                              size: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+
                       // Content
                       Positioned(
                         left: 12,
@@ -754,17 +802,32 @@ class _SubCategoryCardState extends State<_SubCategoryCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: ext.cardColor,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.folder_open_rounded,
-                            size: 18,
-                            color: ext.accent,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ClayIconBadge(
+                              icon: widget.categoryIcon,
+                              size: 16,
+                              padding: 8,
+                              gradientColors: AppColors.getCategoryGradient(widget.categoryKey),
+                              badgeColor: isDark ? const Color(0xFF1E2135) : const Color(0xFFFFFFFF),
+                            ),
+                            GestureDetector(
+                              onTap: widget.onAddDirect,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: ext.cardColor,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.add_rounded,
+                                  size: 16,
+                                  color: ext.accent,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
