@@ -341,20 +341,86 @@ class _SubCategorySheetState extends State<SubCategorySheet> {
                   ),
                 ],
               ),
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: ext.textMuted.withValues(alpha: 0.12),
-                    shape: BoxShape.circle,
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      HapticFeedback.mediumImpact();
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (dialogCtx) => AlertDialog(
+                          backgroundColor: ext.cardColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          title: Text(
+                            'Delete ${widget.category.displayName}?',
+                            style: TextStyle(
+                              color: ext.textPrimary,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          content: Text(
+                            items.isNotEmpty
+                                ? 'This will remove the "${widget.category.displayName}" collection and its ${items.length} dreams.'
+                                : 'Are you sure you want to remove the "${widget.category.displayName}" category?',
+                            style: TextStyle(color: ext.textMuted, fontSize: 13.5),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(dialogCtx, false),
+                              child: Text('Cancel', style: TextStyle(color: ext.textMuted)),
+                            ),
+                            ElevatedButton(
+                              onPressed: () => Navigator.pop(dialogCtx, true),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.error,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                              child: const Text('Delete'),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirm == true && context.mounted) {
+                        Navigator.pop(context);
+                        await itemsProv.deleteCategory(widget.category.key);
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppColors.error.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.delete_outline_rounded,
+                        size: 18,
+                        color: AppColors.error,
+                      ),
+                    ),
                   ),
-                  child: Icon(
-                    Icons.close_rounded,
-                    size: 18,
-                    color: ext.textMuted,
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: ext.textMuted.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 18,
+                        color: ext.textMuted,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),

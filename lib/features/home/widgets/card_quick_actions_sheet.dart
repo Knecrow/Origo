@@ -7,6 +7,7 @@ import '../../../core/models/origo_category.dart';
 import '../../../core/providers/items_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/smooth_page_route.dart';
 import '../../../core/widgets/clay_icon_badge.dart';
 import '../../add/add_item_sheet.dart';
 import '../../gallery/gallery_screen.dart';
@@ -41,8 +42,6 @@ class CardQuickActionsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
-    final isBuiltin = OrigoCategory.defaultCategories
-        .any((d) => d.key.toLowerCase() == category.key.toLowerCase());
 
     return Container(
       decoration: BoxDecoration(
@@ -143,65 +142,63 @@ class CardQuickActionsSheet extends StatelessWidget {
               Navigator.pop(context);
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => GalleryScreen(category: category.key),
+                SmoothPageRoute(
+                  child: GalleryScreen(category: category.key),
                 ),
               );
             },
           ),
+          const SizedBox(height: 10),
 
-          // Action 3: Delete (if custom or user created)
-          if (!isBuiltin) ...[
-            const SizedBox(height: 10),
-            _ActionTile(
-              icon: Icons.delete_outline_rounded,
-              iconColor: AppColors.error,
-              title: 'Delete Category',
-              subtitle: 'Remove category and all associated assets',
-              isDestructive: true,
-              onTap: () async {
-                HapticFeedback.mediumImpact();
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    backgroundColor: ctx.ext.cardColor,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)),
-                    title: const Text('Delete Category',
-                        style: TextStyle(fontWeight: FontWeight.w700)),
-                    content: Text(
-                        'Are you sure you want to delete "${category.displayName}" and all its assets?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx, false),
-                        child: Text('Cancel',
-                            style: TextStyle(color: ctx.ext.textMuted)),
+          // Action 3: Delete Category
+          _ActionTile(
+            icon: Icons.delete_outline_rounded,
+            iconColor: AppColors.error,
+            title: 'Delete Category',
+            subtitle: 'Remove category and all associated assets',
+            isDestructive: true,
+            onTap: () async {
+              HapticFeedback.mediumImpact();
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  backgroundColor: ctx.ext.cardColor,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  title: const Text('Delete Category',
+                      style: TextStyle(fontWeight: FontWeight.w700)),
+                  content: Text(
+                      'Are you sure you want to delete "${category.displayName}" and all its assets?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: Text('Cancel',
+                          style: TextStyle(color: ctx.ext.textMuted)),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(ctx, true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.error,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
-                      ElevatedButton(
-                        onPressed: () => Navigator.pop(ctx, true),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.error,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                        ),
-                        child: const Text('Delete'),
-                      ),
-                    ],
-                  ),
-                );
+                      child: const Text('Delete'),
+                    ),
+                  ],
+                ),
+              );
 
-                if (confirm == true && context.mounted) {
-                  await context
-                      .read<ItemsProvider>()
-                      .deleteCategory(category.key);
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                  }
+              if (confirm == true && context.mounted) {
+                await context
+                    .read<ItemsProvider>()
+                    .deleteCategory(category.key);
+                if (context.mounted) {
+                  Navigator.pop(context);
                 }
-              },
-            ),
-          ],
+              }
+            },
+          ),
         ],
       ),
     );
