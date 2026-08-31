@@ -402,35 +402,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
                   // ── 4. Sub-Categories Section (Editorial Bento Grid) ─────────
                   if (allSubCategories.isNotEmpty) ...[
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 14),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.alphabetic,
-                          children: [
-                            Text(
-                              'Sub-Categories',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                                color: ext.textPrimary,
-                                letterSpacing: -0.4,
-                              ),
-                            ),
-                            Text(
-                              '${allSubCategories.length}',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: ext.textMuted,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 14)),
 
                     // Subcategory Bento Grid (Exact EditorialBentoGrid Cards)
                     SliverPadding(
