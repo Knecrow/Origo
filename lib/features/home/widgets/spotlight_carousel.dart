@@ -99,6 +99,7 @@ class _SpotlightCard extends StatelessWidget {
           SmoothPageRoute(child: DetailScreen(item: item)),
         );
       },
+      onLongPress: () => _showSpotlightQuickActions(context, item),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -203,6 +204,194 @@ class _SpotlightCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _showSpotlightQuickActions(BuildContext context, OrigoItem item) {
+    HapticFeedback.mediumImpact();
+    final ext = context.ext;
+    final itemsProv = context.read<ItemsProvider>();
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (sheetCtx) => Container(
+        decoration: BoxDecoration(
+          color: ext.cardColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          boxShadow: [
+            BoxShadow(
+              color: ext.shadowDark.withValues(alpha: 0.25),
+              blurRadius: 28,
+              offset: const Offset(0, -8),
+            ),
+          ],
+        ),
+        padding: EdgeInsets.fromLTRB(
+          20,
+          12,
+          20,
+          MediaQuery.of(context).padding.bottom + 20,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: ext.textMuted.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              item.title,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: ext.textPrimary,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 16),
+            // Action 1: Edit Dream
+            ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              tileColor: ext.cardSecondaryColor,
+              leading: Icon(Icons.edit_rounded, color: ext.accent),
+              title: Text(
+                'Edit Dream',
+                style: TextStyle(fontWeight: FontWeight.w700, color: ext.textPrimary),
+              ),
+              onTap: () {
+                Navigator.pop(sheetCtx);
+                _promptEditDream(context, item);
+              },
+            ),
+            const SizedBox(height: 8),
+            // Action 2: Toggle Spotlight
+            ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              tileColor: ext.cardSecondaryColor,
+              leading: Icon(
+                item.isSpotlight ? Icons.star_rounded : Icons.star_border_rounded,
+                color: item.isSpotlight ? const Color(0xFFFFD700) : ext.textPrimary,
+              ),
+              title: Text(
+                item.isSpotlight ? 'Remove from Spotlight' : 'Pin to Spotlight',
+                style: TextStyle(fontWeight: FontWeight.w700, color: ext.textPrimary),
+              ),
+              onTap: () async {
+                HapticFeedback.lightImpact();
+                Navigator.pop(sheetCtx);
+                await itemsProv.toggleSpotlight(item);
+              },
+            ),
+            const SizedBox(height: 8),
+            // Action 3: Delete Dream
+            ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              tileColor: ext.cardSecondaryColor,
+              leading: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+              title: const Text(
+                'Delete Dream',
+                style: TextStyle(fontWeight: FontWeight.w700, color: Colors.redAccent),
+              ),
+              onTap: () async {
+                HapticFeedback.heavyImpact();
+                Navigator.pop(sheetCtx);
+                await itemsProv.deleteItem(item);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _promptEditDream(BuildContext context, OrigoItem item) {
+    HapticFeedback.lightImpact();
+    final ext = context.ext;
+    final titleCtrl = TextEditingController(text: item.title);
+    final subCtrl = TextEditingController(text: item.subCategory ?? '');
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        backgroundColor: ext.cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(
+          'Edit Dream',
+          style: TextStyle(
+            color: ext.textPrimary,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleCtrl,
+              autofocus: true,
+              style: TextStyle(color: ext.textPrimary),
+              decoration: InputDecoration(
+                labelText: 'Dream Title',
+                labelStyle: TextStyle(color: ext.textMuted),
+                filled: true,
+                fillColor: ext.cardSecondaryColor,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: subCtrl,
+              style: TextStyle(color: ext.textPrimary),
+              decoration: InputDecoration(
+                labelText: 'Sub-Category (Optional)',
+                labelStyle: TextStyle(color: ext.textMuted),
+                filled: true,
+                fillColor: ext.cardSecondaryColor,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: Text('Cancel', style: TextStyle(color: ext.textMuted)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final newTitle = titleCtrl.text.trim();
+              if (newTitle.isNotEmpty) {
+                HapticFeedback.mediumImpact();
+                final updated = item.copyWith(
+                  title: newTitle,
+                  subCategory: subCtrl.text.trim(),
+                );
+                await context.read<ItemsProvider>().updateItem(updated);
+                if (dialogCtx.mounted) Navigator.pop(dialogCtx);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ext.accent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+            child: const Text('Save'),
+          ),
+        ],
       ),
     );
   }

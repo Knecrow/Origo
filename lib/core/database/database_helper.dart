@@ -268,12 +268,21 @@ class DatabaseHelper {
     );
   }
 
+  Future<int> updateCategory(OrigoCategory category) async {
+    final db = await database;
+    return db.update(
+      'origo_categories',
+      category.toMap(),
+      where: 'key = ?',
+      whereArgs: [category.key],
+    );
+  }
+
   Future<int> deleteCategory(String key) async {
     final db = await database;
-    // Don't delete if it's default
     return db.delete(
       'origo_categories',
-      where: 'key = ? AND is_default = 0',
+      where: 'key = ?',
       whereArgs: [key],
     );
   }

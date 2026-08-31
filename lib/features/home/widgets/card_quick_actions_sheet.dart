@@ -39,6 +39,66 @@ class CardQuickActionsSheet extends StatelessWidget {
     );
   }
 
+  void _promptRenameCategory(BuildContext context) {
+    HapticFeedback.lightImpact();
+    final ext = context.ext;
+    final textCtrl = TextEditingController(text: category.displayName);
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        backgroundColor: ext.cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(
+          'Edit Category Name',
+          style: TextStyle(
+            color: ext.textPrimary,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: TextField(
+          controller: textCtrl,
+          autofocus: true,
+          style: TextStyle(color: ext.textPrimary),
+          decoration: InputDecoration(
+            hintText: 'Category Name',
+            filled: true,
+            fillColor: ext.cardSecondaryColor,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: Text('Cancel', style: TextStyle(color: ext.textMuted)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final val = textCtrl.text.trim();
+              if (val.isNotEmpty) {
+                HapticFeedback.mediumImpact();
+                final updated = category.copyWith(displayName: val.toUpperCase());
+                await context.read<ItemsProvider>().updateCategory(updated);
+                if (dialogCtx.mounted) Navigator.pop(dialogCtx);
+                if (context.mounted) Navigator.pop(context);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ext.accent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+            child: const Text('Save Changes'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ext = context.ext;
@@ -117,10 +177,20 @@ class CardQuickActionsSheet extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // Action 1: Add Dream
+          // Action 1: Edit Category Name
+          _ActionTile(
+            icon: Icons.edit_rounded,
+            iconColor: ext.accent,
+            title: 'Edit Category Name',
+            subtitle: 'Rename this collection',
+            onTap: () => _promptRenameCategory(context),
+          ),
+          const SizedBox(height: 10),
+
+          // Action 2: Add Dream
           _ActionTile(
             icon: Icons.add_photo_alternate_rounded,
-            iconColor: ext.accent,
+            iconColor: ext.textPrimary,
             title: 'Add Dream to ${category.displayName}',
             subtitle: 'Capture a new aspiration for this category',
             onTap: () {
@@ -131,7 +201,7 @@ class CardQuickActionsSheet extends StatelessWidget {
           ),
           const SizedBox(height: 10),
 
-          // Action 2: View Gallery
+          // Action 3: View Gallery
           _ActionTile(
             icon: Icons.grid_view_rounded,
             iconColor: ext.textPrimary,
@@ -150,7 +220,7 @@ class CardQuickActionsSheet extends StatelessWidget {
           ),
           const SizedBox(height: 10),
 
-          // Action 3: Delete Category
+          // Action 4: Delete Category
           _ActionTile(
             icon: Icons.delete_outline_rounded,
             iconColor: AppColors.error,

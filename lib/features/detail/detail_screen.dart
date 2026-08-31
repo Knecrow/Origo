@@ -93,6 +93,19 @@ class _DetailScreenState extends State<DetailScreen> {
                         ),
                         const Spacer(),
                         GestureDetector(
+                          onTap: () => _editDream(context),
+                          child: const FrostedGlassContainer(
+                            borderRadius: 14,
+                            padding: EdgeInsets.all(10),
+                            child: Icon(
+                              Icons.edit_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
                           onTap: _toggleSpotlight,
                           child: FrostedGlassContainer(
                             borderRadius: 14,
@@ -130,6 +143,91 @@ class _DetailScreenState extends State<DetailScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _editDream(BuildContext context) {
+    HapticFeedback.lightImpact();
+    final ext = context.ext;
+    final titleCtrl = TextEditingController(text: _item.title);
+    final subCtrl = TextEditingController(text: _item.subCategory ?? '');
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        backgroundColor: ext.cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(
+          'Edit Dream',
+          style: TextStyle(
+            color: ext.textPrimary,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleCtrl,
+              autofocus: true,
+              style: TextStyle(color: ext.textPrimary),
+              decoration: InputDecoration(
+                labelText: 'Dream Title',
+                labelStyle: TextStyle(color: ext.textMuted),
+                filled: true,
+                fillColor: ext.cardSecondaryColor,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: subCtrl,
+              style: TextStyle(color: ext.textPrimary),
+              decoration: InputDecoration(
+                labelText: 'Sub-Category (Optional)',
+                labelStyle: TextStyle(color: ext.textMuted),
+                filled: true,
+                fillColor: ext.cardSecondaryColor,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: Text('Cancel', style: TextStyle(color: ext.textMuted)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final newTitle = titleCtrl.text.trim();
+              if (newTitle.isNotEmpty) {
+                HapticFeedback.mediumImpact();
+                final updated = _item.copyWith(
+                  title: newTitle,
+                  subCategory: subCtrl.text.trim(),
+                );
+                await context.read<ItemsProvider>().updateItem(updated);
+                setState(() => _item = updated);
+                if (dialogCtx.mounted) Navigator.pop(dialogCtx);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ext.accent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+            child: const Text('Save'),
+          ),
+        ],
       ),
     );
   }

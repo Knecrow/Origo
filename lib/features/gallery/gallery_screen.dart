@@ -107,6 +107,70 @@ class _GalleryScreenState extends State<GalleryScreen> {
     );
   }
 
+  void _promptRenameSubCategory(BuildContext context, String oldSub) {
+    HapticFeedback.lightImpact();
+    final ext = context.ext;
+    final textCtrl = TextEditingController(text: oldSub);
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        backgroundColor: ext.cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(
+          'Rename Sub-Category',
+          style: TextStyle(
+            color: ext.textPrimary,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: TextField(
+          controller: textCtrl,
+          autofocus: true,
+          style: TextStyle(color: ext.textPrimary),
+          decoration: InputDecoration(
+            hintText: 'Sub-Category Name',
+            filled: true,
+            fillColor: ext.cardSecondaryColor,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: Text('Cancel', style: TextStyle(color: ext.textMuted)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final val = textCtrl.text.trim();
+              if (val.isNotEmpty && val != oldSub) {
+                HapticFeedback.mediumImpact();
+                setState(() {
+                  final idx = _customSubCategories.indexOf(oldSub);
+                  if (idx != -1) {
+                    _customSubCategories[idx] = val;
+                  }
+                });
+                await context.read<ItemsProvider>().renameSubCategory(widget.category, oldSub, val);
+                if (dialogCtx.mounted) Navigator.pop(dialogCtx);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ext.accent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+            child: const Text('Save Changes'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showSubCategoryActions(BuildContext context, String subName, int count) {
     HapticFeedback.mediumImpact();
     final ext = context.ext;
@@ -154,11 +218,26 @@ class _GalleryScreenState extends State<GalleryScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            // Action 1: Add Dream
+            // Action 1: Rename Sub-Category
             ListTile(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               tileColor: ext.cardSecondaryColor,
-              leading: Icon(Icons.add_photo_alternate_rounded, color: ext.accent),
+              leading: Icon(Icons.edit_rounded, color: ext.accent),
+              title: Text(
+                'Rename Sub-Category',
+                style: TextStyle(fontWeight: FontWeight.w700, color: ext.textPrimary),
+              ),
+              onTap: () {
+                Navigator.pop(sheetCtx);
+                _promptRenameSubCategory(context, subName);
+              },
+            ),
+            const SizedBox(height: 8),
+            // Action 2: Add Dream
+            ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              tileColor: ext.cardSecondaryColor,
+              leading: Icon(Icons.add_photo_alternate_rounded, color: ext.textPrimary),
               title: Text(
                 'Add Dream to $subName',
                 style: TextStyle(fontWeight: FontWeight.w700, color: ext.textPrimary),
@@ -173,7 +252,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
               },
             ),
             const SizedBox(height: 8),
-            // Action 2: Delete Sub-Category
+            // Action 3: Delete Sub-Category
             ListTile(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               tileColor: ext.cardSecondaryColor,

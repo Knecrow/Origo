@@ -125,10 +125,32 @@ class ItemsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateCategory(OrigoCategory category) async {
+    await _db.updateCategory(category);
+    final idx = _categories.indexWhere((c) => c.key == category.key);
+    if (idx != -1) {
+      _categories[idx] = category;
+      notifyListeners();
+    }
+  }
+
   Future<void> deleteCategory(String key) async {
     await _db.deleteCategory(key);
     _categories.removeWhere((c) => c.key == key);
     _items.removeWhere((i) => i.category == key);
+    notifyListeners();
+  }
+
+  Future<void> renameSubCategory(String categoryKey, String oldSub, String newSub) async {
+    final trimmedNew = newSub.trim();
+    if (trimmedNew.isEmpty) return;
+    for (int i = 0; i < _items.length; i++) {
+      if (_items[i].category == categoryKey && _items[i].subCategory == oldSub) {
+        final updated = _items[i].copyWith(subCategory: trimmedNew);
+        await _db.updateItem(updated);
+        _items[i] = updated;
+      }
+    }
     notifyListeners();
   }
 
@@ -185,6 +207,15 @@ class ItemsProvider extends ChangeNotifier {
     final idx = _items.indexWhere((i) => i.id == item.id);
     if (idx != -1) {
       _items[idx] = updated;
+      notifyListeners();
+    }
+  }
+
+  Future<void> updateItem(OrigoItem updatedItem) async {
+    await _db.updateItem(updatedItem);
+    final idx = _items.indexWhere((i) => i.id == updatedItem.id);
+    if (idx != -1) {
+      _items[idx] = updatedItem;
       notifyListeners();
     }
   }
