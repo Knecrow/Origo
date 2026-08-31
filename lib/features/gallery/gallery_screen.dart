@@ -424,8 +424,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
                               title: subName,
                               itemCount: subItems.length,
                               latestItem: latestSub,
-                              categoryKey: widget.category,
-                              categoryIcon: icon,
                               onLongPress: () => _showSubCategoryActions(context, subName, subItems.length),
                               onTap: () {
                                 HapticFeedback.lightImpact();
@@ -574,8 +572,6 @@ class _BentoSubCategoryCard extends StatefulWidget {
   final String title;
   final int itemCount;
   final OrigoItem? latestItem;
-  final String categoryKey;
-  final IconData categoryIcon;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
 
@@ -583,8 +579,6 @@ class _BentoSubCategoryCard extends StatefulWidget {
     required this.title,
     required this.itemCount,
     required this.latestItem,
-    required this.categoryKey,
-    required this.categoryIcon,
     required this.onTap,
     required this.onLongPress,
   });
@@ -655,8 +649,6 @@ class _BentoSubCategoryCardState extends State<_BentoSubCategoryCard> {
                         fit: BoxFit.cover,
                         errorWidget: _EmptySubInvitationContent(
                           title: widget.title,
-                          categoryKey: widget.categoryKey,
-                          categoryIcon: widget.categoryIcon,
                         ),
                       ),
 
@@ -722,8 +714,6 @@ class _BentoSubCategoryCardState extends State<_BentoSubCategoryCard> {
                   )
                 : _EmptySubInvitationContent(
                     title: widget.title,
-                    categoryKey: widget.categoryKey,
-                    categoryIcon: widget.categoryIcon,
                   ),
           ),
         ),
@@ -736,13 +726,9 @@ class _BentoSubCategoryCardState extends State<_BentoSubCategoryCard> {
 
 class _EmptySubInvitationContent extends StatelessWidget {
   final String title;
-  final String categoryKey;
-  final IconData categoryIcon;
 
   const _EmptySubInvitationContent({
     required this.title,
-    required this.categoryKey,
-    required this.categoryIcon,
   });
 
   @override
@@ -767,31 +753,20 @@ class _EmptySubInvitationContent extends StatelessWidget {
                 ],
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          ClayIconBadge(
-            icon: categoryIcon,
-            size: 22,
-            padding: 10,
-            gradientColors: AppColors.getCategoryGradient(categoryKey),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: Center(
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w900,
+            color: ext.textPrimary,
+            letterSpacing: 0.6,
           ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
-              color: ext.textPrimary,
-              letterSpacing: 0.5,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-          ),
-        ],
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+        ),
       ),
     );
   }
