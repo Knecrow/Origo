@@ -7,6 +7,7 @@ import '../../core/models/origo_item.dart';
 import '../../core/providers/items_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/smooth_page_route.dart';
 import '../../core/widgets/clay_icon_badge.dart';
 import '../../core/widgets/origo_image.dart';
 import '../add/add_item_sheet.dart';
@@ -285,7 +286,7 @@ class _GalleryTile extends StatelessWidget {
         HapticFeedback.lightImpact();
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => DetailScreen(item: item)),
+          SmoothPageRoute(child: DetailScreen(item: item)),
         );
       },
       child: Container(
