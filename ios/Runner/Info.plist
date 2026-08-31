@@ -9,7 +9,7 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>ORIGO needs access to your photo library to add images to your vision board.</string>
 	<key>CFBundleDisplayName</key>
-	<string>Origo</string>
+	<string>ORIGO</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
