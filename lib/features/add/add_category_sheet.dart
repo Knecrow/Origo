@@ -30,7 +30,6 @@ class AddCategorySheet extends StatefulWidget {
 class _AddCategorySheetState extends State<AddCategorySheet> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
-  final _displayCtrl = TextEditingController();
 
   IconData _selectedIcon = kAllSupportedCategoryIcons.first;
   bool _saving = false;
@@ -38,7 +37,6 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
   @override
   void dispose() {
     _nameCtrl.dispose();
-    _displayCtrl.dispose();
     super.dispose();
   }
 
@@ -48,16 +46,13 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
     setState(() => _saving = true);
     try {
       final name = _nameCtrl.text.trim();
-      final display = _displayCtrl.text.trim().isNotEmpty
-          ? _displayCtrl.text.trim().toUpperCase()
-          : name.toUpperCase();
 
       if (!mounted) return;
       final ext = context.ext;
 
       await context.read<ItemsProvider>().addCategory(
             name: name,
-            displayName: display,
+            displayName: name.toUpperCase(),
             icon: _selectedIcon,
             color: ext.accent,
           );
@@ -99,10 +94,10 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
         key: _formKey,
         child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Drag Handle
+              // Drag handle
               Center(
                 child: Container(
                   width: 40,
@@ -113,9 +108,9 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
 
-              // Header
+              // Title Row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -145,7 +140,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
               // Category Name
               Text(
@@ -160,6 +155,7 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: _nameCtrl,
+                autofocus: true,
                 style: TextStyle(color: ext.textPrimary, fontSize: 15),
                 decoration: InputDecoration(
                   hintText: 'e.g. Watches, Real Estate, Art',
@@ -172,40 +168,10 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                   contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16, vertical: 14),
                 ),
-                onChanged: (_) => setState(() {}),
                 validator: (v) =>
                     (v == null || v.trim().isEmpty) ? 'Please enter a name' : null,
               ),
-              const SizedBox(height: 16),
-
-              // Display Header Subtitle (Optional)
-              Text(
-                'DISPLAY TITLE (OPTIONAL)',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.2,
-                  color: ext.textMuted,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _displayCtrl,
-                style: TextStyle(color: ext.textPrimary, fontSize: 15),
-                decoration: InputDecoration(
-                  hintText: 'e.g. HOROLOGY & TIMEPIECES',
-                  filled: true,
-                  fillColor: ext.cardSecondaryColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 14),
-                ),
-                onChanged: (_) => setState(() {}),
-              ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 20),
 
               // Select Icon
               Text(
@@ -245,121 +211,39 @@ class _AddCategorySheetState extends State<AddCategorySheet> {
                   },
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 26),
 
-              // Live Preview Card
-              Text(
-                'LIVE PREVIEW',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.2,
-                  color: ext.textMuted,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                height: 74,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: ext.cardSecondaryColor,
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Row(
-                  children: [
-                    ClayIconBadge(
-                      icon: _selectedIcon,
-                      size: 18,
-                      padding: 8,
-                      iconColor: ext.accent,
-                      badgeColor: ext.cardColor,
+              // Create Collection CTA Button
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: _saving ? null : _save,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ext.accent,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _displayCtrl.text.trim().isNotEmpty
-                                ? _displayCtrl.text.trim().toUpperCase()
-                                : (_nameCtrl.text.trim().isNotEmpty
-                                    ? _nameCtrl.text.trim().toUpperCase()
-                                    : 'NEW COLLECTION'),
-                            style: TextStyle(
-                              color: ext.textMuted,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.2,
-                            ),
+                  ),
+                  child: _saving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            _nameCtrl.text.trim().isNotEmpty
-                                ? _nameCtrl.text.trim()
-                                : 'Collection Name',
-                            style: TextStyle(
-                              color: ext.textPrimary,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w800,
-                            ),
+                        )
+                      : const Text(
+                          'Create Collection',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.2,
                           ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: ext.textMuted.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        '0 Visions',
-                        style: TextStyle(
-                          color: ext.textPrimary,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Create Category Button
-              GestureDetector(
-                onTap: _saving ? null : _save,
-                child: Container(
-                  width: double.infinity,
-                  height: 54,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(27),
-                    gradient: LinearGradient(
-                      colors: ext.primaryGradient,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: ext.accent.withValues(alpha: 0.4),
-                        blurRadius: 16,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: _saving
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            'Create Collection',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                              letterSpacing: -0.2,
-                            ),
-                          ),
-                  ),
                 ),
               ),
             ],
