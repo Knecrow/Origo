@@ -64,13 +64,18 @@ class _AddItemSheetState extends State<AddItemSheet> {
       );
       if (result != null) {
         HapticFeedback.lightImpact();
+        String path;
         if (kIsWeb) {
           final bytes = await result.readAsBytes();
           final mime = result.mimeType ?? 'image/jpeg';
-          final base64String = 'data:$mime;base64,${base64Encode(bytes)}';
-          setState(() => _pickedImagePath = base64String);
+          path = 'data:$mime;base64,${base64Encode(bytes)}';
         } else {
-          setState(() => _pickedImagePath = result.path);
+          path = result.path;
+        }
+
+        setState(() => _pickedImagePath = path);
+        if (mounted) {
+          _openCropDialog(path);
         }
       }
     } catch (e) {
@@ -120,6 +125,7 @@ class _AddItemSheetState extends State<AddItemSheet> {
               if (val.isNotEmpty) {
                 setState(() => _pickedImagePath = val);
                 Navigator.pop(dialogCtx);
+                _openCropDialog(val);
               }
             },
             style: ElevatedButton.styleFrom(
@@ -130,6 +136,18 @@ class _AddItemSheetState extends State<AddItemSheet> {
             child: const Text('Use Image'),
           ),
         ],
+      ),
+    );
+  }
+
+  void _openCropDialog(String imagePath) {
+    showDialog(
+      context: context,
+      builder: (ctx) => _PhotoCropDialog(
+        imagePath: imagePath,
+        onDone: () {
+          Navigator.pop(ctx);
+        },
       ),
     );
   }
@@ -238,11 +256,16 @@ class _AddItemSheetState extends State<AddItemSheet> {
               ),
               const SizedBox(height: 16),
 
-              // 1. Photo Adder Box
+              // 1. Photo Adder Box with Adjust Crop Button
               _ImagePickerWidget(
                 imagePath: _pickedImagePath,
                 onTap: _pickImage,
                 onUrlTap: _promptUrlInput,
+                onCropTap: () {
+                  if (_pickedImagePath != null) {
+                    _openCropDialog(_pickedImagePath!);
+                  }
+                },
                 onRemove: () => setState(() => _pickedImagePath = null),
               ),
               const SizedBox(height: 18),
@@ -331,18 +354,20 @@ class _AddItemSheetState extends State<AddItemSheet> {
   }
 }
 
-// ── Ultra-Clean Image Picker Widget ───────────────────────────────────────────
+// ── Ultra-Clean Image Picker Widget with Crop & Framing Controls ──────────────
 
 class _ImagePickerWidget extends StatelessWidget {
   final String? imagePath;
   final VoidCallback onTap;
   final VoidCallback onUrlTap;
+  final VoidCallback onCropTap;
   final VoidCallback onRemove;
 
   const _ImagePickerWidget({
     required this.imagePath,
     required this.onTap,
     required this.onUrlTap,
+    required this.onCropTap,
     required this.onRemove,
   });
 
@@ -368,23 +393,40 @@ class _ImagePickerWidget extends StatelessWidget {
                 imagePath: imagePath!,
                 fit: BoxFit.cover,
               ),
-              // Change photo tap area
-              GestureDetector(
-                onTap: onTap,
-                behavior: HitTestBehavior.translucent,
-              ),
-              // Remove / Replace badges
+
+              // Action Badges (Crop, Change, Remove)
               Positioned(
                 top: 10,
                 right: 10,
                 child: Row(
                   children: [
+                    // Crop / Frame Button
+                    GestureDetector(
+                      onTap: onCropTap,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.65),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.crop_rounded, size: 14, color: Colors.white),
+                            SizedBox(width: 4),
+                            Text('Crop', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+
+                    // Change Photo Button
                     GestureDetector(
                       onTap: onTap,
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.6),
+                          color: Colors.black.withValues(alpha: 0.65),
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: const Row(
@@ -397,12 +439,14 @@ class _ImagePickerWidget extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 6),
+
+                    // Remove Button
                     GestureDetector(
                       onTap: onRemove,
                       child: Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.6),
+                          color: Colors.black.withValues(alpha: 0.65),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.close_rounded, size: 14, color: Colors.white),
@@ -493,4 +537,169 @@ class _ImagePickerWidget extends StatelessWidget {
       ),
     );
   }
+}
+
+// ── Interactive Photo Framing & Crop Dialog ───────────────────────────────────
+
+class _PhotoCropDialog extends StatefulWidget {
+  final String imagePath;
+  final VoidCallback onDone;
+
+  const _PhotoCropDialog({
+    required this.imagePath,
+    required this.onDone,
+  });
+
+  @override
+  State<_PhotoCropDialog> createState() => _PhotoCropDialogState();
+}
+
+class _PhotoCropDialogState extends State<_PhotoCropDialog> {
+  @override
+  Widget build(BuildContext context) {
+    final ext = context.ext;
+
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
+      child: Container(
+        decoration: BoxDecoration(
+          color: ext.cardColor,
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.4),
+              blurRadius: 30,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Frame Photo',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: ext.textPrimary,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: ext.cardSecondaryColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.close_rounded, size: 18, color: ext.textMuted),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Pinch to zoom & drag to align the perfect framing',
+              style: TextStyle(fontSize: 12, color: ext.textMuted),
+            ),
+            const SizedBox(height: 16),
+
+            // Interactive Framing Viewport
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                height: 280,
+                width: double.infinity,
+                color: Colors.black,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    InteractiveViewer(
+                      minScale: 0.8,
+                      maxScale: 4.0,
+                      child: Center(
+                        child: OrigoImage(
+                          imagePath: widget.imagePath,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+
+                    // Rule of thirds framing grid overlay
+                    IgnorePointer(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.35), width: 1.5),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: CustomPaint(
+                          size: const Size(double.infinity, 280),
+                          painter: _FramingGridPainter(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Confirm Button
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                  HapticFeedback.mediumImpact();
+                  widget.onDone();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ext.accent,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+                child: const Text(
+                  'Apply Framing',
+                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Subtle Composition Grid Painter ───────────────────────────────────────────
+
+class _FramingGridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.15)
+      ..strokeWidth = 1.0;
+
+    final x1 = size.width / 3;
+    final x2 = (size.width / 3) * 2;
+    final y1 = size.height / 3;
+    final y2 = (size.height / 3) * 2;
+
+    // Vertical lines
+    canvas.drawLine(Offset(x1, 0), Offset(x1, size.height), paint);
+    canvas.drawLine(Offset(x2, 0), Offset(x2, size.height), paint);
+
+    // Horizontal lines
+    canvas.drawLine(Offset(0, y1), Offset(size.width, y1), paint);
+    canvas.drawLine(Offset(0, y2), Offset(size.width, y2), paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
